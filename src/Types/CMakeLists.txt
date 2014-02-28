@@ -2,11 +2,11 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # If DCL provides any additional libraries - add them here
 
-# # Get soource files of library 
+# # Get soource files of library
 # FILE(GLOB lib_src *.cpp)
-# ADD_LIBRARY(SIFTObjectModelTypes SHARED ${lib_src})
+# ADD_LIBRARY(PCLTypes SHARED ${lib_src})
 # # Link with other libraries
-# TARGET_LINK_LIBRARIES(SIFTObjectModelTypes ${OpenCV_LIBRARIES})
+# TARGET_LINK_LIBRARIES(PCLTypes ${OpenCV_LIBRARIES})
 #
 # # Install library
 # INSTALL(
@@ -18,12 +18,12 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # If DCL provides any additional headers to be used from outside of it, add them
 
-# # Get list of header files
-# FILE(GLOB headers *.hpp)
-#
-# # Install them to include subdirectory
-# install(
-#     FILES ${headers}
-#     DESTINATION include/Types
-#     COMPONENT sdk
-# )
+ # Get list of header files
+ FILE(GLOB headers *.hpp)
+
+ # Install them to include subdirectory
+ install(
+     FILES ${headers}
+     DESTINATION include/Types
+     COMPONENT sdk
+ )
