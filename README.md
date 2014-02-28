@@ -16,5 +16,7 @@ DCL depends on the following DCLs:
 Maintainer
 ----------
 
-Michał Laszkowski
-Tomasz Kornuta
+- [Michał Laszkowski](https://github.com/mlaszko)
+
+- [Tomasz Kornuta](https://github.com/tkornuta)
+
