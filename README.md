@@ -4,14 +4,17 @@ SIFTObjectModel - DisCODe Component Library
 Description
 -----------
 
-Fill this section with description of this library.
+DCL containing components responsible for generation of SIFTObjecModels (SOMs), their saving to files, loading models from files etc.
 
 Dependencies
 ------------
 
-Put here any dependencies of this library (other DCLs, third party libraries etc)
+DCL depends on the following DCLs:
+- CvBasic (extraction SIFTs, types etc.)
+- PCL (transformation to point clouds, types etc.)
 
 Maintainer
 ----------
 
-Provide any information about yourself
+Michał Laszkowski
+Tomasz Kornuta
