@@ -8,9 +8,9 @@ FILE(GLOB files *.cpp)
 FIND_PACKAGE( OpenCV REQUIRED )
 
 # Create an executable file from sources:
-ADD_LIBRARY(Update SHARED ${files})
+ADD_LIBRARY(SOMGenerator SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(Update ${OpenCV_LIBS} ${DisCODe_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} )
+TARGET_LINK_LIBRARIES(SOMGenerator ${OpenCV_LIBS} ${DisCODe_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} )
 
-INSTALL_COMPONENT(Update)
+INSTALL_COMPONENT(SOMGenerator)

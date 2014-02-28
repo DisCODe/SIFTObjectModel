@@ -4,8 +4,8 @@
  * \author Micha Laszkowski
  */
 
-#ifndef UPDATE_HPP_
-#define UPDATE_HPP_
+#ifndef SOMGENERATOR_HPP_
+#define SOMGENERATOR_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -25,25 +25,25 @@
 #include <opencv2/core/core.hpp>
 
 namespace Processors {
-namespace Update {
+namespace SOMGenerator {
 
 /*!
- * \class Update
- * \brief Update processor class.
+ * \class SOMGenerator
+ * \brief SOMGenerator processor class.
  *
- * Update processor.
+ * SOMGenerator processor.
  */
-class Update: public Base::Component,SIFTObjectModelFactory {
+class SOMGenerator: public Base::Component,SIFTObjectModelFactory {
 public:
 	/*!
 	 * Constructor.
 	 */
-	Update(const std::string & name = "Update");
+    SOMGenerator(const std::string & name = "SOMGenerator");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~Update();
+    virtual ~SOMGenerator();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -95,10 +95,10 @@ protected:
 
 
 	// Handlers
-	Base::EventHandler2 h_update;
+    Base::EventHandler2 h_addViewToModel;
 	
 	// Handlers
-	void update();
+    void addViewToModel();
 
 	/// Computes the transformation between two XYZSIFT clouds basing on the found correspondences.
 	Eigen::Matrix4f computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg, 
@@ -124,12 +124,12 @@ protected:
 */	
 };
 
-} //: namespace Update
+} //: namespace SOMGenerator
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("Update", Processors::Update::Update)
+REGISTER_COMPONENT("SOMGenerator", Processors::SOMGenerator::SOMGenerator)
 
-#endif /* UPDATE_HPP_ */
+#endif /* SOMGENERATOR_HPP_ */

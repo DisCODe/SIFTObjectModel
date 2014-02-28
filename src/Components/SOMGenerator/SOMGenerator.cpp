@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-#include "Update.hpp"
+#include "SOMGenerator.hpp"
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
@@ -45,7 +45,7 @@
 
 
 namespace Processors {
-namespace Update {
+namespace SOMGenerator {
 
 
 
@@ -103,7 +103,7 @@ class SIFTFeatureRepresentation: public pcl::DefaultFeatureRepresentation <Point
 };
 
 
-Eigen::Matrix4f Update::computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg, 
+Eigen::Matrix4f SOMGenerator::computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg,
 		const pcl::CorrespondencesConstPtr& correspondences, pcl::Correspondences& inliers)
 {
 	CLOG(LTRACE) << "Computing SAC" << std::endl ;	
@@ -123,15 +123,15 @@ Eigen::Matrix4f Update::computeTransformationSAC(const pcl::PointCloud<PointXYZS
 	return sac.getBestTransformation() ;
 }
 
-Update::Update(const std::string & name) :
+SOMGenerator::SOMGenerator(const std::string & name) :
 		Base::Component(name)  {
 
 }
 
-Update::~Update() {
+SOMGenerator::~SOMGenerator() {
 }
 
-void Update::prepareInterface() {
+void SOMGenerator::prepareInterface() {
 	// Register data streams.
 	registerStream("in_cloud_xyzrgb", &in_cloud_xyzrgb);
 	registerStream("in_cloud_xyzsift", &in_cloud_xyzsift);
@@ -139,15 +139,16 @@ void Update::prepareInterface() {
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
-	// Register single handler - the "Update" function.
-	h_update.setup(boost::bind(&Update::update, this));
-	registerHandler("update", &h_update);
-	addDependency("update", &in_cloud_xyzsift);
-	addDependency("update", &in_cloud_xyzrgb);
+
+    // Register single handler - the "addViewToModel" function.
+    h_addViewToModel.setup(boost::bind(&SOMGenerator::addViewToModel, this));
+    registerHandler("addViewToModel", &h_addViewToModel);
+    addDependency("addViewToModel", &in_cloud_xyzsift);
+    addDependency("addViewToModel", &in_cloud_xyzrgb);
 
 }
 
-bool Update::onInit() {
+bool SOMGenerator::onInit() {
 	// Number of viewpoints.
 	counter = 0;
 	// Mean number of features per view. 
@@ -167,15 +168,15 @@ bool Update::onInit() {
 	return true;
 }
 
-bool Update::onFinish() {
+bool SOMGenerator::onFinish() {
 	return true;
 }
 
-bool Update::onStop() {
+bool SOMGenerator::onStop() {
 	return true;
 }
 
-bool Update::onStart() {
+bool SOMGenerator::onStart() {
 	return true;
 }
 
@@ -310,8 +311,8 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
  }
 
 
-void Update::update() {
-	CLOG(LTRACE) << "Update::update";
+void SOMGenerator::addViewToModel() {
+    CLOG(LTRACE) << "SOMGenerator::addViewToModel";
 	
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud = in_cloud_xyzrgb.read();
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift = in_cloud_xyzsift.read();
@@ -352,7 +353,7 @@ void Update::update() {
 		return;
 	}
 
-	// Update view count and feature numbers.
+    // SOMGenerator view count and feature numbers.
 	counter++;
 	total_viewpoint_features_number += cloud_sift->size();
 	
@@ -380,7 +381,7 @@ void Update::update() {
 
 	//displayCorrespondences(cloud_next, cloud_sift_next, cloud_prev, cloud_sift_prev, correspondences, viewer) ;
 
-	// Compute transformation between clouds and update global transformation of cloud.
+    // Compute transformation between clouds and SOMGenerator global transformation of cloud.
 	pcl::Correspondences inliers;
 	Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
 	if (current_trans == Eigen::Matrix4f::Identity()){
@@ -472,5 +473,5 @@ void Update::update() {
 
 
 
-} //: namespace Update
+} //: namespace SOMGenerator
 } //: namespace Processors
