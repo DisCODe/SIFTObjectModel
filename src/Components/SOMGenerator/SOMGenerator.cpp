@@ -124,8 +124,10 @@ Eigen::Matrix4f SOMGenerator::computeTransformationSAC(const pcl::PointCloud<Poi
 }
 
 SOMGenerator::SOMGenerator(const std::string & name) :
-		Base::Component(name)  {
-
+    Base::Component(name),
+    prop_ICP_alignment("alignment.use ICP", false)
+{
+    registerProperty(prop_ICP_alignment);
 }
 
 SOMGenerator::~SOMGenerator() {
@@ -413,37 +415,39 @@ void SOMGenerator::addViewToModel() {
 	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
-	// Use ICP to get "better" transformation.
-	pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB> icp;
+    if (prop_ICP_alignment) {
+        // Use ICP to get "better" transformation.
+        pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB> icp;
 
-//	max_correspondence_distance_ (1.0*1.0),
-//	nr_iterations_ (500)
-//	normal_radius_ (0.2),
-//	feature_radius_ (0.2) 
+    //	max_correspondence_distance_ (1.0*1.0),
+    //	nr_iterations_ (500)
+    //	normal_radius_ (0.2),
+    //	feature_radius_ (0.2)
 
-	// Set the max correspondence distance to 5cm (e.g., correspondences with higher distances will be ignored)
-	icp.setMaxCorrespondenceDistance (0.005);
-	// Set the maximum number of iterations (criterion 1)
-	icp.setMaximumIterations (50);
-	// Set the transformation epsilon (criterion 2)
-	icp.setTransformationEpsilon (1e-8);
-	// Set the euclidean distance difference epsilon (criterion 3)
-	icp.setEuclideanFitnessEpsilon (1);
+        // Set the max correspondence distance to 5cm (e.g., correspondences with higher distances will be ignored)
+        icp.setMaxCorrespondenceDistance (0.005);
+        // Set the maximum number of iterations (criterion 1)
+        icp.setMaximumIterations (50);
+        // Set the transformation epsilon (criterion 2)
+        icp.setTransformationEpsilon (1e-8);
+        // Set the euclidean distance difference epsilon (criterion 3)
+        icp.setEuclideanFitnessEpsilon (1);
 
-	icp.setInputSource(cloud_merged);
-	icp.setInputTarget(cloud);
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr Final (new pcl::PointCloud<pcl::PointXYZRGB>());
-	icp.align(*Final);
-	CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
+        icp.setInputSource(cloud_merged);
+        icp.setInputTarget(cloud);
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr Final (new pcl::PointCloud<pcl::PointXYZRGB>());
+        icp.align(*Final);
+        CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
 
-	// Get the transformation from target to source.
-	current_trans = icp.getFinalTransformation().inverse();
-	CLOG(LINFO) << "ICP transformation refinement: " << std::endl << current_trans;
+        // Get the transformation from target to source.
+        current_trans = icp.getFinalTransformation().inverse();
+        CLOG(LINFO) << "ICP transformation refinement: " << std::endl << current_trans;
 
-	// Refine the 	
-	pcl::transformPointCloud(*cloud, *cloud, current_trans);
-	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+        // Refine the transformation.
+        pcl::transformPointCloud(*cloud, *cloud, current_trans);
+        pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
+    }//: ICP alignment
 /*
 	Eigen::Matrix4f icp_trans;
 	pairAlign (cloud_merged, cloud, icp_trans, false); 

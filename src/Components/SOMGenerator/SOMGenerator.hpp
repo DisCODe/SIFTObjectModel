@@ -114,7 +114,10 @@ protected:
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
-	
+
+    /// Alignment mode: use ICP alignment or not.
+    Base::Property<bool> prop_ICP_alignment;
+
 /*	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_prev ;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_next ;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_to_merge;
