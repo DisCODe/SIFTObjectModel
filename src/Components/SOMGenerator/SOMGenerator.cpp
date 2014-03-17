@@ -11,7 +11,7 @@
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
-///////////////////////////////////////////
+
 #include <string>
 #include <cmath>
 
@@ -31,9 +31,7 @@
 #include "pcl/registration/correspondence_rejection_sample_consensus.h"
 
 #include <pcl/io/pcd_io.h>
-#include <pcl/visualization/cloud_viewer.h>
-#include <pcl/visualization/point_cloud_color_handlers.h>
-////////////////////////////////////////////////////////////////////////
+
 #include <pcl/filters/filter.h>
 
 #include<pcl/registration/icp.h>

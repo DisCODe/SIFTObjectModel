@@ -17,3 +17,5 @@ ADD_COMPONENT(CloudCutter)
 ADD_COMPONENT(Downsampling)
 
 ADD_COMPONENT(PC2Octree)
+
+ADD_COMPONENT(CorrespondencesViewer)
