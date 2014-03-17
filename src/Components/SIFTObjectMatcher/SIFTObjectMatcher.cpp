@@ -49,8 +49,10 @@ class SIFTFeatureRepresentation: public pcl::DefaultFeatureRepresentation<PointX
 
 SIFTObjectMatcher::SIFTObjectMatcher(const std::string & name) :
 		Base::Component(name),
-		threshold("threshold", 0.75f)  {
+		threshold("threshold", 0.75f),
+		inlier_threshold("inlier_threshold", 0.001f)  {
 			registerProperty(threshold);
+			registerProperty(inlier_threshold);
 }
 
 SIFTObjectMatcher::~SIFTObjectMatcher() {
@@ -149,7 +151,7 @@ void SIFTObjectMatcher::match() {
         	pcl::registration::CorrespondenceRejectorSampleConsensus<PointXYZSIFT> sac ;
 			sac.setInputSource(cloud_xyzsift) ;
 			sac.setInputTarget(models[i]->cloud_xyzsift) ;
-			sac.setInlierThreshold(0.001f) ;
+			sac.setInlierThreshold(inlier_threshold) ;
 			sac.setMaximumIterations(2000) ;
 			sac.setInputCorrespondences(correspondences) ;
 			sac.getCorrespondences(inliers) ;

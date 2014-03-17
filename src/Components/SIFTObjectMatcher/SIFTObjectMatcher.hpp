@@ -91,6 +91,7 @@ protected:
 	std::vector<SIFTObjectModel*> models;
 	
 	Base::Property<float> threshold;
+	Base::Property<float> inlier_threshold;
 
 };
 
