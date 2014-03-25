@@ -82,11 +82,11 @@ protected:
 
 	// Handlers
 	Base::EventHandler2 h_on_clouds;
-
+	Base::EventHandler2 h_on_spin;
 	
 	// Handlers
 	void on_clouds();
-	
+	void on_spin();
 	
 	
 	Base::Property<std::string> prop_window_name;

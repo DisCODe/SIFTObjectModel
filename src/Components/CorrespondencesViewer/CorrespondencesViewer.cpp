@@ -43,7 +43,10 @@ registerStream("in_correspondences", &in_correspondences);
 	addDependency("on_clouds", &in_cloud_xyzrgb1);
 	addDependency("on_clouds", &in_correspondences);
 	addDependency("on_clouds", &in_cloud_xyzrgb2);
-
+	// Register spin handler.
+	h_on_spin.setup(boost::bind(&CorrespondencesViewer::on_spin, this));
+	registerHandler("on_spin", &h_on_spin);
+	addDependency("on_spin", NULL);
 }
 
 bool CorrespondencesViewer::onInit() {
@@ -111,6 +114,9 @@ void CorrespondencesViewer::on_clouds() {
 	
 }
 
+void CorrespondencesViewer::on_spin() {
+	viewer->spinOnce (100);
+}
 
 
 } //: namespace CorrespondencesViewer
