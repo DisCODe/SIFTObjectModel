@@ -8,9 +8,9 @@ FILE(GLOB files *.cpp)
 
 
 # Create an executable file from sources:
-ADD_LIBRARY(CorrespondencesViewer SHARED ${files})
+ADD_LIBRARY(SIFTClusterExtraction SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(CorrespondencesViewer ${DisCODe_LIBRARIES} ${PCL_LIBRARIES} )
+TARGET_LINK_LIBRARIES(SIFTClusterExtraction ${DisCODe_LIBRARIES} ${PCL_LIBRARIES} )
 
-INSTALL_COMPONENT(CorrespondencesViewer)
+INSTALL_COMPONENT(SIFTClusterExtraction)

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Michał Laszkowski</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>ClustersViewer</brief>
+			<full></full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Processing">
+			<Executor name="Exec1"  period="1">
+				<Component name="Source" type="SIFTObjectModel:PCDReader" priority="1" bump="0">
+					<param name="filename">/home/mlaszkow/jsonmodels/CB1_xyzsift.pcd</param>
+				</Component>
+				<Component name="ClusterExtraction" type="SIFTObjectModel:SIFTClusterExtraction" priority="1" bump="0">
+				</Component>
+
+			</Executor>
+		</Subtask>
+		
+		<Subtask name="Visualisation">
+			<Executor name="Exec2" period="1">
+				<Component name="Window" type="PCL:ClustersViewer" priority="1" bump="0">
+				</Component>
+			</Executor>
+		</Subtask>
+	
+	</Subtasks>
+	
+	<!-- connections between events and handelrs -->
+	<Events>
+	</Events>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+		<Source name="Source.out_cloud_xyz">
+			<sink>ClusterExtraction.in_cloud_xyzsift</sink>
+		</Source>
+		<Source name="ClusterExtraction.out_clusters_xyz">
+			<sink>Window.in_clouds</sink>
+		</Source>
+	</DataStreams>
+</Task>
+
+
+
+

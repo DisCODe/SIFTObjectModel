@@ -15,8 +15,10 @@
 
 #include <pcl/visualization/pcl_visualizer.h>
 #include <Types/PointXYZSIFT.hpp> 
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
+//#include <pcl/point_types.h>
+//#include <pcl/point_cloud.h>
+
+//#include <pcl/visualization/point_cloud_geometry_handlers.h>
 
 namespace Processors {
 namespace CorrespondencesViewer {

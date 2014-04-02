@@ -11,8 +11,7 @@
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
-#include <pcl/visualization/cloud_viewer.h>
-#include <pcl/visualization/point_cloud_color_handlers.h>
+//#include <pcl/visualization/point_cloud_color_handlers.h>
 #include <pcl/registration/correspondence_estimation.h>
 
 namespace Processors {
@@ -95,17 +94,21 @@ void CorrespondencesViewer::on_clouds() {
 	viewer->removePointCloud("viewcloud1") ;
 	viewer->addPointCloud<pcl::PointXYZRGB>(cloud_xyzrgb1, color_distribution1, "viewcloud1") ;
 	viewer->removePointCloud("siftcloud1") ;
-	viewer->addPointCloud<PointXYZSIFT>(cloud_xyzsift1, "siftcloud1") ;
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz1(new pcl::PointCloud<pcl::PointXYZ>); 
+	pcl::copyPointCloud(*cloud_xyzsift1,*cloud_xyz1);
+	viewer->addPointCloud<pcl::PointXYZ>(cloud_xyz1, "siftcloud1") ;
 	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "siftcloud1");
-	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 255, 0, 0, "siftcloud1");
+	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 0, 255, 0, "siftcloud1");
 
 	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> color_distribution2(cloud_xyzrgb2trans);
 	viewer->removePointCloud("viewcloud2") ;
 	viewer->addPointCloud<pcl::PointXYZRGB>(cloud_xyzrgb2trans, color_distribution2, "viewcloud2") ;
 	viewer->removePointCloud("siftcloud2") ;
-	viewer->addPointCloud<PointXYZSIFT>(cloud_xyzsift2trans, "siftcloud2") ;
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz2(new pcl::PointCloud<pcl::PointXYZ>); 
+	pcl::copyPointCloud(*cloud_xyzsift2trans,*cloud_xyz2);
+	viewer->addPointCloud<pcl::PointXYZ>(cloud_xyz2, "siftcloud2") ;
 	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "siftcloud2");
-	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 255, 0, 0, "siftcloud2");
+	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 0, 255, 0, "siftcloud2");
 
 	//Display correspondences
 	viewer->removeCorrespondences("correspondences") ;
