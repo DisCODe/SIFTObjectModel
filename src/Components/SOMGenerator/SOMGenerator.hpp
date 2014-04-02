@@ -121,8 +121,18 @@ protected:
 	Eigen::Matrix4f global_trans;
 
     /// Alignment mode: use ICP alignment or not.
+	/// ICP properties
     Base::Property<bool> prop_ICP_alignment;
   //  Base::Property<bool> prop_ICP_iterations;
+    Base::Property<float> ICP_transformation_epsilon;
+    Base::Property<float> ICP_max_correspondence_distance;
+    Base::Property<int> ICP_max_iterations;
+
+    ///RanSAC Properties
+    Base::Property<float> RanSAC_inliers_threshold;
+    Base::Property<float> RanSAC_max_iterations;
+
+
 
 /*	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_prev ;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_next ;

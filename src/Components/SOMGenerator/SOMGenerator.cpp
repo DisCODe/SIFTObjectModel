@@ -111,8 +111,8 @@ Eigen::Matrix4f SOMGenerator::computeTransformationSAC(const pcl::PointCloud<Poi
 	pcl::registration::CorrespondenceRejectorSampleConsensus<PointXYZSIFT> sac ;
 	sac.setInputSource(cloud_src) ;
 	sac.setInputTarget(cloud_trg) ;
-	sac.setInlierThreshold(0.01f) ;
-	sac.setMaximumIterations(2000) ;
+	sac.setInlierThreshold(0.01f) ; //property RanSAC
+	sac.setMaximumIterations(2000) ; //property RanSAC
 	sac.setInputCorrespondences(correspondences) ;
 	sac.getCorrespondences(inliers) ;
 
@@ -254,10 +254,12 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
   //
   // Align
   pcl::IterativeClosestPointNonLinear<PointNormalT, PointNormalT> reg;
-  reg.setTransformationEpsilon (1e-6);
+
+  reg.setTransformationEpsilon (1e-6); //property ICP
+
   // Set the maximum distance between two correspondences (src<->tgt) to 10cm
   // Note: adjust this based on the size of your datasets
-  reg.setMaxCorrespondenceDistance (0.1);  
+  reg.setMaxCorrespondenceDistance (0.1);  //property ICP
   // Set the point representation
   reg.setPointRepresentation (boost::make_shared<const MyPointRepresentation> (point_representation));
 
@@ -270,8 +272,8 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
   // Run the same optimization in a loop and visualize the results
   Eigen::Matrix4f Ti = Eigen::Matrix4f::Identity (), prev, targetToSource;
   PointCloudWithNormals::Ptr reg_result = points_with_normals_src;
-  reg.setMaximumIterations (2);
-  for (int i = 0; i < 30; ++i)
+  reg.setMaximumIterations (2); //property ICP
+  for (int i = 0; i < 30; ++i) //magiczna liczba 30 :D
   {
     PCL_INFO ("Iteration Nr. %d.\n", i);
 
@@ -405,7 +407,7 @@ void SOMGenerator::addViewToModel() {
 
 	int count=0;
 
-	while ( (inliers.size()) < 10 && (count <50))
+	while ( (inliers.size()) < 10 && (count <50)) //ICP property ?
 	{
 
 		Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
@@ -453,13 +455,13 @@ void SOMGenerator::addViewToModel() {
     //	feature_radius_ (0.2)
 
         // Set the max correspondence distance to 5cm (e.g., correspondences with higher distances will be ignored)
-        icp.setMaxCorrespondenceDistance (0.005);
+        icp.setMaxCorrespondenceDistance (0.005); //zmienic na property
         // Set the maximum number of iterations (criterion 1)
-        icp.setMaximumIterations (50);
+        icp.setMaximumIterations (50); //zmienic na property
         // Set the transformation epsilon (criterion 2)
-        icp.setTransformationEpsilon (1e-8);
+        icp.setTransformationEpsilon (1e-8); //zmienic na property
         // Set the euclidean distance difference epsilon (criterion 3)
-        icp.setEuclideanFitnessEpsilon (1);
+        icp.setEuclideanFitnessEpsilon (1); //zmienic na property
 
         icp.setInputSource(cloud_merged);
         icp.setInputTarget(cloud);
