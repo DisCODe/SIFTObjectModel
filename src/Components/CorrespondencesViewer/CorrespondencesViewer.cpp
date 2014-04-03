@@ -19,9 +19,37 @@ namespace CorrespondencesViewer {
 
 CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 		Base::Component(name),
-		prop_window_name("window_name", std::string("Correspondences Viewer"))  {
+		prop_window_name("window_name", std::string("Correspondences Viewer")),
+		cloud_xyzsift1_point_size("cloud_xyzsift1_point_size", 5), 
+		cloud_xyzsift2_point_size("cloud_xyzsift2_point_size", 5),
+		clouds_colours("clouds_colours", cv::Mat(cv::Mat::zeros(2, 3, CV_8UC1))),
+		correspondences_colours("correspondences_colours", cv::Mat(cv::Mat::zeros(1, 3, CV_8UC1))),
+		display_cloud_xyzrgb1("display_cloud_xyzrgb1", true),
+		display_cloud_xyzrgb2("display_cloud_xyzrgb2", true),
+		display_cloud_xyzsift1("display_cloud_xyzsift1", true),
+		display_cloud_xyzsift2("display_cloud_xyzsift2", true),
+		display_correspondences("display_correspondences", true) {
 			registerProperty(prop_window_name);
-
+			registerProperty(cloud_xyzsift1_point_size);
+			registerProperty(cloud_xyzsift2_point_size);
+			registerProperty(clouds_colours);
+			registerProperty(correspondences_colours);
+			registerProperty(display_cloud_xyzrgb1);
+			registerProperty(display_cloud_xyzrgb2);
+			registerProperty(display_cloud_xyzsift1);
+			registerProperty(display_cloud_xyzsift2);
+			registerProperty(display_correspondences);
+			
+			  // Set red as default.
+			((cv::Mat)clouds_colours).at<uchar>(0,0) = 255;
+			((cv::Mat)clouds_colours).at<uchar>(0,1) = 0;
+			((cv::Mat)clouds_colours).at<uchar>(0,2) = 0;
+			((cv::Mat)clouds_colours).at<uchar>(1,0) = 255;
+			((cv::Mat)clouds_colours).at<uchar>(1,1) = 0;
+			((cv::Mat)clouds_colours).at<uchar>(1,2) = 0;
+			((cv::Mat)correspondences_colours).at<uchar>(0,0) = 255;
+			((cv::Mat)correspondences_colours).at<uchar>(0,1) = 0;
+			((cv::Mat)correspondences_colours).at<uchar>(0,2) = 0;
 }
 
 CorrespondencesViewer::~CorrespondencesViewer() {
@@ -90,31 +118,52 @@ void CorrespondencesViewer::on_clouds() {
 	pcl::transformPointCloud(*cloud_xyzsift2, *cloud_xyzsift2trans, trans) ;
 	
 	//Display clouds
-	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> color_distribution1(cloud_xyzrgb1);
+	
 	viewer->removePointCloud("viewcloud1") ;
-	viewer->addPointCloud<pcl::PointXYZRGB>(cloud_xyzrgb1, color_distribution1, "viewcloud1") ;
+	if(display_cloud_xyzrgb1){
+		pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> color_distribution1(cloud_xyzrgb1);
+		viewer->addPointCloud<pcl::PointXYZRGB>(cloud_xyzrgb1, color_distribution1, "viewcloud1") ;
+	}
 	viewer->removePointCloud("siftcloud1") ;
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz1(new pcl::PointCloud<pcl::PointXYZ>); 
-	pcl::copyPointCloud(*cloud_xyzsift1,*cloud_xyz1);
-	viewer->addPointCloud<pcl::PointXYZ>(cloud_xyz1, "siftcloud1") ;
-	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "siftcloud1");
-	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 0, 255, 0, "siftcloud1");
-
-	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> color_distribution2(cloud_xyzrgb2trans);
+	if(display_cloud_xyzsift1){
+		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz1(new pcl::PointCloud<pcl::PointXYZ>); 
+		pcl::copyPointCloud(*cloud_xyzsift1,*cloud_xyz1);
+		viewer->addPointCloud<pcl::PointXYZ>(cloud_xyz1, "siftcloud1") ;
+		viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, cloud_xyzsift1_point_size, "siftcloud1");
+		viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 
+			((cv::Mat)clouds_colours).at<uchar>(0, 0),
+			((cv::Mat)clouds_colours).at<uchar>(0, 1),
+			((cv::Mat)clouds_colours).at<uchar>(0, 2), 
+			"siftcloud1");
+	}
+	
 	viewer->removePointCloud("viewcloud2") ;
-	viewer->addPointCloud<pcl::PointXYZRGB>(cloud_xyzrgb2trans, color_distribution2, "viewcloud2") ;
+	if(display_cloud_xyzrgb2){
+		pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> color_distribution2(cloud_xyzrgb2trans);
+		viewer->addPointCloud<pcl::PointXYZRGB>(cloud_xyzrgb2trans, color_distribution2, "viewcloud2") ;
+	}
 	viewer->removePointCloud("siftcloud2") ;
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz2(new pcl::PointCloud<pcl::PointXYZ>); 
-	pcl::copyPointCloud(*cloud_xyzsift2trans,*cloud_xyz2);
-	viewer->addPointCloud<pcl::PointXYZ>(cloud_xyz2, "siftcloud2") ;
-	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "siftcloud2");
-	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 0, 255, 0, "siftcloud2");
-
+	if(display_cloud_xyzsift2){
+		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz2(new pcl::PointCloud<pcl::PointXYZ>); 
+		pcl::copyPointCloud(*cloud_xyzsift2trans,*cloud_xyz2);
+		viewer->addPointCloud<pcl::PointXYZ>(cloud_xyz2, "siftcloud2") ;
+		viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, cloud_xyzsift2_point_size, "siftcloud2");
+		viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 
+			((cv::Mat)clouds_colours).at<uchar>(1, 0),
+			((cv::Mat)clouds_colours).at<uchar>(1, 1),
+			((cv::Mat)clouds_colours).at<uchar>(1, 2), 
+			"siftcloud2");
+	}
 	//Display correspondences
 	viewer->removeCorrespondences("correspondences") ;
-	viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift1, cloud_xyzsift2trans, *correspondences, "correspondences") ;
-	viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 255, 0, 0, "correspondences") ;
-	
+	if(display_correspondences){
+		viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift1, cloud_xyzsift2trans, *correspondences, "correspondences") ;
+		viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 
+			((cv::Mat)correspondences_colours).at<uchar>(0, 0),
+			((cv::Mat)correspondences_colours).at<uchar>(0, 1),
+			((cv::Mat)correspondences_colours).at<uchar>(0, 2), 
+			"correspondences") ;
+	}
 }
 
 void CorrespondencesViewer::on_spin() {

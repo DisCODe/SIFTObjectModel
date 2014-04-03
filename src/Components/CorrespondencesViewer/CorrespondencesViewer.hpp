@@ -15,6 +15,11 @@
 
 #include <pcl/visualization/pcl_visualizer.h>
 #include <Types/PointXYZSIFT.hpp> 
+
+#include <Types/MatrixTranslator.hpp>
+#include <opencv2/core/core.hpp>
+
+
 //#include <pcl/point_types.h>
 //#include <pcl/point_cloud.h>
 
@@ -92,7 +97,19 @@ protected:
 	
 	
 	Base::Property<std::string> prop_window_name;
-
+	Base::Property<int> cloud_xyzsift1_point_size;
+	Base::Property<int> cloud_xyzsift2_point_size;
+	/// Property for setting the colours of clouds. From default it will be set to 2 rows with 255, 0, 0 (red).
+	Base::Property<cv::Mat, Types::MatrixTranslator> clouds_colours; 
+	/// Property for setting the colour of correspondences. From default it will be set to 1 row with 255, 0, 0 (red).
+	Base::Property<cv::Mat, Types::MatrixTranslator> correspondences_colours;
+	
+	Base::Property<bool> display_cloud_xyzrgb1;
+	Base::Property<bool> display_cloud_xyzrgb2;
+	Base::Property<bool> display_cloud_xyzsift1;
+	Base::Property<bool> display_cloud_xyzsift2;
+	Base::Property<bool> display_correspondences;
+	
 };
 
 } //: namespace CorrespondencesViewer
