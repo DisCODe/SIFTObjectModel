@@ -111,23 +111,23 @@ Eigen::Matrix4f SOMGenerator::computeTransformationSAC(const pcl::PointCloud<Poi
 	pcl::registration::CorrespondenceRejectorSampleConsensus<PointXYZSIFT> sac ;
 	sac.setInputSource(cloud_src) ;
 	sac.setInputTarget(cloud_trg) ;
-	sac.setInlierThreshold(0.001f) ;
-	sac.setMaximumIterations(2000) ;
+	sac.setInlierThreshold(0.01f) ; //property RanSAC
+	sac.setMaximumIterations(2000) ; //property RanSAC
 	sac.setInputCorrespondences(correspondences) ;
 	sac.getCorrespondences(inliers) ;
 
 	CLOG(LINFO) << "SAC inliers " << inliers.size();
 
-	if ( ((float)inliers.size()/(float)correspondences->size()) >85)
-		return Eigen::Matrix4f::Identity();
+
 	return sac.getBestTransformation() ;
 }
 
 SOMGenerator::SOMGenerator(const std::string & name) :
     Base::Component(name),
-    prop_ICP_alignment("alignment.use ICP", false)
+    prop_ICP_alignment("ICP.Iterative", false)
 {
     registerProperty(prop_ICP_alignment);
+
 }
 
 SOMGenerator::~SOMGenerator() {
@@ -141,12 +141,25 @@ void SOMGenerator::prepareInterface() {
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
+	//registerStream("out_trigger", &out_Trigger);
+	//registerStream("in_trigger", &in_trigger);
 
     // Register single handler - the "addViewToModel" function.
     h_addViewToModel.setup(boost::bind(&SOMGenerator::addViewToModel, this));
     registerHandler("addViewToModel", &h_addViewToModel);
     addDependency("addViewToModel", &in_cloud_xyzsift);
     addDependency("addViewToModel", &in_cloud_xyzrgb);
+
+
+
+   // h_Trigger.setup(Trigger::trigger(),this);
+   // registerHandler("Trigger", &h_Trigger);
+	//addDependency("Trigger", &h_Trigger);
+
+	//h_Trigger.setup(boost::bind(&SOMGenerator::out_trigger, this));
+	//registerHandler("trigger", &h_Trigger);
+	//addDependency("trigger", &out_Trigger);
+	//addDependency("trigger", &in_trigger);
 
 }
 
@@ -206,7 +219,7 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
 
     grid.setInputCloud (cloud_tgt);
     grid.filter (*tgt);
-  }
+  }//in_
   else
   {
     src = cloud_src;
@@ -241,10 +254,12 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
   //
   // Align
   pcl::IterativeClosestPointNonLinear<PointNormalT, PointNormalT> reg;
-  reg.setTransformationEpsilon (1e-6);
+
+  reg.setTransformationEpsilon (1e-6); //property ICP
+
   // Set the maximum distance between two correspondences (src<->tgt) to 10cm
   // Note: adjust this based on the size of your datasets
-  reg.setMaxCorrespondenceDistance (0.1);  
+  reg.setMaxCorrespondenceDistance (0.1);  //property ICP
   // Set the point representation
   reg.setPointRepresentation (boost::make_shared<const MyPointRepresentation> (point_representation));
 
@@ -257,8 +272,8 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
   // Run the same optimization in a loop and visualize the results
   Eigen::Matrix4f Ti = Eigen::Matrix4f::Identity (), prev, targetToSource;
   PointCloudWithNormals::Ptr reg_result = points_with_normals_src;
-  reg.setMaximumIterations (2);
-  for (int i = 0; i < 30; ++i)
+  reg.setMaximumIterations (2); //property ICP
+  for (int i = 0; i < 30; ++i) //magiczna liczba 30 :D
   {
     PCL_INFO ("Iteration Nr. %d.\n", i);
 
@@ -338,6 +353,7 @@ void SOMGenerator::addViewToModel() {
 	CLOG(LINFO) << "view cloud->size(): "<<cloud->size();
 	CLOG(LINFO) << "view cloud_sift->size(): "<<cloud_sift->size();
 
+
 	// First cloud.
 	if (counter == 0 ){
 		*cloud_merged = *cloud;
@@ -386,6 +402,20 @@ void SOMGenerator::addViewToModel() {
     // Compute transformation between clouds and SOMGenerator global transformation of cloud.
 	pcl::Correspondences inliers;
 	Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
+
+
+
+	int count=0;
+
+	while ( (inliers.size()) < 10 && (count <50)) //ICP property ?
+	{
+
+		Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
+		count++;
+	}
+
+	cout<<"Count: "<<count<<endl;
+
 	if (current_trans == Eigen::Matrix4f::Identity()){
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
@@ -425,13 +455,13 @@ void SOMGenerator::addViewToModel() {
     //	feature_radius_ (0.2)
 
         // Set the max correspondence distance to 5cm (e.g., correspondences with higher distances will be ignored)
-        icp.setMaxCorrespondenceDistance (0.005);
+        icp.setMaxCorrespondenceDistance (0.005); //zmienic na property
         // Set the maximum number of iterations (criterion 1)
-        icp.setMaximumIterations (50);
+        icp.setMaximumIterations (50); //zmienic na property
         // Set the transformation epsilon (criterion 2)
-        icp.setTransformationEpsilon (1e-8);
+        icp.setTransformationEpsilon (1e-8); //zmienic na property
         // Set the euclidean distance difference epsilon (criterion 3)
-        icp.setEuclideanFitnessEpsilon (1);
+        icp.setEuclideanFitnessEpsilon (1); //zmienic na property
 
         icp.setInputSource(cloud_merged);
         icp.setInputTarget(cloud);
@@ -456,6 +486,7 @@ void SOMGenerator::addViewToModel() {
 	//addCloudToScene(cloud_to_merge, sceneviewer, counter - 1) ; 
 
 	// Add clouds.
+
 	*cloud_merged += *cloud;
 	*cloud_sift_merged += *cloud_sift;
 
@@ -474,7 +505,9 @@ void SOMGenerator::addViewToModel() {
 	// Push SOM - depricated.
 //	out_instance.write(produce());	
 }
+void SOMGenerator::out_trigger(){
 
+}
 
 
 } //: namespace SOMGenerator
