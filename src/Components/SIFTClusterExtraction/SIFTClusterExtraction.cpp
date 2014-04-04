@@ -12,8 +12,17 @@
 
 #include <boost/bind.hpp>
 
+#include <pcl/search/impl/search.hpp>
+#include <pcl/kdtree/impl/kdtree_flann.hpp>
+#include <pcl/search/impl/organized.hpp>
+#include <pcl/impl/pcl_base.hpp>
+#include <pcl/search/impl/kdtree.hpp>
+
+#include <pcl/point_representation.h>
+
 namespace Processors {
 namespace SIFTClusterExtraction {
+
 
 SIFTClusterExtraction::SIFTClusterExtraction(const std::string & name) :
 		Base::Component(name) , 
@@ -59,19 +68,22 @@ bool SIFTClusterExtraction::onStart() {
 }
 
 void SIFTClusterExtraction::extract() {
+  LOG(LTRACE) <<"SIFTClusterExtraction::extract()";
+  
+  
   pcl::PointCloud<PointXYZSIFT>::Ptr cloud = in_cloud_xyzsift.read();
   // Creating the KdTree object for the search method of the extraction
   pcl::search::KdTree<PointXYZSIFT>::Ptr tree (new pcl::search::KdTree<PointXYZSIFT>);
   tree->setInputCloud (cloud);
   
   std::vector<pcl::PointIndices> cluster_indices;
-  //pcl::EuclideanClusterExtraction<PointXYZSIFT> ec;
-  //ec.setClusterTolerance (clusterTolerance); // 2cm
-  //ec.setMinClusterSize (minClusterSize);
-  //ec.setMaxClusterSize (maxClusterSize);
-  //ec.setSearchMethod (tree);
-  //ec.setInputCloud (cloud);
-  //ec.extract (cluster_indices);
+  pcl::EuclideanClusterExtraction<PointXYZSIFT> ec;
+  ec.setClusterTolerance (clusterTolerance); // 2cm
+  ec.setMinClusterSize (minClusterSize);
+  ec.setMaxClusterSize (maxClusterSize);
+  ec.setSearchMethod (tree);
+  ec.setInputCloud (cloud);
+  ec.extract (cluster_indices);
 
   std::vector<pcl::PointCloud<PointXYZSIFT>::Ptr> clusters;
   
@@ -89,13 +101,13 @@ void SIFTClusterExtraction::extract() {
   }	
 	
 	out_clusters.write(clusters);
-	//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz(new pcl::PointCloud<pcl::PointXYZ>); 
-	//std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clusters_xyz;
-	//for(int i = 0; i < clusters.size(); i++){
-		//pcl::copyPointCloud(*clusters[i],*cloud_xyz);
-		//clusters_xyz.push_back(cloud_xyz);
-	//}
-	//out_clusters_xyz.write(clusters_xyz);
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz(new pcl::PointCloud<pcl::PointXYZ>); 
+	std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clusters_xyz;
+	for(int i = 0; i < clusters.size(); i++){
+		pcl::copyPointCloud(*clusters[i],*cloud_xyz);
+		clusters_xyz.push_back(cloud_xyz);
+	}
+	out_clusters_xyz.write(clusters_xyz);
 
 }
 

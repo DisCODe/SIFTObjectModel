@@ -26,12 +26,14 @@
 			</Executor>
 		</Subtask>
 		
+<!--
 		<Subtask name="Visualisation">
 			<Executor name="Exec2" period="1">
 				<Component name="Window" type="PCL:ClustersViewer" priority="1" bump="0">
 				</Component>
 			</Executor>
 		</Subtask>
+-->
 	
 	</Subtasks>
 	
@@ -44,9 +46,11 @@
 		<Source name="Source.out_cloud_xyz">
 			<sink>ClusterExtraction.in_cloud_xyzsift</sink>
 		</Source>
+<!--
 		<Source name="ClusterExtraction.out_clusters_xyz">
 			<sink>Window.in_clouds</sink>
 		</Source>
+-->
 	</DataStreams>
 </Task>
 
