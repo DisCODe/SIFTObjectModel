@@ -127,14 +127,15 @@ protected:
 	/// ICP properties
 public:
     Base::Property<bool> prop_ICP_alignment;
-  //  Base::Property<bool> prop_ICP_iterations;
-   Base::Property<double> ICP_transformation_epsilon;
-   Base::Property<float> ICP_max_correspondence_distance;
-   Base::Property<int> ICP_max_iterations;
+    Base::Property<bool> prop_ICP_alignment_normal;
+    Base::Property<bool> prop_ICP_alignment_color;
+    Base::Property<double> ICP_transformation_epsilon;
+    Base::Property<float> ICP_max_correspondence_distance;
+    Base::Property<int> ICP_max_iterations;
 
     ///RanSAC Properties
-   Base::Property<float> RanSAC_inliers_threshold;
-   Base::Property<float> RanSAC_max_iterations;
+    Base::Property<float> RanSAC_inliers_threshold;
+    Base::Property<float> RanSAC_max_iterations;
 
   // friend extern void pairAlign(const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform, bool downsample);
 
