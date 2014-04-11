@@ -24,6 +24,9 @@
 
 #include <opencv2/core/core.hpp>
 
+//#include <pcl/point_types.h>
+//#include <pcl/point_cloud.h>
+
 namespace Processors {
 namespace SOMGenerator {
 
@@ -122,17 +125,18 @@ protected:
 
     /// Alignment mode: use ICP alignment or not.
 	/// ICP properties
+public:
     Base::Property<bool> prop_ICP_alignment;
   //  Base::Property<bool> prop_ICP_iterations;
-    Base::Property<float> ICP_transformation_epsilon;
-    Base::Property<float> ICP_max_correspondence_distance;
-    Base::Property<int> ICP_max_iterations;
+   Base::Property<double> ICP_transformation_epsilon;
+   Base::Property<float> ICP_max_correspondence_distance;
+   Base::Property<int> ICP_max_iterations;
 
     ///RanSAC Properties
-    Base::Property<float> RanSAC_inliers_threshold;
-    Base::Property<float> RanSAC_max_iterations;
+   Base::Property<float> RanSAC_inliers_threshold;
+   Base::Property<float> RanSAC_max_iterations;
 
-
+  // friend extern void pairAlign(const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform, bool downsample);
 
 /*	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_prev ;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_next ;

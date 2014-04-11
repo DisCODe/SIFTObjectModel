@@ -111,8 +111,8 @@ Eigen::Matrix4f SOMGenerator::computeTransformationSAC(const pcl::PointCloud<Poi
 	pcl::registration::CorrespondenceRejectorSampleConsensus<PointXYZSIFT> sac ;
 	sac.setInputSource(cloud_src) ;
 	sac.setInputTarget(cloud_trg) ;
-	sac.setInlierThreshold(0.01f) ; //property RanSAC
-	sac.setMaximumIterations(2000) ; //property RanSAC
+	sac.setInlierThreshold(RanSAC_inliers_threshold) ; //property RanSAC
+	sac.setMaximumIterations(RanSAC_max_iterations) ; //property RanSAC
 	sac.setInputCorrespondences(correspondences) ;
 	sac.getCorrespondences(inliers) ;
 
@@ -124,11 +124,21 @@ Eigen::Matrix4f SOMGenerator::computeTransformationSAC(const pcl::PointCloud<Poi
 
 SOMGenerator::SOMGenerator(const std::string & name) :
     Base::Component(name),
-    prop_ICP_alignment("ICP.Iterative", false)
+    prop_ICP_alignment("ICP.Iterative", false),
+    ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
+    ICP_max_correspondence_distance("ICP.Correspondence_distance",0.1),
+    ICP_max_iterations("ICP.Iterations",2),
+    RanSAC_inliers_threshold("RanSac.Inliiers_threshold",0.001f),
+    RanSAC_max_iterations("RanSac.Iterations",2000)
 {
     registerProperty(prop_ICP_alignment);
-
+    registerProperty(ICP_transformation_epsilon);
+    registerProperty(ICP_max_correspondence_distance);
+    registerProperty(ICP_max_iterations);
+    registerProperty(RanSAC_inliers_threshold);
+    registerProperty(RanSAC_max_iterations);
 }
+
 
 SOMGenerator::~SOMGenerator() {
 }
@@ -149,7 +159,6 @@ void SOMGenerator::prepareInterface() {
     registerHandler("addViewToModel", &h_addViewToModel);
     addDependency("addViewToModel", &in_cloud_xyzsift);
     addDependency("addViewToModel", &in_cloud_xyzrgb);
-
 
 
    // h_Trigger.setup(Trigger::trigger(),this);
@@ -201,7 +210,7 @@ bool SOMGenerator::onStart() {
   * \param cloud_src the source PointCloud
   * \param cloud_tgt the target PointCloud
   * \param output the resultant aligned source PointCloud
-  * \param final_transform the resultant transform between source and target
+  * \param final_transform the resultant transform between source and targetRanSAC_max_iterations
   */
 void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform, bool downsample = false) // PointCloud::Ptr output, 
 {
@@ -255,9 +264,9 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
   // Align
   pcl::IterativeClosestPointNonLinear<PointNormalT, PointNormalT> reg;
 
-  reg.setTransformationEpsilon (1e-6); //property ICP
+  reg.setTransformationEpsilon(1e-6); //property ICP
 
-  // Set the maximum distance between two correspondences (src<->tgt) to 10cm
+  // Set the maximum distance between two correspondences (src<->tgt) to 10cm0.000001
   // Note: adjust this based on the size of your datasets
   reg.setMaxCorrespondenceDistance (0.1);  //property ICP
   // Set the point representation
@@ -373,9 +382,9 @@ void SOMGenerator::addViewToModel() {
 
     // SOMGenerator view count and feature numbers.
 	counter++;
-	total_viewpoint_features_number += cloud_sift->size();
+	total_viewpoint_features_number += cloud_sift->size();static
 	
-	// Find corespondences between feature clouds.
+	// Find correspondences between feature clouds.
 	// Initialize parameters.
 	pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
 	pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst;
@@ -387,7 +396,7 @@ void SOMGenerator::addViewToModel() {
 	correst.determineReciprocalCorrespondences(*correspondences) ;
 	CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences->size() << " out of " << cloud_sift->size() << " features";
 
-	// Computate multiplicity of features (designating how many multiplicity given feature appears in all views).
+	// Compute multiplicity of features (designating how many multiplicity given feature appears in all views).
 	for(int i = 0; i< correspondences->size();i++){	
 		if (correspondences->at(i).index_query >=cloud_sift->size() || correspondences->at(i).index_match >=cloud_sift_merged->size()){
 			continue;
@@ -455,13 +464,13 @@ void SOMGenerator::addViewToModel() {
     //	feature_radius_ (0.2)
 
         // Set the max correspondence distance to 5cm (e.g., correspondences with higher distances will be ignored)
-        icp.setMaxCorrespondenceDistance (0.005); //zmienic na property
+        icp.setMaxCorrespondenceDistance (SOMGenerator::ICP_max_correspondence_distance); //property
         // Set the maximum number of iterations (criterion 1)
-        icp.setMaximumIterations (50); //zmienic na property
+        icp.setMaximumIterations (SOMGenerator::ICP_max_iterations); // property
         // Set the transformation epsilon (criterion 2)
-        icp.setTransformationEpsilon (1e-8); //zmienic na property
+        icp.setTransformationEpsilon (SOMGenerator::ICP_transformation_epsilon); //property
         // Set the euclidean distance difference epsilon (criterion 3)
-        icp.setEuclideanFitnessEpsilon (1); //zmienic na property
+        icp.setEuclideanFitnessEpsilon (1); // property ?
 
         icp.setInputSource(cloud_merged);
         icp.setInputTarget(cloud);
