@@ -106,7 +106,7 @@ protected:
 	
 	// Handlers
     void addViewToModel();
-    void out_trigger();
+    //void ICP_points();
 
 	/// Computes the transformation between two XYZSIFT clouds basing on the found correspondences.
 	Eigen::Matrix4f computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg, 
@@ -137,15 +137,6 @@ public:
     Base::Property<float> RanSAC_inliers_threshold;
     Base::Property<float> RanSAC_max_iterations;
 
-  // friend extern void pairAlign(const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform, bool downsample);
-
-/*	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_prev ;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_next ;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_to_merge;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_to_merge;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_prev;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_next;
-*/	
 };
 
 } //: namespace SOMGenerator

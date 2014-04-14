@@ -1,7 +1,7 @@
 /*!
  * \file
  * \brief
- * \author Micha Laszkowski
+ * \author Michal Laszkowski
  */
 
 #include <memory>
@@ -118,7 +118,6 @@ Eigen::Matrix4f SOMGenerator::computeTransformationSAC(const pcl::PointCloud<Poi
 
 	CLOG(LINFO) << "SAC inliers " << inliers.size();
 
-
 	return sac.getBestTransformation() ;
 }
 
@@ -130,7 +129,7 @@ SOMGenerator::SOMGenerator(const std::string & name) :
     ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
     ICP_max_correspondence_distance("ICP.Correspondence_distance",0.1),
     ICP_max_iterations("ICP.Iterations",2),
-    RanSAC_inliers_threshold("RanSac.Inliiers_threshold",0.001f),
+    RanSAC_inliers_threshold("RanSac.Inliiers_threshold",0.01f),
     RanSAC_max_iterations("RanSac.Iterations",2000)
 {
     registerProperty(prop_ICP_alignment);
@@ -155,24 +154,12 @@ void SOMGenerator::prepareInterface() {
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
-	//registerStream("out_trigger", &out_Trigger);
-	//registerStream("in_trigger", &in_trigger);
 
     // Register single handler - the "addViewToModel" function.
     h_addViewToModel.setup(boost::bind(&SOMGenerator::addViewToModel, this));
     registerHandler("addViewToModel", &h_addViewToModel);
     addDependency("addViewToModel", &in_cloud_xyzsift);
     addDependency("addViewToModel", &in_cloud_xyzrgb);
-
-
-   // h_Trigger.setup(Trigger::trigger(),this);
-   // registerHandler("Trigger", &h_Trigger);
-	//addDependency("Trigger", &h_Trigger);
-
-	//h_Trigger.setup(boost::bind(&SOMGenerator::out_trigger, this));
-	//registerHandler("trigger", &h_Trigger);
-	//addDependency("trigger", &out_Trigger);
-	//addDependency("trigger", &in_trigger);
 
 }
 
@@ -186,12 +173,6 @@ bool SOMGenerator::onInit() {
 
 	cloud_merged = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
 	cloud_sift_merged = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
-/*
-	cloud_prev = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
-	cloud_next = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
-	cloud_sift_prev = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
-	cloud_sift_next = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());	
-*/
 	
 	return true;
 }
@@ -216,14 +197,15 @@ bool SOMGenerator::onStart() {
   * \param output the resultant aligned source PointCloud
   * \param final_transform the resultant transform between source and targetRanSAC_max_iterations
   */
-void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform, bool downsample = false) // PointCloud::Ptr output, 
+void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform, bool downsample = false) // PointCloud::Ptr output,
 {
+	cout<<"w pair align"<<endl;
   //
   // Downsample for consistency and speed
   // \note enable this for large datasets
   PointCloud::Ptr src (new PointCloud);
   PointCloud::Ptr tgt (new PointCloud);
-  pcl::VoxelGrid<PointT> grid;
+ /* pcl::VoxelGrid<PointT> grid;
   if (downsample)
   {
     grid.setLeafSize (0.05, 0.05, 0.05);
@@ -232,14 +214,17 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
 
     grid.setInputCloud (cloud_tgt);
     grid.filter (*tgt);
-  }//in_
+    cout<<"w pair align1"<<endl;
+  }
   else
   {
     src = cloud_src;
     tgt = cloud_tgt;
-  }
-
-
+    cout<<"w pair align"<<endl;
+  }*/
+  src = cloud_src;
+  tgt = cloud_tgt;
+  cout<<"w pair align"<<endl;
   // Compute surface normals and curvature
   PointCloudWithNormals::Ptr points_with_normals_src (new PointCloudWithNormals);
   PointCloudWithNormals::Ptr points_with_normals_tgt (new PointCloudWithNormals);
@@ -279,7 +264,7 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
   reg.setInputSource (points_with_normals_src);
   reg.setInputTarget (points_with_normals_tgt);
 
-
+  cout<<"w pair align"<<endl;
 
   //
   // Run the same optimization in a loop and visualize the results
@@ -289,14 +274,14 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
   for (int i = 0; i < 30; ++i) //magiczna liczba 30 :D
   {
     PCL_INFO ("Iteration Nr. %d.\n", i);
-
+    cout<<"w forze w pair align"<<endl;
     // save cloud for visualization purpose
     points_with_normals_src = reg_result;
 
     // Estimate
     reg.setInputSource (points_with_normals_src);
     reg.align (*reg_result);
-
+    cout<<"po align"<<endl;
 		//accumulate transformation between each Iteration
     Ti = reg.getFinalTransformation () * Ti;
 
@@ -308,34 +293,11 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
     
     prev = reg.getLastIncrementalTransformation ();
 
-    // visualize current state
-//    showCloudsRight(points_with_normals_tgt, points_with_normals_src);
   }
 
 	//
   // Get the transformation from target to source
   targetToSource = Ti.inverse();
-
-  //
-  // Transform target back in source frame
-//  pcl::transformPointCloud (*cloud_tgt, *output, targetToSource);
-
-/*  p->removePointCloud ("source");
-  p->removePointCloud ("target");
-
-  PointCloudColorHandlerCustom<PointT> cloud_tgt_h (output, 0, 255, 0);
-  PointCloudColorHandlerCustom<PointT> cloud_src_h (cloud_src, 255, 0, 0);
-  p->addPointCloud (output, cloud_tgt_h, "target", vp_2);
-  p->addPointCloud (cloud_src, cloud_src_h, "source", vp_2);
-
-	PCL_INFO ("Press q to continue the registration.\n");
-  p->spin ();
-
-  p->removePointCloud ("source"); 
-  p->removePointCloud ("target");*/
-
-  //add the source to the transformed target
-//  *output += *cloud_src;
   
   final_transform = targetToSource;
  }
@@ -379,14 +341,12 @@ void SOMGenerator::addViewToModel() {
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
 
-		// Push SOM - depricated.
-//		out_instance.write(produce());	
 		return;
 	}
 
     // SOMGenerator view count and feature numbers.
 	counter++;
-	total_viewpoint_features_number += cloud_sift->size();static
+	total_viewpoint_features_number += cloud_sift->size();
 	
 	// Find correspondences between feature clouds.
 	// Initialize parameters.
@@ -418,27 +378,41 @@ void SOMGenerator::addViewToModel() {
 
 
 
-	int count=0;
+	/*int count=0;
 
 	while ( (inliers.size()) < 10 && (count <5)) //czemu to nie liczy wgl od poczatku
 	{
 
 		Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
-		count++;
+		count++;merged
 
 	}
 
-	cout<<"Count: "<<count<<endl;
+	cout<<"Count: "<<count<<endl;*/
 
 	if (current_trans == Eigen::Matrix4f::Identity()){
-		out_cloud_xyzrgb.write(cloud_merged);
-		out_cloud_xyzsift.write(cloud_sift_merged);
+		// Add clouds.
+
+			*cloud_merged += *cloud;
+			*cloud_sift_merged += *cloud_sift;
+
+			CLOG(LINFO) << "model cloud->size(): "<<cloud_merged->size();
+			CLOG(LINFO) << "model cloud_sift->size(): "<<cloud_sift_merged->size();
+
+
+			// Compute mean number of features.
+			mean_viewpoint_features_number = total_viewpoint_features_number/counter;
+
+			// Push results to output data ports.
+			out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
+			out_cloud_xyzrgb.write(cloud_merged);
+			out_cloud_xyzsift.write(cloud_sift_merged);
 		return;
 	}//: if
-	CLOG(LINFO) << "SAC Transformation from current view cloud to cloud_merged: " << std::endl << current_trans;
-/*	global_trans = global_trans * current_trans;
+//	CLOG(LINFO) << "SAC Transformation from current view cloud to cloud_merged: " << std::endl << current_trans;
+	global_trans = global_trans * current_trans;
 	CLOG(LINFO) << "Transformation from current view cloud to first view: " << std::endl << global_trans << std::endl ;
-*/
+
 
 	// Delete points.
 	pcl::PointCloud<PointXYZSIFT>::iterator pt_iter = cloud_sift_merged->begin();
@@ -449,12 +423,6 @@ void SOMGenerator::addViewToModel() {
 			++pt_iter;	
 		}
 	}
-
-	// Transform both view clouds.
-/*	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_to_merge;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_to_merge;
-	cloud_to_merge = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
-	cloud_sift_to_merge = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());*/
 
 	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
@@ -487,52 +455,99 @@ void SOMGenerator::addViewToModel() {
         pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
     }//: ICP alignment
-    else if(prop_ICP_alignment_normal){ //aktualnie to bez sensu, gdzie jest implementacja z wektorami normalnymi?
+    else if(prop_ICP_alignment_normal){ //aktualnie to bez sensu, gdzie jest implemen reg.align (*reg_result);tacja z wektorami normalnymi?
 
     	Eigen::Matrix4f icp_trans;
     	pairAlign (cloud_merged, cloud, icp_trans, false);
-    	pcl::transformPointCloud(*cloud, *cloud, icp_trans);
-    	pcl::transformPointCloud(*cloud_sift, *cloud_sift, icp_trans);
-/*
-    	  // Use ICP to get "better" transformation.
-    	        pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB> icp;
+    //	pcl::transformPointCloud(*cloud, *cloud, icp_trans);
+    //	pcl::transformPointCloud(*cloud_sift, *cloud_sift, icp_trans);
+    	return;
+    	/* // Compute surface normals and curvature
+    	  PointCloudWithNormals::Ptr points_with_normals_src (new PointCloudWithNormals);
+    	  PointCloudWithNormals::Ptr points_with_normals_tgt (new PointCloudWithNormals);
 
-    	        // Set the max correspondence distance to 5cm (e.g., correspondences with higher distances will be ignored)
-    	        icp.setMaxCorrespondenceDistance (SOMGenerator::ICP_max_correspondence_distance); //property
-    	        // Set the maximum number of iterations (criterion 1)
-    	        icp.setMaximumIterations (SOMGenerator::ICP_max_iterations); // property
-    	        // Set the transformation epsilon (criterion 2)
-    	        icp.setTransformationEpsilon (SOMGenerator::ICP_transformation_epsilon); //property
-    	        // Set the euclidean distance difference epsilon (criterion 3)
-    	        icp.setEuclideanFitnessEpsilon (1); // property ?
+    	  pcl::NormalEstimation<PointT, PointNormalT> norm_est;
+    	  pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB> ());
+    	  norm_est.setSearchMethod (tree);
+    	  norm_est.setKSearch (30);
 
-    	        icp.setInputSource(cloud_merged);
-    	        icp.setInputTarget(cloud);
-    	        pcl::PointCloud<pcl::PointXYZRGB>::Ptr Final (new pcl::PointCloud<pcl::PointXYZRGB>());
-    	        icp.align(*Final);
-    	        CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
 
-    	        // Get the transformation from target to source.
-    	        current_trans = icp.getFinalTransformation().inverse();
-    	        CLOG(LINFO) << "ICP transformation refinement: " << std::endl << current_trans;
+    	  norm_est.setInputCloud (cloud_merged);
+    	  norm_est.compute (*points_with_normals_src);
+    	  pcl::copyPointCloud (*cloud_merged, *points_with_normals_src);
 
-    	        // Refine the transformation.
-    	        pcl::transformPointCloud(*cloud, *cloud, current_trans);
-    	        pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);*/
+    	  norm_est.setInputCloud (cloud);
+    	  norm_est.compute (*points_with_normals_tgt);
+    	  pcl::copyPointCloud (*cloud, *points_with_normals_tgt);
+
+    	  //
+    	  // Instantiate our custom point representation (defined above) ...
+    	  MyPointRepresentation point_representation;
+    	  // ... and weight the 'curvature' dimension so that it is balanced against x, y, and z
+    	  float alpha[4] = {1.0, 1.0, 1.0, 1.0};
+    	  point_representation.setRescaleValues (alpha);
+
+    	  //
+    	  // Align
+    	  pcl::IterativeClosestPointNonLinear<PointNormalT, PointNormalT> reg; // z wektorami normalnymi ?
+
+    	  reg.setTransformationEpsilon(ICP_transformation_epsilon); //property ICP
+
+    	  // Set the maximum distance between two correspondences (src<->tgt) to 10cm0.000001
+    	  // Note: adjust this based on the size of your datasets
+    	  reg.setMaxCorrespondenceDistance (ICP_max_correspondence_distance);  //property ICP
+    	  // Set the point representation
+    	  reg.setPointRepresentation (boost::make_shared<const MyPointRepresentation> (point_representation));
+
+    	  reg.setInputSource (cloud_merged);
+    	  reg.setInputTarget (cloud);
+
+    	  PointCloudWithNormals::Ptr reg_result (new PointCloudWithNormals);
+    	  cout<<"w ICP normal"<<endl;
+    	  reg.align(*reg_result);
+    	  cout<<"po align"<<endl;
+    	  CLOG(LINFO) << "ICP has converged:" << reg.hasConverged() << " score: " << reg.getFitnessScore();
+
+    	  // Get the transformation from target to source.
+    	  current_trans = reg.getFinalTransformation().inverse();
+    	  CLOG(LINFO) << "ICP transformation refinement: " << std::endl << current_trans;
+
+    	  // Refine the transformation.
+    	  pcl::transformPointCloud(*cloud, *cloud, current_trans);
+    	  pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+    	//  Eigen::Matrix4f Ti = Eigen::Matrix4f::Identity (), prev, targetToSource;
+
+    	  reg.setMaximumIterations (ICP_max_iterations); //property ICP*/
+    	    /*       for (int i = 0; i < 30; ++i) //magiczna liczba 30 :D
+    	           {
+    	             PCL_INFO ("Iteration Nr. %d.\n", i);
+
+    	             // save cloud for visualization purpose
+    	             points_with_normals_src = reg_result;
+
+    	             // Estimate
+    	             reg.setInputSource (points_with_normals_src);
+    	             reg.align (*reg_result);
+
+    	         		//accumulate transformation between each Iteration
+    	             Ti = reg.getFinalTransformation () * Ti;
+
+    	         		//if the difference between this transformation and the previous one
+    	         		//is smaller than the threshold, refine the process by reducing
+    	         		//the maximal correspondence distance
+    	             if (fabs ((reg.getLastIncrementalTransformation () - prev).sum ()) < reg.getTransformationEpsilon ())
+    	               reg.setMaxCorrespondenceDistance (reg.getMaxCorrespondenceDistance () - 0.001);
+
+    	             prev = reg.getLastIncrementalTransformation ();
+
+    	           }*/
+
     }
     else if(prop_ICP_alignment_color)
     {
 
     }
 
-
-
-/*
-	Eigen::Matrix4f icp_trans;
-	pairAlign (cloud_merged, cloud, icp_trans, false); 
-	CLOG(LINFO) << "ICP transformation refinement: " << std::endl << icp_trans;
-*/
-	//addCloudToScene(cloud_to_merge, sceneviewer, counter - 1) ; 
 
 	// Add clouds.
 
@@ -552,11 +567,8 @@ void SOMGenerator::addViewToModel() {
 	out_cloud_xyzsift.write(cloud_sift_merged);
 
 	// Push SOM - depricated.
-//	out_instance.write(produce());	
 }
-void SOMGenerator::out_trigger(){
 
-}
 
 
 } //: namespace SOMGenerator
