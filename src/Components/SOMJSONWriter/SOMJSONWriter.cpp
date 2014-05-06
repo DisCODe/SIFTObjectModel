@@ -134,9 +134,11 @@ void SOMJSONWriter::Write() {
 		ptree_file.put("cloud_xyzrgb", name_cloud_xyzrgb);
 		ptree_file.put("cloud_xyzsift", name_cloud_xyzsift);
 		write_json (std::string(dir) + std::string("/") + std::string(SOMname) + std::string(".json"), ptree_file);
+		std::cout<<"Rozmiar zapisanej chmury: "<<cloud_xyzrgb->points.size()<<std::endl;
 		return;
 	}
 	
+
 	CLOG(LWARNING) << "There are no required datastreams enabling save of the SOM to file.";
 } 
 

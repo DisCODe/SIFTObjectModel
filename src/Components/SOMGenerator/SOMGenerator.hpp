@@ -24,8 +24,6 @@
 
 #include <opencv2/core/core.hpp>
 
-//#include <pcl/point_types.h>
-//#include <pcl/point_cloud.h>
 
 namespace Processors {
 namespace SOMGenerator {
@@ -55,6 +53,7 @@ public:
 	 */
 	void prepareInterface();
 
+
 protected:
 
 	/*!
@@ -83,10 +82,6 @@ protected:
 	/// Input data stream containing feature cloud from a given view.
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
 
-	//Base::DataStreamIn<bool> in_trigger;
-
-//	Base::DataStreamOut<SOMGenerator> out_Trigger;
-
 	/// Output data stream containing SIFTObjectModel - depricated.
 	Base::DataStreamOut<AbstractObject*> out_instance; 
 		
@@ -98,7 +93,6 @@ protected:
 
 	// Mean number of features per view. 
 	Base::DataStreamOut<int> out_mean_viewpoint_features_number;
-
 
 	// Handlers
     Base::EventHandler2 h_addViewToModel;
