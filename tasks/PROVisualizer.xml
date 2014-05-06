@@ -1,0 +1,37 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Marta Łępicka</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>Visualize point clouds with different options</brief>
+			<full>Options: simple, with normals ... to be continued</full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+			<Executor name="Processing"  period="0.1">
+                                <Component name="Visualizer" type="SIFTObjectModel:Visualization" priority="1" bump="0">
+					<param name="filenames">/home/mlepicka/modele/savanah_v2_xyzrgb.pcd</param>
+				</Component>
+			</Executor>
+
+			<!---<Executor name="Visualization" period="1">
+				<Component name="WindowPCL" type="PCL:CloudViewer" priority="1" bump="0">
+				</Component> 
+
+			</Executor>-->
+		</Subtask>
+	</Subtasks>
+
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+
+				
+	</DataStreams>
+</Task>
