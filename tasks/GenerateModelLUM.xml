@@ -43,7 +43,7 @@
 				</Component>
 				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
 				</Component>
-                                <Component name="Generator" type="SIFTObjectModel:SOMGenerator" priority="9" bump="1">
+                                <Component name="Generator" type="SIFTObjectModel:LUMGenerator" priority="9" bump="1">
 					<param name="alignment.use ICP">1</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="10" bump="0">
