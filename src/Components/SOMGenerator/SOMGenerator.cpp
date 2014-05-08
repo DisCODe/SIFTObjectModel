@@ -201,7 +201,7 @@ bool SOMGenerator::onStart() {
 void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform, bool downsample = false) // PointCloud::Ptr output,
 {
 	cout<<"w pair align"<<endl;
-  //
+  //rgb
   // Downsample for consistency and speed
   // \note enable this for large datasets
   PointCloud::Ptr src (new PointCloud);

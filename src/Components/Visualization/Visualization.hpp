@@ -63,6 +63,7 @@ public:
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> rgbVis (pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
 	
 	void visualize();
+	void refresh();
 	
 protected:
 
@@ -87,25 +88,42 @@ protected:
 	bool onStop();
 
 
-// Input data streams
+
+	/// Input data stream containing point cloud from a given view.
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
+
+	/// Input data stream containing feature cloud from a given view.
+	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
+
+	/// Output data stream containing SIFTObjectModel - depricated.
+	Base::DataStreamOut<AbstractObject*> out_instance;
+
+	/// Output data stream containing object model point cloud.
+	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
+
+	/// Output data stream containing object model feature cloud (SIFTs).
+	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 
 
-// Output data streams
 
 	// Handlers
 	Base::EventHandler2 h_visualize;
-	Base::Property<string> filenames;
+	Base::EventHandler2 h_refresh;
 	// Handlers
 
-	void onFilenamesChanged(const std::string & old_filenames, const std::string & new_filenames);
+
 	pcl::PointCloud<pcl::PointXYZ>::Ptr basic_cloud_ptr;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_ptr;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point2_cloud_ptr;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb;
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
+	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer2;
 	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb;
 
+	Base::Property<string> filenames;
 	Base::Property<float> radius_search;
 
+	void onFilenamesChanged(const std::string & old_filenames, const std::string & new_filenames);
 };
 
 } //: namespace Visualization
