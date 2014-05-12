@@ -57,10 +57,6 @@ public:
 	 * values set in config file.
 	 */
 	void prepareInterface();
-	boost::shared_ptr<pcl::visualization::PCLVisualizer> normalsVis (
-			pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, pcl::PointCloud<pcl::Normal>::ConstPtr normals);
-
-	boost::shared_ptr<pcl::visualization::PCLVisualizer> rgbVis (pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
 	
 	void visualize();
 	void refresh();
@@ -90,10 +86,13 @@ protected:
 
 
 	/// Input data stream containing point cloud from a given view.
-	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
+	//Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
 
 	/// Input data stream containing feature cloud from a given view.
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
+
+	/// Input data stream containing feature cloud from a given view.
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr > in_cloud_xyzrgb_normals;
 
 	/// Output data stream containing SIFTObjectModel - depricated.
 	Base::DataStreamOut<AbstractObject*> out_instance;
@@ -115,10 +114,11 @@ protected:
 	pcl::PointCloud<pcl::PointXYZ>::Ptr basic_cloud_ptr;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_ptr;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point2_cloud_ptr;
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_ptr_normals;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb;
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
-	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer2;
-	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb;
+	//boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer2;
+	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBNormal> rgb;
 
 	Base::Property<string> filenames;
 	Base::Property<float> radius_search;

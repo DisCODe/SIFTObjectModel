@@ -49,16 +49,19 @@
 				</Component>
 				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="9" bump="0">
 				</Component>
-                                <Component name="Generator" type="SIFTObjectModel:SOMGenerator" priority="10" bump="1">
+				<Component name="Normals" type="SIFTObjectModel:NormalEstimation" priority="10">
+					
+				</Component>
+                                <Component name="Generator" type="SIFTObjectModel:SOMGenerator" priority="11" bump="1">
 					<param name="ICP.Iterative">1</param>
 					<param name="trigger">1</param>
 				</Component>
-				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
+				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="12" bump="0">
 					<param name="LeafSize.x">0.005</param>
 					<param name="LeafSize.y">0.005</param>
 					<param name="LeafSize.z">0.005</param>
 				</Component>
-		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="12" bump="10">
+		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="13" bump="10">
 					<param name="SOM">savanah_v2</param>
 			        </Component>
 
@@ -101,35 +104,37 @@
 		</Source>
 		<Source name="SIFT.out_features">
 			<sink>FeatureCloudConverter.in_features</sink>	
-		</Source>		
+		</Source>	
 		<Source name="Converter.out_cloud_xyzrgb">
 			<sink>StatisticalOutlierRemoval.in_cloud_xyzrgb</sink>
 		</Source>
 
 		<Source name="StatisticalOutlierRemoval.out_cloud_xyzrgb">
-			<sink>Generator.in_cloud_xyzrgb</sink>
+			<sink>Normals.in_cloud_xyzrgb</sink>
 		</Source>
 
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
 			<sink>Generator.in_cloud_xyzsift</sink>	
 		</Source>
+
+		<Source name="Normals.out_cloud_xyzrgb_normals">
+			<sink>Generator.in_cloud_xyzrgb</sink>
+		</Source>
 		<Source name="Generator.out_cloud_xyzrgb">
-			<sink>VoxelGrid.in_cloud_xyzrgb</sink>
+			<sink>VoxelGrid.in_cloud_xyzrgb_normal</sink>
+		</Source>
+		<Source name="VoxelGrid.out_cloud_xyzrgb_normal">
+			<sink>Visualizer.in_cloud_xyzrgb_normals</sink>
+		</Source>	
+
+	<!--	<Source name="Generator.out_cloud_xyzsift">
+			<sink>Writer.in_cloud_xyzsift</sink>	
 		</Source>
 
-		<Source name="VoxelGrid.out_cloud_xyzrgb">
-			<sink>Writer.in_cloud_xyzrgb</sink>
-			<sink>Visualizer.in_cloud_xyzrgb</sink>	
-		</Source>
-
-		<Source name="Generator.out_cloud_xyzsift">
-			<sink>Writer.in_cloud_xyzsift</sink>
-			<sink>Visualizer.in_cloud_xyzsift</sink>	
-
-		</Source>
+		
 		<Source name="Generator.out_mean_viewpoint_features_number">
 			<sink>Writer.in_mean_viewpoint_features_number</sink>
-		</Source>
+		</Source>--->
 
 				
 	</DataStreams>

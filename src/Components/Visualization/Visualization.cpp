@@ -37,14 +37,14 @@ Visualization::~Visualization() {
 
 void Visualization::refresh(){
 	viewer->spinOnce(100);
-	viewer2->spinOnce(100);
+	//viewer2->spinOnce(100);
 }
 
 void Visualization::visualize(){
 	//visualization of model
-	viewer2->removeAllPointClouds();
+//	viewer2->removeAllPointClouds();
 	viewer->removeAllPointClouds();
-
+/*
 	  if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (filenames, *cloud_xyzrgb) == -1)
 	  {
 		cout <<"Cannot read PointXYZRGB cloud from "<<filenames;
@@ -77,41 +77,48 @@ void Visualization::visualize(){
 	   pcl::PointCloud<pcl::Normal>::Ptr cloud_normals1 (new pcl::PointCloud<pcl::Normal>);
 	   ne1.setRadiusSearch (radius_search); //property
 	   ne1.compute (*cloud_normals1);
+*/
+	//pomyslec nad typem tego
+		//point_cloud_ptr=(pcl::PointXYZRGB)in_cloud_xyzrgb_normals.read();
+		cloud_ptr_normals=in_cloud_xyzrgb_normals.read();
+	   rgb = pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBNormal>(cloud_ptr_normals);
+	   viewer->addPointCloud<pcl::PointXYZRGBNormal>(cloud_ptr_normals, rgb, "sample cloud");
+	   viewer->addPointCloudNormals<pcl::PointXYZRGBNormal> (cloud_ptr_normals, 15, 0.05, "normals");
 
-	   rgb = pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB>(point_cloud_ptr);
-	   viewer->addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal> (point_cloud_ptr, cloud_normals2, 15, 0.05, "normals");
-	   viewer->addPointCloud<pcl::PointXYZRGB> (point_cloud_ptr, rgb, "sample cloud");
 	   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
 
-
+/*
 	   rgb = pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB>(point2_cloud_ptr);
 	   viewer2->addPointCloud<pcl::PointXYZRGB> (point2_cloud_ptr, rgb, "sample cloud");
 	   viewer2->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
 	   viewer2->addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal> (point2_cloud_ptr, cloud_normals1, 10, 0.05, "normals");
+*/
 
-
-	   if (!viewer2->wasStopped ())
+	   if (!viewer->wasStopped ())
 	   {
 	     viewer->spinOnce (100);
-	     viewer2->spinOnce (100);
+	    // viewer2->spinOnce (100);
 	   }
 
 }
 
 void Visualization::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
-	registerStream("in_cloud_xyzrgb", &in_cloud_xyzrgb);
+//	registerStream("in_cloud_xyzrgb", &in_cloud_xyzrgb);
 	registerStream("in_cloud_xyzsift", &in_cloud_xyzsift);
+	registerStream("in_cloud_xyzrgb_normals", &in_cloud_xyzrgb_normals);
+
 	registerStream("out_instance", &out_instance);
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 
 
+
     // Register handlers
     h_visualize.setup(boost::bind(&Visualization::visualize, this));
     registerHandler("Visualize", &h_visualize);
-    addDependency("Visualize", &in_cloud_xyzrgb);
-    addDependency("Visualize", &in_cloud_xyzsift);
+    //addDependency("Visualize", &in_cloud_xyzrgb);
+    addDependency("Visualize", &in_cloud_xyzrgb_normals);
 
     h_refresh.setup(boost::bind(&Visualization::refresh, this));
     registerHandler("Refresh", &h_refresh);
@@ -121,7 +128,7 @@ void Visualization::prepareInterface() {
 bool Visualization::onInit() {
 	  basic_cloud_ptr = pcl::PointCloud<pcl::PointXYZ>::Ptr (new pcl::PointCloud<pcl::PointXYZ>);
 	  point_cloud_ptr =  pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>);
-
+	  cloud_ptr_normals= pcl::PointCloud<pcl::PointXYZRGBNormal >::Ptr (new pcl::PointCloud<pcl::PointXYZRGBNormal >);
 	  cloud_xyzrgb = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>);
 
 	  viewer= boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer ("3D Viewer"));
@@ -130,13 +137,13 @@ bool Visualization::onInit() {
 	  viewer->addCoordinateSystem (1.0);
 	  viewer->initCameraParameters ();
 
-
+/*
 	  viewer2= boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer ("3D Viewer"));
 	  viewer2->setBackgroundColor (0, 0, 0);
 
 	  viewer2->addCoordinateSystem (1.0);
 	  viewer2->initCameraParameters ();
-
+*/
 	return true;
 }
 

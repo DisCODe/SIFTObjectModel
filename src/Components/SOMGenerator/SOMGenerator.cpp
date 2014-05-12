@@ -172,7 +172,7 @@ bool SOMGenerator::onInit() {
 		
 	global_trans = Eigen::Matrix4f::Identity();
 
-	cloud_merged = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
+	cloud_merged = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
 	cloud_sift_merged = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
 	
 	return true;
@@ -307,7 +307,7 @@ void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt
 void SOMGenerator::addViewToModel() {
     CLOG(LTRACE) << "SOMGenerator::addViewToModel";
 	
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud = in_cloud_xyzrgb.read();
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud = in_cloud_xyzrgb.read();
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift = in_cloud_xyzsift.read();
 
 	// TODO if empty()
@@ -415,7 +415,7 @@ void SOMGenerator::addViewToModel() {
 
     if (prop_ICP_alignment) {
         // Use ICP to get "better" transformation.
-        pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB> icp;
+        pcl::IterativeClosestPoint<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal> icp;
 
         // Set the max correspondence distance to 5cm (e.g., correspondences with higher distances will be ignored)
         icp.setMaxCorrespondenceDistance (SOMGenerator::ICP_max_correspondence_distance); //property
@@ -428,7 +428,7 @@ void SOMGenerator::addViewToModel() {
 
         icp.setInputSource(cloud_merged);
         icp.setInputTarget(cloud);
-        pcl::PointCloud<pcl::PointXYZRGB>::Ptr Final (new pcl::PointCloud<pcl::PointXYZRGB>());
+        pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Final (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
         icp.align(*Final);
         CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
 
@@ -443,10 +443,12 @@ void SOMGenerator::addViewToModel() {
     }//: ICP alignment
     else if(prop_ICP_alignment_normal){
 
-    	Eigen::Matrix4f icp_trans;
-    	pairAlign (cloud_merged, cloud, icp_trans, false);
 
-    	return;
+
+    	//Eigen::Matrix4f icp_trans;
+    	//pairAlign (cloud_merged, cloud, icp_trans, false);
+
+    	//return;
 
 
     }

@@ -77,7 +77,7 @@ protected:
 	bool onStop();
 
 	/// Input data stream containing point cloud from a given view.
-	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> in_cloud_xyzrgb;
 
 	/// Input data stream containing feature cloud from a given view.
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
@@ -86,7 +86,7 @@ protected:
 	Base::DataStreamOut<AbstractObject*> out_instance; 
 		
 	/// Output data stream containing object model point cloud.
-	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
+	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> out_cloud_xyzrgb;
 
 	/// Output data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
@@ -113,7 +113,7 @@ protected:
 	/// Total number of features (in all views).	
 	int total_viewpoint_features_number;
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_merged;
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
 
