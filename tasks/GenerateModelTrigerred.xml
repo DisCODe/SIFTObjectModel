@@ -16,49 +16,59 @@
 	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
-				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
+				<Component name="Trigger" type="CvBasic:Trigger" priority="1" bump="0">
+					<param name="">1</param>
+				</Component>
+				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
 					<param name="sequence.directory">/home/mlepicka/012/savanah/</param>
 					<param name="sequence.pattern">col*.*</param>
-					<param name="mode.loop">0</param>					
+					<param name="mode.loop">0</param>
+					<param name="mode.triggered">1</param>				
 				</Component>
-				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="2" bump="0">
+				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="3" bump="0">
 					<param name="sequence.directory">/home/mlepicka/012/savanah/</param>
 					<param name="sequence.pattern">dep*.*</param>	
-					<param name="mode.loop">0</param>	
+					<param name="mode.loop">0</param>
+					<param name="mode.triggered">1</param>		
 				</Component>
-				<Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
+				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
 					<param name="sequence.directory">/home/mlepicka/012/savanah/</param>
 					<param name="sequence.pattern">mas*.*</param>
-					<param name="mode.loop">0</param>	
+					<param name="mode.loop">0</param>
+					<param name="mode.triggered">1</param>		
 				</Component>
-				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="4" bump="0">
+				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="5" bump="0">
 					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
 				</Component>
-				<Component name="SIFT" type="CvBasic:CvSIFT" priority="5" bump="0">
+				<Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
 				</Component>
-				<Component name="Converter" type="PCL:DepthConverter" priority="6" bump="0">
+				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
 				</Component>
-				<Component name="StatisticalOutlierRemoval" type="PCL:StatisticalOutlierRemoval" priority="7" bump="0">
+				<Component name="StatisticalOutlierRemoval" type="PCL:StatisticalOutlierRemoval" priority="8" bump="0">
 					<param name="MeanK">200</param>
 				</Component>
-				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
+				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="9" bump="0">
 				</Component>
-                                <Component name="Generator" type="SIFTObjectModel:SOMGenerator" priority="9" bump="1">
-					<param name="alignment.use ICP">1</param>
+                                <Component name="Generator" type="SIFTObjectModel:SOMGenerator" priority="10" bump="1">
+					<param name="ICP.Iterative">1</param>
+					<param name="trigger">1</param>
 				</Component>
-				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="10" bump="0">
+				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
 					<param name="LeafSize.x">0.005</param>
 					<param name="LeafSize.y">0.005</param>
 					<param name="LeafSize.z">0.005</param>
 				</Component>
-		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="11" bump="10">
+		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="12" bump="10">
 					<param name="SOM">savanah_v2</param>
 			        </Component>
+
 			</Executor>
 
 			<Executor name="Visualization" period="1">
+
 				<Component name="WindowPCL" type="PCL:CloudViewer" priority="1" bump="0">
 				</Component>
+
 			</Executor>
 		</Subtask>	
 	
@@ -66,6 +76,17 @@
 	
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
+		<Source name="Trigger.out_trigger">
+			<sink>SequenceRGB.in_trigger</sink>
+			<sink>SequenceDepth.in_trigger</sink>
+			<sink>SequenceMask.in_trigger</sink>
+			<sink>Generator.in_trigger</sink>
+		</Source>
+		<Source name="Generator.out_trigger">
+			<sink>SequenceRGB.in_trigger</sink>
+			<sink>SequenceDepth.in_trigger</sink>
+			<sink>SequenceMask.in_trigger</sink>
+		</Source>
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
 			<sink>Converter.in_color</sink>

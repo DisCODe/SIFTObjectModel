@@ -80,6 +80,9 @@ protected:
 	/// Input data stream containing feature cloud from a given view.
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
 
+	//Base::DataStreamIn<bool> in_trigger;
+
+//	Base::DataStreamOut<SOMGenerator> out_Trigger;
 
 	/// Output data stream containing SIFTObjectModel - depricated.
 	Base::DataStreamOut<AbstractObject*> out_instance; 
@@ -96,9 +99,11 @@ protected:
 
 	// Handlers
     Base::EventHandler2 h_addViewToModel;
+    Base::EventHandler2 h_Trigger;
 	
 	// Handlers
     void addViewToModel();
+    void out_trigger();
 
 	/// Computes the transformation between two XYZSIFT clouds basing on the found correspondences.
 	Eigen::Matrix4f computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg, 
@@ -116,7 +121,18 @@ protected:
 	Eigen::Matrix4f global_trans;
 
     /// Alignment mode: use ICP alignment or not.
+	/// ICP properties
     Base::Property<bool> prop_ICP_alignment;
+  //  Base::Property<bool> prop_ICP_iterations;
+    Base::Property<float> ICP_transformation_epsilon;
+    Base::Property<float> ICP_max_correspondence_distance;
+    Base::Property<int> ICP_max_iterations;
+
+    ///RanSAC Properties
+    Base::Property<float> RanSAC_inliers_threshold;
+    Base::Property<float> RanSAC_max_iterations;
+
+
 
 /*	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_prev ;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_next ;
