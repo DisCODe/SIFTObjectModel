@@ -18,3 +18,6 @@ ADD_COMPONENT(Downsampling)
 
 ADD_COMPONENT(PC2Octree)
 
+ADD_COMPONENT(Visualization)
+
+ADD_COMPONENT(NormalEstimation)

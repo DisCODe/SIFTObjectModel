@@ -24,6 +24,7 @@
 
 #include <opencv2/core/core.hpp>
 
+
 namespace Processors {
 namespace SOMGenerator {
 
@@ -52,6 +53,7 @@ public:
 	 */
 	void prepareInterface();
 
+
 protected:
 
 	/*!
@@ -75,20 +77,16 @@ protected:
 	bool onStop();
 
 	/// Input data stream containing point cloud from a given view.
-	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> in_cloud_xyzrgb;
 
 	/// Input data stream containing feature cloud from a given view.
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
-
-	//Base::DataStreamIn<bool> in_trigger;
-
-//	Base::DataStreamOut<SOMGenerator> out_Trigger;
 
 	/// Output data stream containing SIFTObjectModel - depricated.
 	Base::DataStreamOut<AbstractObject*> out_instance; 
 		
 	/// Output data stream containing object model point cloud.
-	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
+	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> out_cloud_xyzrgb;
 
 	/// Output data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
@@ -96,14 +94,13 @@ protected:
 	// Mean number of features per view. 
 	Base::DataStreamOut<int> out_mean_viewpoint_features_number;
 
-
 	// Handlers
     Base::EventHandler2 h_addViewToModel;
     Base::EventHandler2 h_Trigger;
 	
 	// Handlers
     void addViewToModel();
-    void out_trigger();
+    //void ICP_points();
 
 	/// Computes the transformation between two XYZSIFT clouds basing on the found correspondences.
 	Eigen::Matrix4f computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg, 
@@ -116,15 +113,17 @@ protected:
 	/// Total number of features (in all views).	
 	int total_viewpoint_features_number;
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_merged;
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
 
     /// Alignment mode: use ICP alignment or not.
 	/// ICP properties
+public:
     Base::Property<bool> prop_ICP_alignment;
-  //  Base::Property<bool> prop_ICP_iterations;
-    Base::Property<float> ICP_transformation_epsilon;
+    Base::Property<bool> prop_ICP_alignment_normal;
+    Base::Property<bool> prop_ICP_alignment_color;
+    Base::Property<double> ICP_transformation_epsilon;
     Base::Property<float> ICP_max_correspondence_distance;
     Base::Property<int> ICP_max_iterations;
 
@@ -132,15 +131,6 @@ protected:
     Base::Property<float> RanSAC_inliers_threshold;
     Base::Property<float> RanSAC_max_iterations;
 
-
-
-/*	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_prev ;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_next ;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_to_merge;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_to_merge;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_prev;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_next;
-*/	
 };
 
 } //: namespace SOMGenerator
