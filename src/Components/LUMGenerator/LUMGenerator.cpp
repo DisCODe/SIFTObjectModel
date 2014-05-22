@@ -108,7 +108,7 @@ class SIFTFeatureRepresentation: public pcl::DefaultFeatureRepresentation <Point
 Eigen::Matrix4f LUMGenerator::computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg,
 		const pcl::CorrespondencesConstPtr& correspondences, pcl::Correspondences& inliers)
 {
-	CLOG(LTRACE) << "Computing SAC" << std::endl ;
+//	CLOG(LTRACE) << "Computing SAC" << std::endl ;
 
 	pcl::registration::CorrespondenceRejectorSampleConsensus<PointXYZSIFT> sac ;
 	sac.setInputSource(cloud_src) ;
@@ -118,8 +118,7 @@ Eigen::Matrix4f LUMGenerator::computeTransformationSAC(const pcl::PointCloud<Poi
 	sac.setInputCorrespondences(correspondences) ;
 	sac.getCorrespondences(inliers) ;
 
-	//CLOG(LINFO) << "SAC inliers " << inliers.size();
-
+	CLOG(LINFO) << "SAC inliers " << inliers.size();
 
 	return sac.getBestTransformation() ;
 }
@@ -198,137 +197,47 @@ bool LUMGenerator::onStop() {
 bool LUMGenerator::onStart() {
 	return true;
 }
-////////////////////////////////////////////////////////////////////////////////
-/** \brief Align a pair of PointCloud datasets and return the result
-  * \param cloud_src the source PointCloud
-  * \param cloud_tgt the target PointCloud
-  * \param output the resultant aligned source PointCloud
-  * \param final_transform the resultant transform between source and target
-  */
-void pairAlign (const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform, bool downsample = false) // PointCloud::Ptr output,
+
+bool loopDetection (int end, std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> &clouds, double dist, int &first, int &last)
 {
-  //
-  // Downsample for consistency and speed
-  // \note enable this for large datasets
-  PointCloud::Ptr src (new PointCloud);
-  PointCloud::Ptr tgt (new PointCloud);
-  pcl::VoxelGrid<PointT> grid;
-  if (downsample)
-  {
-    grid.setLeafSize (0.05, 0.05, 0.05);
-    grid.setInputCloud (cloud_src);
-    grid.filter (*src);
+  static double min_dist = -1;
+  int state = 0;
 
-    grid.setInputCloud (cloud_tgt);
-    grid.filter (*tgt);
-  }//in_
-  else
+  for (int i = end-1; i >= 0; i--)
   {
-    src = cloud_src;
-    tgt = cloud_tgt;
+    Eigen::Vector4f cstart, cend;
+    pcl::compute3DCentroid (*(clouds[i]), cstart);
+    pcl::compute3DCentroid (*(clouds[end]), cend);
+    Eigen::Vector4f diff = cend - cstart;
+    double norm = diff.norm ();
+
+    std::cout << endl << "distance between " << i << " and " << end << " is " << norm << " state is " << state << endl;
+
+    if (state == 0 && norm > dist)
+    {
+      state = 1;
+      //std::cout << "state 1" << std::endl;
+    }
+    if (state > 0 && norm < dist)
+    {
+      state = 2;
+      std::cout << "loop detected between scan " << i << " and scan " << end  << endl;
+      if (min_dist < 0 || norm < min_dist)
+      {
+        min_dist = norm;
+        first = i;
+        last = end;
+      }
+    }
   }
-
-
-  // Compute surface normals and curvature
-  PointCloudWithNormals::Ptr points_with_normals_src (new PointCloudWithNormals);
-  PointCloudWithNormals::Ptr points_with_normals_tgt (new PointCloudWithNormals);
-
-  pcl::NormalEstimation<PointT, PointNormalT> norm_est;
-  pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB> ());
-  norm_est.setSearchMethod (tree);
-  norm_est.setKSearch (30);
-
-  norm_est.setInputCloud (src);
-  norm_est.compute (*points_with_normals_src);
-  pcl::copyPointCloud (*src, *points_with_normals_src);
-
-  norm_est.setInputCloud (tgt);
-  norm_est.compute (*points_with_normals_tgt);
-  pcl::copyPointCloud (*tgt, *points_with_normals_tgt);
-
-  //
-  // Instantiate our custom point representation (defined above) ...
-  MyPointRepresentation point_representation;
-  // ... and weight the 'curvature' dimension so that it is balanced against x, y, and z
-  float alpha[4] = {1.0, 1.0, 1.0, 1.0};
-  point_representation.setRescaleValues (alpha);
-
-  //
-  // Align
-  pcl::IterativeClosestPointNonLinear<PointNormalT, PointNormalT> reg;
-
-  reg.setTransformationEpsilon (1e-6); //property ICP
-
-  // Set the maximum distance between two correspondences (src<->tgt) to 10cm
-  // Note: adjust this based on the size of your datasets
-  reg.setMaxCorrespondenceDistance (0.1);  //property ICP
-  // Set the point representation
-  reg.setPointRepresentation (boost::make_shared<const MyPointRepresentation> (point_representation));
-
-  reg.setInputSource (points_with_normals_src);
-  reg.setInputTarget (points_with_normals_tgt);
-
-
-
-  //
-  // Run the same optimization in a loop and visualize the results
-  Eigen::Matrix4f Ti = Eigen::Matrix4f::Identity (), prev, targetToSource;
-  PointCloudWithNormals::Ptr reg_result = points_with_normals_src;
-  reg.setMaximumIterations (2); //property ICP
-  for (int i = 0; i < 30; ++i) //magiczna liczba 30 :D
-  {
-    PCL_INFO ("Iteration Nr. %d.\n", i);
-
-    // save cloud for visualization purpose
-    points_with_normals_src = reg_result;
-
-    // Estimate
-    reg.setInputSource (points_with_normals_src);
-    reg.align (*reg_result);
-
-		//accumulate transformation between each Iteration
-    Ti = reg.getFinalTransformation () * Ti;
-
-		//if the difference between this transformation and the previous one
-		//is smaller than the threshold, refine the process by reducing
-		//the maximal correspondence distance
-    if (fabs ((reg.getLastIncrementalTransformation () - prev).sum ()) < reg.getTransformationEpsilon ())
-      reg.setMaxCorrespondenceDistance (reg.getMaxCorrespondenceDistance () - 0.001);
-
-    prev = reg.getLastIncrementalTransformation ();
-
-    // visualize current state
-//    showCloudsRight(points_with_normals_tgt, points_with_normals_src);
-  }
-
-	//
-  // Get the transformation from target to source
-  targetToSource = Ti.inverse();
-
-  //
-  // Transform target back in source frame
-//  pcl::transformPointCloud (*cloud_tgt, *output, targetToSource);
-
-/*  p->removePointCloud ("source");
-  p->removePointCloud ("target");
-
-  PointCloudColorHandlerCustom<PointT> cloud_tgt_h (output, 0, 255, 0);
-  PointCloudColorHandlerCustom<PointT> cloud_src_h (cloud_src, 255, 0, 0);
-  p->addPointCloud (output, cloud_tgt_h, "target", vp_2);
-  p->addPointCloud (cloud_src, cloud_src_h, "source", vp_2);
-
-	PCL_INFO ("Press q to continue the registration.\n");
-  p->spin ();
-
-  p->removePointCloud ("source");
-  p->removePointCloud ("target");*/
-
-  //add the source to the transformed target
-//  *output += *cloud_src;
-
-  final_transform = targetToSource;
+  //std::cout << "min_dist: " << min_dist << " state: " << state << " first: " << first << " end: " << end << std::endl;
+   if (min_dist > 0 && (state < 2 || end == int (clouds.size ()) - 1)) //TODO
+   {
+     min_dist = -1;
+     return true;
+   }
+   return false;
  }
-
 
 void LUMGenerator::addViewToModel() {
     CLOG(LTRACE) << "LUMGenerator::addViewToModel";
@@ -356,73 +265,124 @@ void LUMGenerator::addViewToModel() {
 	CLOG(LINFO) << "view cloud_sift->size(): "<<cloud_sift->size();
 
 	rgb_views.push_back(pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>()));
-	CLOG(LINFO) << "rgb views size : " << rgb_views.size();
-	*(rgb_views[counter]) = *cloud;
-	CLOG(LINFO) << "cos: ";
-    lum_sift.addPointCloud(cloud_sift);
+
+	counter++;
 
 	// First cloud.
-	if (counter == 0 ){
-		CLOG(LINFO) << "counter 0: ";
-		*cloud_merged = *cloud;
-		*cloud_sift_merged = *cloud_sift;
-
-		counter++;
+	if (counter == 1)
+	{
+		//counter++;
 		mean_viewpoint_features_number = cloud_sift->size();
 		// Push results to output data ports.
 		out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
+
+		lum_sift.addPointCloud(cloud_sift);
+		*rgb_views[0] = *cloud;
+
+
+		*cloud_merged = *cloud;
+		*cloud_sift_merged = *cloud_sift;
+
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
-
 		// Push SOM - depricated.
 //		out_instance.write(produce());
 		CLOG(LINFO) << "return ";
 		return;
 	}
 
-    // LUMGenerator view count and feature numbers.
-	counter++;
-	total_viewpoint_features_number += cloud_sift->size();
-
 	// Find corespondences between feature clouds.
 	// Initialize parameters.
-	for (int i = counter - 2; i >= 0; i--)
+	pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
+	pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst;
+	SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation()) ;
+	correst.setPointRepresentation(point_representation) ;
+	correst.setInputSource(cloud_sift) ;
+	correst.setInputTarget(cloud_sift_merged) ;
+	// Find correspondences.
+	correst.determineReciprocalCorrespondences(*correspondences) ;
+	CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences->size() << " out of " << cloud_sift->size() << " features";
+
+
+    // Compute transformation between clouds and SOMGenerator global transformation of cloud.
+	pcl::Correspondences inliers;
+	Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
+
+	int i=0;
+
+	while ( (inliers.size()) < 10 && (i <50)) //ICP property ?
 	{
-		pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
-		pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst;
-		SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation()) ;
-		correst.setPointRepresentation(point_representation) ;
-		correst.setInputSource(cloud_sift);
-		correst.setInputTarget(lum_sift.getPointCloud(i));
-		// Find correspondences.
-		correst.determineReciprocalCorrespondences(*correspondences) ;
-		//CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences->size() << " out of " << cloud_sift->size() << " features";
-		if (correspondences->size() > 2) {
-			lum_sift.setCorrespondences(counter-1, i, correspondences);
-			//break;
-			//CLOG(LINFO) << "added";
-		}
+
+		Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
+		i++;
 	}
 
-	CLOG(LINFO) << "compute";
+	cout<<"i: "<<i<<endl;
+
+	pcl::transformPointCloud(*cloud, *cloud, current_trans);
+	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+
+	lum_sift.addPointCloud(cloud_sift);
+	*rgb_views[counter -1] = *cloud;
+//	*cloud_sift_merged += *cloud_sift;
+
+	int first, last;
+
+	loopDetection(counter-1, rgb_views, 0.03, first, last);
+
+	for (int i = counter - 2; i >= 0; i--)
+	{
+	//SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation()) ;
+	//correst.setPointRepresentation(point_representation) ;
+	pcl::CorrespondencesPtr correspondences2(new pcl::Correspondences()) ;
+	pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst2;
+	correst2.setInputSource(lum_sift.getPointCloud(counter-1));
+	correst2.setInputTarget(lum_sift.getPointCloud(i));
+	// Find correspondences.
+	correst2.determineReciprocalCorrespondences(*correspondences2) ;
+	//CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences->size() << " out of " << cloud_sift->size() << " features";
+//	pcl::registration::CorrespondenceRejectorSampleConsensus<pcl::PointXYZRGB> sac2 ;
+//	sac2.setInputSource(lum_sift.getPointCloud(counter-1)) ;
+//	sac2.setInputTarget(lum_sift.getPointCloud(i)) ;
+//	sac2.setInlierThreshold(0.01f) ; //property RanSAC
+//	sac2.setMaximumIterations(2000) ; //property RanSAC
+//	sac2.setInputCorrespondences(correspondences2) ;
+//	pcl::Correspondences inliers2;
+//	sac2.getCorrespondences(inliers2) ;
+
+	//cortab[counter-1][i] = inliers2;
+	if (correspondences2->size() > 2)
+		lum_sift.setCorrespondences(counter-1, i, correspondences2);
+	//break;
+	//CLOG(LINFO) << "computet for "<<counter-1 <<" and "<< i << "  SAC2 inliers: " << correspondences2->size() << " out of " << correspondences2->size();
+	}
+
+
+	CLOG(LINFO) << "cloud_merged from LUM ";
+
+
+	//	lum_sift.setCorrespondences(counter-1, i, pcl::CorrespondencesPtr(&inliers2));
+	//	CLOG(LINFO) << "corr z 5 do 3 " << lum_sift.getCorresponences(5,3)->size();
 	//lum_rgb.compute();
-	lum_sift.compute();
-	CLOG(LINFO) << "ended";
+	if (counter > 150) {
+		lum_sift.setMaxIterations(10);
+		lum_sift.compute();
+		CLOG(LINFO) << "ended";
+		CLOG(LINFO) << "cloud_merged from LUM ";
+	}
+
+	*cloud_merged = *(rgb_views[0]);
+	for (int i = 1 ; i < counter; i++)
+	{
+		pcl::PointCloud<pcl::PointXYZRGB> tmp = *(rgb_views[i]);
+		pcl::transformPointCloud(tmp, tmp, lum_sift.getTransformation (i));
+		*cloud_merged += tmp;
+	}
 
 	cloud_sift_merged = lum_sift.getConcatenatedCloud ();
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_tmp(new pcl::PointCloud<pcl::PointXYZRGB>());
 
-	for (int i = 0; i < counter-1; i++) {
-		*cloud_tmp = *rgb_views[i];
-		Eigen::Matrix4f m = lum_sift.getTransformation(i).matrix();
-		pcl::transformPointCloud(*cloud_tmp, *cloud_tmp, m);
-		CLOG(LINFO) << "LUM Transformation " << i << " : "<< std::endl << m;
-		if(i)
-			*cloud_merged += *cloud_tmp;
-		else
-			*cloud_merged = *cloud_tmp;
-	}
+		//*cloud_sift_merged += *cloud_sift;
 //
 	CLOG(LINFO) << "model cloud->size(): "<< cloud_merged->size();
 	CLOG(LINFO) << "model cloud_sift->size(): "<< cloud_sift_merged->size();
@@ -439,6 +399,7 @@ void LUMGenerator::addViewToModel() {
 	// Push SOM - depricated.
 //	out_instance.write(produce());
 }
+
 void LUMGenerator::out_trigger(){
 
 }

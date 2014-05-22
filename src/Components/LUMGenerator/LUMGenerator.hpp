@@ -1,7 +1,7 @@
 /*!
  * \file
  * \brief
- * \author Micha Laszkowski
+ * \author Mikołaj Kamionka
  */
 
 #ifndef LUMGENERATOR_HPP_
@@ -113,6 +113,7 @@ protected:
 
 	/// Number of views.
 	int counter;
+	int count;
 
 	/// Total number of features (in all views).
 	int total_viewpoint_features_number;
