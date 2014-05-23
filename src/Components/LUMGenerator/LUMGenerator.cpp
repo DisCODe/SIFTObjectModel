@@ -326,9 +326,6 @@ void LUMGenerator::addViewToModel() {
 	*rgb_views[counter -1] = *cloud;
 //	*cloud_sift_merged += *cloud_sift;
 
-	int first, last;
-
-	loopDetection(counter-1, rgb_views, 0.03, first, last);
 
 	for (int i = counter - 2; i >= 0; i--)
 	{
