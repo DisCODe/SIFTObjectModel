@@ -52,7 +52,7 @@
 					<param name="LeafSize.z">0.005</param>
 				</Component>
 		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="11" bump="10">
-					<param name="SOM">binder_1</param>
+					<param name="SOM">LUMModel</param>
 			        </Component>
 			</Executor>
 
