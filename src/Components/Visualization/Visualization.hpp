@@ -59,6 +59,7 @@ public:
 	void prepareInterface();
 	
 	void visualize();
+	void visualize_normals();
 	void refresh();
 	
 protected:
@@ -86,7 +87,7 @@ protected:
 
 
 	/// Input data stream containing point cloud from a given view.
-	//Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
 
 	/// Input data stream containing feature cloud from a given view.
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
@@ -107,21 +108,24 @@ protected:
 
 	// Handlers
 	Base::EventHandler2 h_visualize;
+	Base::EventHandler2 h_visualize_normals;
 	Base::EventHandler2 h_refresh;
 	// Handlers
 
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr basic_cloud_ptr;
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr point_cloud;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_ptr;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point2_cloud_ptr;
+
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_ptr_normals;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb;
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
-	//boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer2;
-	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBNormal> rgb;
+	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer_normals;
+	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb;
+	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBNormal> rgb_normals;
 
 	Base::Property<string> filenames;
-	Base::Property<float> radius_search;
+	Base::Property<bool> show_normals;
 
 	void onFilenamesChanged(const std::string & old_filenames, const std::string & new_filenames);
 };
