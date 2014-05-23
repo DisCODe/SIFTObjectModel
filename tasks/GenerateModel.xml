@@ -17,18 +17,19 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
-					<param name="sequence.directory">/home/kamion/RGB-D/binder_1/</param>
-					<param name="sequence.pattern">col*.*</param>
+					<param name="sequence.directory">/home/mlepicka/Objects/food_box/rgbd-dataset/food_box/food_box_11/</param>
+					<param name="sequence.pattern">.*\_color.png</param>
 					<param name="mode.loop">0</param>					
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/kamion/RGB-D/binder_1/</param>
-					<param name="sequence.pattern">dep*.*</param>	
+					<param name="sequence.directory">/home/mlepicka/Objects/food_box/rgbd-dataset/food_box/food_box_11/</param>
+					<param name="sequence.pattern">.*\_depth.png</param>	
 					<param name="mode.loop">0</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/kamion/RGB-D/binder_1/</param>
-					<param name="sequence.pattern">mas*.*</param>
+					<param name="sequence.directory">/home/mlepicka/Objects/food_box/rgbd-dataset/food_box/food_box_11/</param>
+					<param name="sequence.pattern">.*\_mask.png</param>
+
 					<param name="mode.loop">0</param>	
 				</Component>
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="4" bump="0">
