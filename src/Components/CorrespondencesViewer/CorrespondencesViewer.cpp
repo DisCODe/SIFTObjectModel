@@ -13,7 +13,7 @@
 #include <boost/bind.hpp>
 //#include <pcl/visualization/point_cloud_color_handlers.h>
 #include <pcl/registration/correspondence_estimation.h>
-
+#include <pcl/filters/filter.h>
 namespace Processors {
 namespace CorrespondencesViewer {
 
@@ -121,6 +121,9 @@ void CorrespondencesViewer::on_clouds() {
 	
 	viewer->removePointCloud("viewcloud1") ;
 	if(display_cloud_xyzrgb1){
+		std::vector<int> indices;
+		cloud_xyzrgb1->is_dense = false; 
+		pcl::removeNaNFromPointCloud(*cloud_xyzrgb1, *cloud_xyzrgb1, indices);
 		pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> color_distribution1(cloud_xyzrgb1);
 		viewer->addPointCloud<pcl::PointXYZRGB>(cloud_xyzrgb1, color_distribution1, "viewcloud1") ;
 	}
@@ -139,6 +142,9 @@ void CorrespondencesViewer::on_clouds() {
 	
 	viewer->removePointCloud("viewcloud2") ;
 	if(display_cloud_xyzrgb2){
+		std::vector<int> indices;
+		cloud_xyzrgb2->is_dense = false; 
+		pcl::removeNaNFromPointCloud(*cloud_xyzrgb2, *cloud_xyzrgb2, indices);
 		pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> color_distribution2(cloud_xyzrgb2trans);
 		viewer->addPointCloud<pcl::PointXYZRGB>(cloud_xyzrgb2trans, color_distribution2, "viewcloud2") ;
 	}
