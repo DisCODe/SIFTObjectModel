@@ -28,7 +28,8 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 		display_cloud_xyzrgb2("display_cloud_xyzrgb2", true),
 		display_cloud_xyzsift1("display_cloud_xyzsift1", true),
 		display_cloud_xyzsift2("display_cloud_xyzsift2", true),
-		display_correspondences("display_correspondences", true) {
+		display_correspondences("display_correspondences", true),
+		prop_coordinate_system("coordinate_system", false) {
 			registerProperty(prop_window_name);
 			registerProperty(cloud_xyzsift1_point_size);
 			registerProperty(cloud_xyzsift2_point_size);
@@ -39,6 +40,7 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 			registerProperty(display_cloud_xyzsift1);
 			registerProperty(display_cloud_xyzsift2);
 			registerProperty(display_correspondences);
+			registerProperty(prop_coordinate_system);
 			
 			  // Set red as default.
 			((cv::Mat)clouds_colours).at<uchar>(0,0) = 255;
@@ -80,7 +82,7 @@ bool CorrespondencesViewer::onInit() {
 	LOG(LTRACE) << "CorrespondencesViewer::onInit";
 	viewer = new pcl::visualization::PCLVisualizer (prop_window_name);
 	viewer->setBackgroundColor (0, 0, 0);
-	viewer->addCoordinateSystem (1.0);
+	//viewer->addCoordinateSystem (1.0);
 	viewer->initCameraParameters ();
 
 	return true;
@@ -118,6 +120,8 @@ void CorrespondencesViewer::on_clouds() {
 	pcl::transformPointCloud(*cloud_xyzsift2, *cloud_xyzsift2trans, trans) ;
 	
 	//Display clouds
+	if(prop_coordinate_system)
+		viewer->addCoordinateSystem (1.0);
 	
 	viewer->removePointCloud("viewcloud1") ;
 	if(display_cloud_xyzrgb1){

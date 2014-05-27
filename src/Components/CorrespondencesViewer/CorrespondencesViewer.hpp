@@ -110,6 +110,8 @@ protected:
 	Base::Property<bool> display_cloud_xyzsift2;
 	Base::Property<bool> display_correspondences;
 	
+	Base::Property<bool> prop_coordinate_system;
+	
 };
 
 } //: namespace CorrespondencesViewer
