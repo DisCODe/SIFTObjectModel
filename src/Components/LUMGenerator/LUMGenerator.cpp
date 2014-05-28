@@ -126,8 +126,12 @@ Eigen::Matrix4f LUMGenerator::computeTransformationSAC(const pcl::PointCloud<Poi
 
 LUMGenerator::LUMGenerator(const std::string & name) :
     Base::Component(name),
-    prop_ICP_alignment("ICP.Iterative", false)
+    prop_ICP_alignment("ICP.Iterative", false),
+	threshold("threshold", 5),
+	maxIterations("Interations.Max", 5)
 {
+	registerProperty(maxIterations);
+	registerProperty(threshold);
     registerProperty(prop_ICP_alignment);
 
 }
@@ -268,6 +272,32 @@ void LUMGenerator::addViewToModel() {
 
 	counter++;
 
+		if (counter > threshold) {
+			lum_sift.setMaxIterations(maxIterations);
+			lum_sift.compute();
+			CLOG(LINFO) << "ended";
+			CLOG(LINFO) << "cloud_merged from LUM ";
+			*cloud_merged = *(rgb_views[0]);
+			for (int i = 1 ; i < threshold; i++)
+			{
+				pcl::PointCloud<pcl::PointXYZRGB> tmp = *(rgb_views[i]);
+				pcl::transformPointCloud(tmp, tmp, lum_sift.getTransformation (i));
+				*cloud_merged += tmp;
+			}
+
+			CLOG(LINFO) << "model cloud->size(): "<< cloud_merged->size();
+			CLOG(LINFO) << "model cloud_sift->size(): "<< cloud_sift_merged->size();
+
+
+			// Compute mean number of features.
+			mean_viewpoint_features_number = total_viewpoint_features_number/threshold;
+
+			out_cloud_xyzrgb.write(cloud_merged);
+			out_cloud_xyzsift.write(cloud_sift_merged);
+			cloud_sift_merged = lum_sift.getConcatenatedCloud ();
+			return;
+		}
+
 	// First cloud.
 	if (counter == 1)
 	{
@@ -291,12 +321,12 @@ void LUMGenerator::addViewToModel() {
 		return;
 	}
 
-	// Find corespondences between feature clouds.
-	// Initialize parameters.
+//	 Find corespondences between feature clouds.
+//	 Initialize parameters.
 	pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
 	pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst;
-	SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation()) ;
-	correst.setPointRepresentation(point_representation) ;
+	SIFTFeatureRepresentation::Ptr point_representation2(new SIFTFeatureRepresentation()) ;
+	correst.setPointRepresentation(point_representation2) ;
 	correst.setInputSource(cloud_sift) ;
 	correst.setInputTarget(cloud_sift_merged) ;
 	// Find correspondences.
@@ -326,37 +356,35 @@ void LUMGenerator::addViewToModel() {
 	*rgb_views[counter -1] = *cloud;
 //	*cloud_sift_merged += *cloud_sift;
 
-	int first, last;
+//	int first, last;
 
-	loopDetection(counter-1, rgb_views, 0.03, first, last);
-
-	for (int i = counter - 2; i >= 0; i--)
+//	loopDetection(counter-1, rgb_views, 0.03, first, last);
+	int added = 0;
+	for (int i = counter - 2 ; i >= 0; i--)
 	{
-	//SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation()) ;
-	//correst.setPointRepresentation(point_representation) ;
-	pcl::CorrespondencesPtr correspondences2(new pcl::Correspondences()) ;
-	pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst2;
-	correst2.setInputSource(lum_sift.getPointCloud(counter-1));
-	correst2.setInputTarget(lum_sift.getPointCloud(i));
-	// Find correspondences.
-	correst2.determineReciprocalCorrespondences(*correspondences2) ;
-	//CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences->size() << " out of " << cloud_sift->size() << " features";
-//	pcl::registration::CorrespondenceRejectorSampleConsensus<pcl::PointXYZRGB> sac2 ;
-//	sac2.setInputSource(lum_sift.getPointCloud(counter-1)) ;
-//	sac2.setInputTarget(lum_sift.getPointCloud(i)) ;
-//	sac2.setInlierThreshold(0.01f) ; //property RanSAC
-//	sac2.setMaximumIterations(2000) ; //property RanSAC
-//	sac2.setInputCorrespondences(correspondences2) ;
-//	pcl::Correspondences inliers2;
-//	sac2.getCorrespondences(inliers2) ;
+		pcl::CorrespondencesPtr correspondences2(new pcl::Correspondences()) ;
+		pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst2;
+		SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation()) ;
+		correst2.setPointRepresentation(point_representation) ;
+		correst2.setInputSource(lum_sift.getPointCloud(counter - 1));
+		correst2.setInputTarget(lum_sift.getPointCloud(i));
+		// Find correspondences.
+		correst2.determineReciprocalCorrespondences(*correspondences2);
+		//CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences2->size() << " out of " << lum_sift.getPointCloud(counter - 1)->size() << " features";
 
-	//cortab[counter-1][i] = inliers2;
-	if (correspondences2->size() > 2)
-		lum_sift.setCorrespondences(counter-1, i, correspondences2);
+		pcl::CorrespondencesPtr correspondences3(new pcl::Correspondences()) ;
+		computeTransformationSAC(lum_sift.getPointCloud(counter - 1), lum_sift.getPointCloud(i), correspondences2, *correspondences3) ;
+		//cortab[counter-1][i] = inliers2;
+		if (correspondences3->size() > 7) {
+			lum_sift.setCorrespondences(counter-1, i, correspondences3);
+			added++;
+		}
 	//break;
-	//CLOG(LINFO) << "computet for "<<counter-1 <<" and "<< i << "  SAC2 inliers: " << correspondences2->size() << " out of " << correspondences2->size();
+	//CLOG(LINFO) << "computet for "<<counter-1 <<" and "<< i << "  correspondences2: " << correspondences2->size() << " out of " << correspondences2->size();
 	}
-
+	CLOG(LINFO) << "view " << counter << " have correspondences with " << added << " views";
+	if (added == 0 )
+		CLOG(LINFO) << endl << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" <<endl;
 
 	CLOG(LINFO) << "cloud_merged from LUM ";
 
@@ -364,12 +392,19 @@ void LUMGenerator::addViewToModel() {
 	//	lum_sift.setCorrespondences(counter-1, i, pcl::CorrespondencesPtr(&inliers2));
 	//	CLOG(LINFO) << "corr z 5 do 3 " << lum_sift.getCorresponences(5,3)->size();
 	//lum_rgb.compute();
-	if (counter > 150) {
-		lum_sift.setMaxIterations(10);
-		lum_sift.compute();
-		CLOG(LINFO) << "ended";
-		CLOG(LINFO) << "cloud_merged from LUM ";
-	}
+//	if (counter > 150) {
+//		lum_sift.setMaxIterations(10);
+//		lum_sift.compute();
+//		CLOG(LINFO) << "ended";
+//		CLOG(LINFO) << "cloud_merged from LUM ";
+//		*cloud_merged = *(rgb_views[0]);
+//		for (int i = 1 ; i < counter; i++)
+//		{
+//			pcl::PointCloud<pcl::PointXYZRGB> tmp = *(rgb_views[i]);
+//			pcl::transformPointCloud(tmp, tmp, lum_sift.getTransformation (i));
+//			*cloud_merged += tmp;
+//		}
+//	}
 
 	*cloud_merged = *(rgb_views[0]);
 	for (int i = 1 ; i < counter; i++)
