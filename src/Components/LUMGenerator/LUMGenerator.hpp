@@ -127,6 +127,7 @@ protected:
     /// Alignment mode: use ICP alignment or not.
 	/// ICP properties
     Base::Property<bool> prop_ICP_alignment;
+    Base::Property<int> threshold, maxIterations;
   //  Base::Property<bool> prop_ICP_iterations;
  /*   Base::Property<float> ICP_transformation_epsilon;
     Base::Property<float> ICP_max_correspondence_distance;
