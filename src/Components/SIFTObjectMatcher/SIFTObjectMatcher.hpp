@@ -19,6 +19,7 @@
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <pcl/registration/correspondence_estimation.h>
 
 namespace Processors {
 namespace SIFTObjectMatcher {
@@ -73,11 +74,16 @@ protected:
 
 // Input data streams
 
-		Base::DataStreamIn<std::vector<AbstractObject*> > in_models;
-		Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
-		Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
+	Base::DataStreamIn<std::vector<AbstractObject*> > in_models;
+	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
 
 // Output data streams
+	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
+	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb_model;
+	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
+	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift_model;
+	Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;
 
 	// Handlers
 	Base::EventHandler2 h_readModels;
@@ -91,6 +97,7 @@ protected:
 	std::vector<SIFTObjectModel*> models;
 	
 	Base::Property<float> threshold;
+	Base::Property<float> inlier_threshold;
 
 };
 

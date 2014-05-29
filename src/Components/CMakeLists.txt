@@ -24,3 +24,8 @@ ADD_COMPONENT(Visualization)
 
 ADD_COMPONENT(NormalEstimation)
 
+ADD_COMPONENT(CorrespondencesViewer)
+
+ADD_COMPONENT(SIFTClusterExtraction)
+
+ADD_COMPONENT(PCDReader)
