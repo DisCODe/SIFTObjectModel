@@ -22,8 +22,10 @@ public:
 	/// Produces and returns a SOM object.
 	AbstractObject* produce(){
 		SIFTObjectModel *som = new SIFTObjectModel;
+		PointCloudNormalObject * somn = new PointCloudNormalObject;
 		som->cloud_xyzrgb = cloud_xyzrgb;
 		som->cloud_xyzsift = cloud_xyzsift;
+		somn->cloud_xyzrgb_normals=cloud_xyzrgb_normals;
 		som->name = model_name;
 		som->mean_viewpoint_features_number = mean_viewpoint_features_number;
 		return som;
@@ -35,6 +37,9 @@ protected:
 
 	/// Cloud of XYZRGB points - object model cloud.
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb;
+
+	/// Cloud of XYZRGBNormal points - object model cloud.
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_xyzrgb_normals;
 
 	/// Name of the model.
 	std::string model_name;
