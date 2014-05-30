@@ -152,6 +152,8 @@ SOMGenerator::SOMGenerator(const std::string & name) :
     registerProperty(ICP_max_iterations);
     registerProperty(RanSAC_inliers_threshold);
     registerProperty(RanSAC_max_iterations);
+
+    MergeUtils::test();
 }
 
 
