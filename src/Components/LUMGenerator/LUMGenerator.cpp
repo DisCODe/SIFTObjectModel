@@ -336,18 +336,7 @@ void LUMGenerator::addViewToModel() {
 
     // Compute transformation between clouds and SOMGenerator global transformation of cloud.
 	pcl::Correspondences inliers;
-	Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
-
-	int i=0;
-
-	while ( (inliers.size()) < 10 && (i <50)) //ICP property ?
-	{
-
-		Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
-		i++;
-	}
-
-	cout<<"i: "<<i<<endl;
+	Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers);
 
 	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
@@ -373,7 +362,7 @@ void LUMGenerator::addViewToModel() {
 		pcl::CorrespondencesPtr correspondences3(new pcl::Correspondences()) ;
 		computeTransformationSAC(lum_sift.getPointCloud(counter - 1), lum_sift.getPointCloud(i), correspondences2, *correspondences3) ;
 		//cortab[counter-1][i] = inliers2;
-		if (correspondences3->size() > 7) {
+		if (correspondences3->size() > 10) {
 			lum_sift.setCorrespondences(counter-1, i, correspondences3);
 			added++;
 		}

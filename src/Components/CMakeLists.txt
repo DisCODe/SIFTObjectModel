@@ -30,5 +30,4 @@ ADD_COMPONENT(SIFTClusterExtraction)
 
 ADD_COMPONENT(PCDReader)
 
-ADD_COMPONENT(CloudMerge)
-
+ADD_COMPONENT(ClosedCloudMerge)
