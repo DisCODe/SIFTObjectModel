@@ -8,9 +8,9 @@ FILE(GLOB files *.cpp)
 FIND_PACKAGE( OpenCV REQUIRED )
 
 # Create an executable file from sources:
-ADD_LIBRARY(SOMGenerator SHARED ${files})
+ADD_LIBRARY(CorrespondencesViewer SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(SOMGenerator MergeUtils ${OpenCV_LIBS} ${DisCODe_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} )
+TARGET_LINK_LIBRARIES(CorrespondencesViewer ${OpenCV_LIBS} ${DisCODe_LIBRARIES} ${PCL_LIBRARIES} )
 
-INSTALL_COMPONENT(SOMGenerator)
+INSTALL_COMPONENT(CorrespondencesViewer)

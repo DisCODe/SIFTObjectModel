@@ -12,7 +12,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 # Find another necessary libraries
 
-FIND_PACKAGE(PCL 1.3 REQUIRED)
+FIND_PACKAGE(PCL 1.3 REQUIRED COMPONENTS io visualization)
 include_directories(${PCL_INCLUDE_DIRS})
 MESSAGE("PCL include: ${PCL_INCLUDE_DIRS}")
 link_directories(${PCL_LIBRARY_DIRS})

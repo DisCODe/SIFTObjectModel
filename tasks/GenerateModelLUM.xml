@@ -17,19 +17,18 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
-					<param name="sequence.directory">/home/mlepicka/Objects/food_box/rgbd-dataset/food_box/food_box_11/</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8/</param>
 					<param name="sequence.pattern">.*\_color.png</param>
 					<param name="mode.loop">0</param>					
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/mlepicka/Objects/food_box/rgbd-dataset/food_box/food_box_11/</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8/</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 					<param name="mode.loop">0</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/mlepicka/Objects/food_box/rgbd-dataset/food_box/food_box_11/</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8/</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
-
 					<param name="mode.loop">0</param>	
 				</Component>
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="4" bump="0">
@@ -44,17 +43,19 @@
 				</Component>
 				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
 				</Component>
-                                <Component name="Generator" type="SIFTObjectModel:SOMGenerator" priority="9" bump="1">
+                                <Component name="Generator" type="SIFTObjectModel:LUMGenerator" priority="9" bump="1">
 					<param name="alignment.use ICP">1</param>
+					<param name="threshold">150</param>
+					<param name="Interations.Max">10</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="10" bump="0">
 					<param name="LeafSize.x">0.005</param>
 					<param name="LeafSize.y">0.005</param>
 					<param name="LeafSize.z">0.005</param>
 				</Component>
-		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="11" bump="10">
-					<param name="SOM">binder_1</param>
-			        </Component>
+		        <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="11" bump="10">
+					<param name="SOM">LUMModel</param>
+			    </Component>
 			</Executor>
 
 			<Executor name="Visualization" period="1">
