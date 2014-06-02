@@ -29,3 +29,5 @@ ADD_COMPONENT(CorrespondencesViewer)
 ADD_COMPONENT(SIFTClusterExtraction)
 
 ADD_COMPONENT(PCDReader)
+
+ADD_COMPONENT(ClosedCloudMerge)

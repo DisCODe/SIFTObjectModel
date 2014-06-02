@@ -1,15 +1,9 @@
-/*
- * MergeUtils.cpp
- *
- *  Created on: 30 maj 2014
- *      Author: mlepicka
- */
 
-#include "MergeUtils.hpp"
 
 #include <memory>
 #include <string>
 
+#include "CloudMerge.hpp"
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
@@ -45,6 +39,20 @@
 #include <pcl/sample_consensus/sac_model.h>
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/sample_consensus/ransac.h>
+
+
+
+namespace Processors {
+namespace CloudMerge {
+/*TO DO:
+ * -przetestowac writer oraz reader czy odpowiednio zapisuja/wczytuja z typu PointXYZRGBNormal
+ * -ICP color: czy nowy typ, czy tylko ma wyciagac informacge z PointXYZRGB o rgb i porownywac, dziecziczone po IterativeClosestPoint
+ * -domykanie pętli
+ *
+ *
+ *
+ */
+
 
 //convenient typedefs
 typedef pcl::PointXYZRGB PointT;
@@ -100,18 +108,9 @@ class SIFTFeatureRepresentation: public pcl::DefaultFeatureRepresentation <Point
 	}
 };
 
-MergeUtils::MergeUtils() {
-	// TODO Auto-generated constructor stub
-
-}
-
-MergeUtils::~MergeUtils() {
-	// TODO Auto-generated destructor stub
-}
-
-void MergeUtils::computeCorrespondences(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg, const pcl::CorrespondencesPtr& correspondences)
+void CloudMerge::computeCorrespondences(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg, pcl::Correspondences* correspondences)
 {
-	//CLOG(LTRACE) << "Computing Correspondences" << std::endl;
+	CLOG(LTRACE) << "Computing Correspondences" << std::endl;
 	pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst;
 	SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation());
 	correst.setPointRepresentation(point_representation);
@@ -119,38 +118,38 @@ void MergeUtils::computeCorrespondences(const pcl::PointCloud<PointXYZSIFT>::Con
 	correst.setInputTarget(cloud_trg) ;
 	// Find correspondences.
 	correst.determineReciprocalCorrespondences(*correspondences) ;
-	//CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences->size() << " out of " << cloud_src->size() << " features";
+	CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences->size() << " out of " << cloud_src->size() << " features";
 }
 
-Eigen::Matrix4f MergeUtils::computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg,
-		const pcl::CorrespondencesConstPtr& correspondences, pcl::Correspondences& inliers, Properties properties)
+Eigen::Matrix4f CloudMerge::computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg,
+		const pcl::CorrespondencesConstPtr& correspondences, pcl::Correspondences& inliers)
 {
-	//CLOG(LTRACE) << "Computing SAC" << std::endl;
+	CLOG(LTRACE) << "Computing SAC" << std::endl ;
 
 	pcl::registration::CorrespondenceRejectorSampleConsensus<PointXYZSIFT> sac ;
 	sac.setInputSource(cloud_src) ;
 	sac.setInputTarget(cloud_trg) ;
-	sac.setInlierThreshold(properties.RanSAC_inliers_threshold) ; //property RanSAC
-	sac.setMaximumIterations(properties.RanSAC_max_iterations) ; //property RanSAC
+	sac.setInlierThreshold(RanSAC_inliers_threshold) ; //property RanSAC
+	sac.setMaximumIterations(RanSAC_max_iterations) ; //property RanSAC
 	sac.setInputCorrespondences(correspondences) ;
 	sac.getCorrespondences(inliers) ;
 
-	//CLOG(LINFO) << "SAC inliers " << inliers.size();
+	CLOG(LINFO) << "SAC inliers " << inliers.size();
 
 	return sac.getBestTransformation() ;
 }
 
-Eigen::Matrix4f MergeUtils::computeTransformationIPC(const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_trg, Properties properties)
+Eigen::Matrix4f CloudMerge::computeTransformationIPC(const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_trg)
 {
         // Use ICP to get "better" transformation.
         pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB> icp;
 
         // Set the max correspondence distance to 5cm (e.g., correspondences with higher distances will be ignored)
-        icp.setMaxCorrespondenceDistance (properties.ICP_max_correspondence_distance); //property
+        icp.setMaxCorrespondenceDistance (CloudMerge::ICP_max_correspondence_distance); //property
         // Set the maximum number of iterations (criterion 1)
-        icp.setMaximumIterations (properties.ICP_max_iterations); // property
+        icp.setMaximumIterations (CloudMerge::ICP_max_iterations); // property
         // Set the transformation epsilon (criterion 2)
-        icp.setTransformationEpsilon (properties.ICP_transformation_epsilon); //property
+        icp.setTransformationEpsilon (CloudMerge::ICP_transformation_epsilon); //property
         // Set the euclidean distance difference epsilon (criterion 3)
         icp.setEuclideanFitnessEpsilon (1); // property ?
 
@@ -158,23 +157,23 @@ Eigen::Matrix4f MergeUtils::computeTransformationIPC(const pcl::PointCloud<pcl::
         icp.setInputTarget(cloud_trg);
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr Final (new pcl::PointCloud<pcl::PointXYZRGB>());
         icp.align(*Final);
-      //  CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
+        CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
 
         // Get the transformation from target to source.
         return icp.getFinalTransformation().inverse();
 }
 
-Eigen::Matrix4f MergeUtils::computeTransformationIPCNormals(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_trg, Properties properties)
+Eigen::Matrix4f CloudMerge::computeTransformationIPCNormals(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_trg)
 {
     // Use ICP to get "better" transformation.
     pcl::IterativeClosestPointWithNormals<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal> icp;
 
     // Set the max correspondence distance to 5cm (e.g., correspondences with higher distances will be ignored)
-    icp.setMaxCorrespondenceDistance (properties.ICP_max_correspondence_distance); //property
+    icp.setMaxCorrespondenceDistance (CloudMerge::ICP_max_correspondence_distance); //property
     // Set the maximum number of iterations (criterion 1)
-    icp.setMaximumIterations (properties.ICP_max_iterations); // property
+    icp.setMaximumIterations (CloudMerge::ICP_max_iterations); // property
     // Set the transformation epsilon (criterion 2)
-    icp.setTransformationEpsilon (properties.ICP_transformation_epsilon); //property
+    icp.setTransformationEpsilon (CloudMerge::ICP_transformation_epsilon); //property
     // Set the euclidean distance difference epsilon (criterion 3)
     icp.setEuclideanFitnessEpsilon (0.001); // property ?
 
@@ -218,8 +217,85 @@ Eigen::Matrix4f MergeUtils::computeTransformationIPCNormals(const pcl::PointClou
       reg_result= Final;
     }
 
-    // CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
+    CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
 
     // Get the transformation from target to source.
     return icp.getFinalTransformation().inverse();
 }
+
+CloudMerge::CloudMerge(const std::string & name) :
+    Base::Component(name),
+    prop_ICP_alignment("ICP.Points", true),
+    prop_ICP_alignment_normal("ICP.Normals",true),
+    prop_ICP_alignment_color("ICP.Color",false),
+    ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
+    ICP_max_correspondence_distance("ICP.Correspondence_distance",0.1),
+    ICP_max_iterations("ICP.Iterations",2000),
+    RanSAC_inliers_threshold("RanSac.Inliers_threshold",0.01f),
+    RanSAC_max_iterations("RanSac.Iterations",2000)
+{
+    registerProperty(prop_ICP_alignment);
+    registerProperty(prop_ICP_alignment_normal);
+    registerProperty(prop_ICP_alignment_color);
+    registerProperty(ICP_transformation_epsilon);
+    registerProperty(ICP_max_correspondence_distance);
+    registerProperty(ICP_max_iterations);
+    registerProperty(RanSAC_inliers_threshold);
+    registerProperty(RanSAC_max_iterations);
+}
+
+
+CloudMerge::~CloudMerge() {
+}
+
+void CloudMerge::prepareInterface() {
+	// Register data streams.
+	registerStream("in_cloud_xyzrgb", &in_cloud_xyzrgb);
+	registerStream("in_cloud_xyzrgb_normals", &in_cloud_xyzrgb_normals);
+	registerStream("in_cloud_xyzsift", &in_cloud_xyzsift);
+	registerStream("out_instance", &out_instance);
+	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
+	registerStream("out_cloud_xyzrgb_normals", &out_cloud_xyzrgb_normals);
+	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
+	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
+
+    // Register single handler - the "addViewToModel" function.
+    h_addViewToModel.setup(boost::bind(&CloudMerge::addViewToModel, this));
+    registerHandler("addViewToModel", &h_addViewToModel);
+    addDependency("addViewToModel", &in_cloud_xyzsift);
+    addDependency("addViewToModel", &in_cloud_xyzrgb);
+}
+
+bool CloudMerge::onInit() {
+	// Number of viewpoints.
+	counter = 0;
+	// Mean number of features per view.
+	mean_viewpoint_features_number = 0;
+
+	global_trans = Eigen::Matrix4f::Identity();
+
+	cloud_merged = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
+	cloud_sift_merged = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
+	cloud_normal_merged = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+	return true;
+}
+
+bool CloudMerge::onFinish() {
+	return true;
+}
+
+bool CloudMerge::onStop() {
+	return true;
+}
+
+bool CloudMerge::onStart() {
+	return true;
+}
+
+void addViewToModel(){
+
+}
+
+} // namespace CloudMerge
+} // namespace Processors
+
