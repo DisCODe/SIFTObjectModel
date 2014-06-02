@@ -83,6 +83,9 @@ protected:
 	/// Input data stream containing object model point cloud.
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
 
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> in_cloud_xyzrgb_normals;
+
+
 	/// Input data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
 
@@ -92,9 +95,11 @@ protected:
 
 	// Handlers
 	Base::EventHandler2 h_Write;
+	Base::EventHandler2 h_Write_normals;
 	
 	// Handlers
 	void Write();
+	void Write_normals();
 
 	/// Name of the model - used for generation of names of JSON ("major" file) and PCDs ("minor" files containing clouds).
 	Base::Property<std::string> SOMname;

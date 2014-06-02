@@ -18,6 +18,16 @@ ADD_COMPONENT(Downsampling)
 
 ADD_COMPONENT(PC2Octree)
 
+ADD_COMPONENT(LUMGenerator)
+
 ADD_COMPONENT(Visualization)
 
 ADD_COMPONENT(NormalEstimation)
+
+ADD_COMPONENT(CorrespondencesViewer)
+
+ADD_COMPONENT(SIFTClusterExtraction)
+
+ADD_COMPONENT(PCDReader)
+
+ADD_COMPONENT(ClosedCloudMerge)

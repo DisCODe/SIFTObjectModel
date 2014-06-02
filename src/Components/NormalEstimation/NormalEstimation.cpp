@@ -76,31 +76,48 @@ void NormalEstimation::compute() {
 	std::vector<int> indices;
 
 	point_cloud_ptr=in_cloud_xyzrgb.read();
+
+	// Remove NaNs.
 	point_cloud_ptr->is_dense = false;
 	pcl::removeNaNFromPointCloud(*point_cloud_ptr, *point_cloud_ptr, indices);
-	std::cout<< "NormalEstimation::in_cloud_xyzrgb.read()->size(): "<< point_cloud_ptr->size() <<std::endl;
 
 
 	pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
-	ne.setInputCloud (point_cloud_ptr->makeShared());
-	//pcl::removeNaNNormalsFromPointCloud();
+	ne.setInputCloud (point_cloud_ptr);
+
 
 	pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB> ());
 	ne.setSearchMethod(tree);
 
 	pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
-	ne.setRadiusSearch(0.05);
-	//cloud_normals=point_cloud_ptr;
+	ne.setRadiusSearch(radius_search);
+
+	float x_;
+	float y_;
+	float z_;
+
+
+	for(int i=0; i<point_cloud_ptr->size(); i++){
+		x_+=point_cloud_ptr->points[i].x;
+		y_+=point_cloud_ptr->points[i].y;
+		z_+=point_cloud_ptr->points[i].z;
+	}
+
+	x_/=point_cloud_ptr->size();
+	y_/=point_cloud_ptr->size();
+	z_/=point_cloud_ptr->size();
+
+	//ne.setViewPoint(x_, y_, z_);
+
+	ne.setViewPoint(point_cloud_ptr->points[1].x,point_cloud_ptr->points[1].y,point_cloud_ptr->points[1].z);
 
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_out (new pcl::PointCloud<pcl::PointXYZRGBNormal>);
-	//compute zapewne nie kopiuje XYZRGB na wyjscie a dodaje same wektory
+
 	ne.compute(*cloud_normals);
-	//cloud_normals->
 
 	pcl::concatenateFields(*point_cloud_ptr, *cloud_normals, *cloud_out);
 
 	out_cloud_xyzrgb_normals.write(cloud_out);
-	//std::cout<<"Normal Estimation:: out_cloud_xyzrgb_normals.write(cloud_normals)->size(): "<<out_cloud_xyzrgb_normals <<std::endl;
 
 }
 

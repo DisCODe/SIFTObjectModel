@@ -5,6 +5,8 @@
 #include <pcl/point_cloud.h>
 #include <Types/PointCloudObject.hpp> 
 #include <Types/PointXYZSIFT.hpp> 
+#include <Types/PointCloudNormalObject.hpp>
+
 //namespace Types {
 
 /*!
@@ -12,7 +14,7 @@
  * \brief Model of 3D object.
  * It consists of: object point cloud, SIFT cloud, mean number of viewpoint features.
  */
-class SIFTObjectModel : public PointCloudObject
+class SIFTObjectModel : public PointCloudObject, public PointCloudNormalObject
 {
 	public:
 	/// Mean number of viewpoint features
