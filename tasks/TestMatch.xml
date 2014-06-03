@@ -16,19 +16,19 @@
 	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
-				<Component name="SOMJSONReader" type="PCL:SOMJSONReader" priority="1" bump="4">
-					<param name="filenames">/home/tkornuta/SOModels/cereal_box_1_co5_v2.json</param>
+				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
+					<param name="filenames">/home/mlepicka/modele/savanah_v2.json</param>
 				</Component>
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/tkornuta/Objects/cereal_box_1_co5</param>
+					<param name="sequence.directory">/home/mlepicka/Objects/food_box_8/rgbd-dataset/food_box/food_box_8/</param>
 					<param name="sequence.pattern">.*\_color.png</param>				
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/tkornuta/Objects/cereal_box_1_co5</param>
+					<param name="sequence.directory">/home/mlepicka/Objects/food_box_8/rgbd-dataset/food_box/food_box_8/</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
-					<param name="sequence.directory">/home/tkornuta/Objects/cereal_box_1_co5</param>
+					<param name="sequence.directory">/home/mlepicka/Objects/food_box_8/rgbd-dataset/food_box/food_box_8/</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 				</Component>
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="5" bump="0">
@@ -38,10 +38,10 @@
 				</Component>
 				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
 				</Component>
-				<Component name="FeatureCloudConverter" type="PCL:FeatureCloudConverter" priority="8" bump="0">
+				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
 				</Component>
 				
-				<Component name="SIFTObjectMatcher" type="PCL:SIFTObjectMatcher" priority="9" bump="0">
+				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
 				</Component>
             </Executor>
 

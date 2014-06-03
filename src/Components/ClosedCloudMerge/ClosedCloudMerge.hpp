@@ -1,11 +1,7 @@
-/*!
- * \file
- * \brief 
- * \author Micha Laszkowski
- */
 
-#ifndef SOMGENERATOR_HPP_
-#define SOMGENERATOR_HPP_
+
+#ifndef CLOSEDCLOUDMERGE_HPP_
+#define CLOSEDCLOUDMERGE_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -15,9 +11,10 @@
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-#include <Types/PointXYZSIFT.hpp> 
-#include <Types/SIFTObjectModel.hpp> 
-#include <Types/SIFTObjectModelFactory.hpp> 
+#include <Types/MergeUtils.hpp>
+#include <Types/PointXYZSIFT.hpp>
+#include <Types/SIFTObjectModel.hpp>
+#include <Types/SIFTObjectModelFactory.hpp>
 
 #include <Types/MergeUtils.hpp>
 
@@ -25,36 +22,30 @@
 #include "pcl/registration/correspondence_rejection_sample_consensus.h"
 
 #include <opencv2/core/core.hpp>
+#include <pcl/registration/lum.h>
 
 
 namespace Processors {
-namespace SOMGenerator {
+namespace ClosedCloudMerge {
 
-/*!
- * \class SOMGenerator
- * \brief SOMGenerator processor class.
- *
- * SOMGenerator processor.
- */
-class SOMGenerator: public Base::Component,SIFTObjectModelFactory {
+class ClosedCloudMerge: public Base::Component,SIFTObjectModelFactory {
+
 public:
 	/*!
 	 * Constructor.
 	 */
-    SOMGenerator(const std::string & name = "SOMGenerator");
-
+    ClosedCloudMerge(const std::string & name = "ClosedCloudMerge");
 	/*!
 	 * Destructor
 	 */
-    virtual ~SOMGenerator();
+    virtual ~ClosedCloudMerge();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
-	 * At this point, all properties are already initialized and loaded to 
+	 * At this point, all properties are already initialized and loaded to
 	 * values set in config file.
 	 */
 	void prepareInterface();
-
 
 protected:
 
@@ -88,7 +79,7 @@ protected:
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
 
 	/// Output data stream containing SIFTObjectModel - depricated.
-	Base::DataStreamOut<AbstractObject*> out_instance; 
+	Base::DataStreamOut<AbstractObject*> out_instance;
 
 	/// Output data stream containing object model point cloud.
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
@@ -100,26 +91,21 @@ protected:
 	/// Output data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 
-	// Mean number of features per view. 
+	// Mean number of features per view.
 	Base::DataStreamOut<int> out_mean_viewpoint_features_number;
 
 	// Handlers
     Base::EventHandler2 h_addViewToModel;
-    Base::EventHandler2 h_addViewToModel_normals;
-	
-	// Handlers
+
     void addViewToModel();
-    void addViewToModel_normals();
 
-	/// Computes the transformation between two XYZSIFT clouds basing on the found correspondences.
-	Eigen::Matrix4f computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg, 
-		const pcl::CorrespondencesConstPtr& correspondences, pcl::Correspondences& inliers);
+    MergeUtils::Properties properties;
 
-	/// Number of views.	
+	/// Number of views.
 	int counter;
 
 
-	/// Total number of features (in all views).	
+	/// Total number of features (in all views).
 	int total_viewpoint_features_number;
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
@@ -127,8 +113,11 @@ protected:
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
 
-    /// Alignment mode: use ICP alignment or not.
-	/// ICP properties
+//	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> rgb_views;
+	std::vector<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> rgb_views;
+    pcl::registration::LUM<PointXYZSIFT> lum_sift;
+
+
 public:
     Base::Property<bool> prop_ICP_alignment;
     Base::Property<bool> prop_ICP_alignment_normal;
@@ -141,14 +130,12 @@ public:
     Base::Property<float> RanSAC_inliers_threshold;
     Base::Property<float> RanSAC_max_iterations;
 
+    Base::Property<int> threshold, maxIterations;
 };
 
-} //: namespace SOMGenerator
-} //: namespace Processors
+REGISTER_COMPONENT("ClosedCloudMerge", Processors::ClosedCloudMerge::ClosedCloudMerge)
 
-/*
- * Register processor component.
- */
-REGISTER_COMPONENT("SOMGenerator", Processors::SOMGenerator::SOMGenerator)
+} // namespace Processors
+} // namespace ClosedCloudMerge
 
-#endif /* SOMGENERATOR_HPP_ */
+#endif /* CLOSEDCLOUDMERGE_HPP_ */
