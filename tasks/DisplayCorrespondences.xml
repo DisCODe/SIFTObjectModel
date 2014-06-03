@@ -46,14 +46,12 @@
             </Executor>
 
 			<Executor name="Visualization" period="1">
-<!--
-				<Component name="WindowPCL" type="PCL:XYZCloudViewer" priority="1" bump="0">
-					<param name="title">RGB(white), SIFT(red)</param>
-					<param name="count">2</param>
-					<param name="clouds_colours"> 255 255 255;255 0 0</param>
-				</Component>
--->
+
 				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
+				</Component>
+				<Component name="Window2" type="PCL:CloudViewer" priority="1" bump="0">
+					<param name="coordinate_system">0</param>
+					<param name="two_viewports">1</param>
 				</Component>
             </Executor>
 		</Subtask>	
@@ -86,15 +84,10 @@
 		</Source>		
 		<Source name="Converter.out_cloud_xyzrgb">
 			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
-<!--
-			<sink>WindowPCL.in_cloud_xyz0</sink>			
--->
+
 		</Source>
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
 			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>	
-<!--
-			<sink>WindowPCL.in_cloud_xyz1</sink>
--->
 		</Source>
 
 		<Source name="SOMJSONReader.out_models">
@@ -103,9 +96,11 @@
 		
 		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
 			<sink>Window.in_cloud_xyzrgb1</sink>
+			<sink>Window2.in_cloud_xyzrgb</sink>
 		</Source>
 		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
 			<sink>Window.in_cloud_xyzrgb2</sink>
+			<sink>Window2.in_cloud_xyzrgb2</sink>
 		</Source>
 		<Source name="SIFTObjectMatcher.out_cloud_xyzsift">
 			<sink>Window.in_cloud_xyzsift1</sink>
