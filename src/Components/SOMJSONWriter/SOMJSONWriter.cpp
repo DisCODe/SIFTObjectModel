@@ -47,6 +47,8 @@ void SOMJSONWriter::prepareInterface() {
 	// Register handlers
 	h_Write.setup(boost::bind(&SOMJSONWriter::Write, this));
 	registerHandler("Write", &h_Write);
+	addDependency("Write", &in_cloud_xyzsift);
+	addDependency("Write", &in_cloud_xyzrgb_normals);
 
 }
 
@@ -83,6 +85,11 @@ void SOMJSONWriter::Write() {
 	LOG(LTRACE) << "SOMJSONWriter::Write";
 	// Try to save the model retrieved from the SOM data stream.
 	ptree ptree_file;
+
+	if(in_cloud_xyzrgb_normals.empty()&&in_cloud_xyzrgb.empty()&&in_cloud_xyzsift.empty()&&in_mean_viewpoint_features_number.empty()){
+		CLOG(LWARNING) << "There are no required datastreams enabling save of the SOM to file.";
+		return;
+	}
 
 	if (!in_som.empty()) {
 		LOG(LDEBUG) << "!in_som.empty()";
@@ -172,15 +179,7 @@ void SOMJSONWriter::Write() {
 		ptree_file.put("type", "PointCloudNormalObject");
 		ptree_file.put("cloud_xyzrgb_normal", name_cloud_xyzrgb_normals);
 
-
-
 	}
-
-
-if(in_cloud_xyzrgb_normals.empty()&&in_cloud_xyzrgb.empty()&&in_cloud_xyzsift.empty()&&in_mean_viewpoint_features_number.empty()){
-	CLOG(LWARNING) << "There are no required datastreams enabling save of the SOM to file.";
-	return;
-}
 
 write_json (std::string(dir) + std::string("/") + std::string(SOMname) + std::string(".json"), ptree_file);
 

@@ -17,18 +17,18 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
-					<param name="filenames">/home/mlaszkow/jsonmodels/CB1.json</param>
+					<param name="filenames">/home/mkamionk/DisCODe/RGB-D/Model/LUMfood_box_8R.json</param>
 				</Component>
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/tkornuta/Objects/cereal_box_1_co5</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3</param>
 					<param name="sequence.pattern">.*\_color.png</param>				
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/tkornuta/Objects/cereal_box_1_co5</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
-					<param name="sequence.directory">/home/tkornuta/Objects/cereal_box_1_co5</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 				</Component>
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="5" bump="0">

@@ -179,7 +179,6 @@ Eigen::Matrix4f MergeUtils::computeTransformationIPCNormals(const pcl::PointClou
     icp.setEuclideanFitnessEpsilon (0.001); // property ?
 
     icp.setInputSource(cloud_src);
-
     icp.setInputTarget(cloud_trg);
     pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Final (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
     pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr points_with_normals_src (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
@@ -193,17 +192,14 @@ Eigen::Matrix4f MergeUtils::computeTransformationIPCNormals(const pcl::PointClou
 
     for (int i = 0; i < 30; ++i)
     {
-
       // Estimate
         icp.setInputSource(reg_result);
-
         icp.align (*Final);
         if(icp.converged_==false)
         {
         	PCL_INFO("Not enough correspondences so nothing happened\n");
         	return Eigen::Matrix4f::Identity();
         }
-
   		//accumulate transformation between each Iteration
       Ti = icp.getFinalTransformation () * Ti;
 
@@ -212,9 +208,7 @@ Eigen::Matrix4f MergeUtils::computeTransformationIPCNormals(const pcl::PointClou
   		//the maximal correspondence distance
       if (fabs ((icp.getLastIncrementalTransformation () - prev).sum ()) < icp.getTransformationEpsilon ())
         icp.setMaxCorrespondenceDistance (icp.getMaxCorrespondenceDistance () - 0.001);
-
       prev = icp.getLastIncrementalTransformation ();
-
       reg_result= Final;
     }
 

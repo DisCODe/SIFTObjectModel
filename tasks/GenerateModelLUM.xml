@@ -17,21 +17,21 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
-					<param name="sequence.directory">/home/kamion/RGB-D/food_box_R/</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3R/</param>
 					<param name="sequence.pattern">.*\_color.png</param>
 					<param name="mode.loop">0</param>					
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/kamion/RGB-D/food_box_R/</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3R/</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 					<param name="mode.loop">0</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/kamion/RGB-D/food_box_R/</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3R/</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>	
 				</Component>
-				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="4" bump="0">
+				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="4" bum="0">
 					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
 				</Component>
 				<Component name="SIFT" type="CvBasic:CvSIFT" priority="5" bump="0">
@@ -48,7 +48,7 @@
 				<param name="radius">0.02</param>
 				</Component>
                 <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="10" bump="1">
-					<param name="threshold">14</param>
+					<param name="threshold">15</param>
 					<param name="Interations.Max">10</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
@@ -56,8 +56,13 @@
 					<param name="LeafSize.y">0.005</param>
 					<param name="LeafSize.z">0.005</param>
 				</Component>
-		        <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="12" bump="10">
-					<param name="SOM">LUMModel</param>
+				<Component name="VoxelGridRGB" type="PCL:VoxelGrid" priority="12" bump="0">
+					<param name="LeafSize.x">0.005</param>
+					<param name="LeafSize.y">0.005</param>
+					<param name="LeafSize.z">0.005</param>
+				</Component>
+		        <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="13" bump="10">
+					<param name="SOM">LUMfood_box_3R</param>
 			    </Component>
 			</Executor>
 
@@ -100,6 +105,7 @@
 
 		<Source name="StatisticalOutlierRemoval.out_cloud_xyzrgb">
 			<sink>Normals.in_cloud_xyzrgb</sink>
+			<sink>Generator.in_cloud_xyzrgb</sink>
 		</Source>
 
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
@@ -112,11 +118,16 @@
 		<Source name="Generator.out_cloud_xyzrgb_normals">
 			<sink>VoxelGrid.in_cloud_xyzrgb_normal</sink>
 		</Source>
+		<Source name="Generator.out_cloud_xyzrgb">
+			<sink>VoxelGridRGB.in_cloud_xyzrgb</sink>
+		</Source>
 		<Source name="VoxelGrid.out_cloud_xyzrgb_normal">
 			<sink>Visualizer.in_cloud_xyzrgb_normals</sink>
 			<sink>Writer.in_cloud_xyzrgb_normals</sink>
 		</Source>	
-
+		<Source name="VoxelGridRGB.out_cloud_xyzrgb">
+			<sink>Writer.in_cloud_xyzrgb</sink>
+		</Source>	
 		<Source name="Generator.out_cloud_xyzsift">
 			<sink>Writer.in_cloud_xyzsift</sink>	
 		</Source>
