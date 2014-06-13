@@ -229,7 +229,7 @@ void ClosedCloudMerge::addViewToModel()
 	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
-	current_trans = MergeUtils::computeTransformationIPCNormals(cloud, cloud_normal_merged, properties);
+	current_trans = MergeUtils::computeTransformationICPNormals(cloud, cloud_normal_merged, properties);
 
 	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);

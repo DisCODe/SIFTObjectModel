@@ -54,7 +54,7 @@
 					<param name="radius">0.02</param>
 					
 				</Component>
-                                <Component name="Generator" type="SIFTObjectModel:SOMGenerator" priority="11" bump="1">
+                                <Component name="Generator" type="SIFTObjectModel:OpenCloudMerge" priority="11" bump="1">
 					<param name="ICP.Correspondence_distance">0.01</param>
 					<param name="ICP.Iterations">5000</param>
 				</Component>
