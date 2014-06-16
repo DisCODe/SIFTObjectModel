@@ -20,19 +20,19 @@
 					<param name="">1</param>
 				</Component>
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/mlepicka/Objects/food_box_3/rgbd-dataset/food_box/food_box_3/</param>
-					<param name="sequence.pattern">.*\_color.png</param>
+					<param name="sequence.directory">/home/mlepicka/012/kakao/</param>
+					<param name="sequence.pattern">.*\_rgb.png</param>
 					<param name="mode.loop">0</param>
 					<param name="mode.triggered">1</param>				
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/mlepicka/Objects/food_box_3/rgbd-dataset/food_box/food_box_3/</param>
+					<param name="sequence.directory">/home/mlepicka/012/kakao/</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 					<param name="mode.loop">0</param>
 					<param name="mode.triggered">1</param>		
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
-					<param name="sequence.directory">/home/mlepicka/Objects/food_box_3/rgbd-dataset/food_box/food_box_3/</param>
+					<param name="sequence.directory">/home/mlepicka/012/kakao/</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>
 					<param name="mode.triggered">1</param>		
@@ -63,8 +63,9 @@
 					<param name="LeafSize.y">0.005</param>
 					<param name="LeafSize.z">0.005</param>
 				</Component>
-		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="13" bump="2">
-					<param name="SOM">pudelko_v2</param>
+		                <Component name="Writer" type="SIFTObjectModel:SIFTNOMJSONWriter" priority="13" bump="2">
+					<param name="SOM">Normalne_test</param>
+					<param name="directory">/home/mlepicka/modele</param>
 			        </Component>
 
 			</Executor>
@@ -137,7 +138,6 @@
 		<Source name="Generator.out_mean_viewpoint_features_number">
 			<sink>Writer.in_mean_viewpoint_features_number</sink>
 		</Source>
-
 				
 	</DataStreams>
 </Task>

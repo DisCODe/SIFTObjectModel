@@ -108,7 +108,7 @@ void Visualization::refresh(){
 void Visualization::visualize(){
 	//visualization of model
 	viewer->removeAllPointClouds();
-/*
+
 	  if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (filenames, *cloud_xyzrgb) == -1)
 	  {
 		cout <<"Cannot read PointXYZRGB cloud from "<<filenames;
@@ -116,9 +116,9 @@ void Visualization::visualize(){
 	  else
 		  point_cloud_ptr=cloud_xyzrgb;
 
-*/
 
 
+/*
 	   point_cloud_ptr=in_cloud_xyzrgb.read();
 	   rgb = pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB>(point_cloud_ptr);
 	   viewer->addPointCloud<pcl::PointXYZRGB>(point_cloud_ptr, rgb, "sample cloud");
@@ -130,7 +130,7 @@ void Visualization::visualize(){
 	   if (!viewer->wasStopped ())
 	   {
 	     viewer->spinOnce (100);
-	   }
+	   }*/
 
 }
 
