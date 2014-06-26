@@ -48,8 +48,8 @@ ClosedCloudMerge::ClosedCloudMerge(const std::string & name) :
     ICP_max_iterations("ICP.Iterations",2000),
     RanSAC_inliers_threshold("RanSac.Inliers_threshold",0.01f),
     RanSAC_max_iterations("RanSac.Iterations",2000),
-	threshold("threshold", 5),
-	maxIterations("Interations.Max", 5)
+    threshold("View.Number", 5),
+    maxIterations("Interations.Max", 5)
 {
     registerProperty(prop_ICP_alignment);
     registerProperty(prop_ICP_alignment_normal);
@@ -59,8 +59,8 @@ ClosedCloudMerge::ClosedCloudMerge(const std::string & name) :
     registerProperty(ICP_max_iterations);
     registerProperty(RanSAC_inliers_threshold);
     registerProperty(RanSAC_max_iterations);
-	registerProperty(maxIterations);
-	registerProperty(threshold);
+    registerProperty(maxIterations);
+    registerProperty(threshold);
 
 	properties.ICP_transformation_epsilon = ICP_transformation_epsilon;
 	properties.ICP_max_iterations = ICP_max_iterations;
@@ -221,7 +221,7 @@ void ClosedCloudMerge::addViewToModel()
 		MergeUtils::computeTransformationSAC(lum_sift.getPointCloud(counter - 1), lum_sift.getPointCloud(i), correspondences2, *correspondences3, properties) ;
 		//cortab[counter-1][i] = inliers2;
 		CLOG(LINFO) << "  correspondences3: " << correspondences3->size() << " out of " << correspondences2->size();
-		if (correspondences3->size() > 5) {
+		if (correspondences3->size() > 10) {
 			lum_sift.setCorrespondences(counter-1, i, correspondences3);
 			added++;
 			for(int j = 0; j< correspondences3->size();j++){
