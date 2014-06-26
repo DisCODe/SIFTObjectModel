@@ -94,32 +94,39 @@ void Visualization::onFilenamesChanged(const std::string & old_filenames, const 
 	CLOG(LTRACE) << "onFilenamesChanged: " << std::string(filenames) << std::endl;
 }
 void Visualization::refresh(){
-	viewer->spinOnce(100);
+	//viewer->spinOnce(100);
 
 	if(show_normals)
 	{
-		   if(point_cloud->size()!=cloud_ptr_normals->size())
+		   if( (point_cloud->size()!=cloud_ptr_normals->size()) )
 			   viewer->addPointCloudNormals<pcl::PointXYZRGBNormal> (cloud_ptr_normals, 15, 0.05, "normals");
 
 		   point_cloud=cloud_ptr_normals;
 	}
+	else
+	{
+			viewer->removePointCloud("normals",0);
+
+	}
+	viewer->spinOnce(100);
 }
 
 void Visualization::visualize(){
 	//visualization of model
 	viewer->removeAllPointClouds();
 
-	  if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (filenames, *cloud_xyzrgb) == -1)
-	  {
-		cout <<"Cannot read PointXYZRGB cloud from "<<filenames;
-	  }
-	  else
-		  point_cloud_ptr=cloud_xyzrgb;
+	 // if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (filenames, *cloud_xyzrgb) == -1)
+	 // {
+	//	cout <<"Cannot read PointXYZRGB cloud from "<<filenames;
+	//  }
+	//  else
+	//	  point_cloud_ptr=cloud_xyzrgb;
 
 
-
-/*
 	   point_cloud_ptr=in_cloud_xyzrgb.read();
+
+	   CLOG(LINFO)<<"Size of in_cloud_xyzrgb "<<point_cloud_ptr->size();
+
 	   rgb = pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB>(point_cloud_ptr);
 	   viewer->addPointCloud<pcl::PointXYZRGB>(point_cloud_ptr, rgb, "sample cloud");
 
@@ -130,7 +137,7 @@ void Visualization::visualize(){
 	   if (!viewer->wasStopped ())
 	   {
 	     viewer->spinOnce (100);
-	   }*/
+	   }
 
 }
 
@@ -150,7 +157,7 @@ void Visualization::visualize_normals(){
 */
 	   cloud_ptr_normals=in_cloud_xyzrgb_normals.read();
 
-	   std::cout<<"Size of in_cloud_xyzrgb_normals: "<<cloud_ptr_normals->size()<<std::endl;
+	   CLOG(LINFO)<<"Size of in_cloud_xyzrgb_normals: "<<cloud_ptr_normals->size();
 
 	   rgb_normals = pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBNormal>(cloud_ptr_normals);
 

@@ -154,11 +154,11 @@ void SOMJSONWriter::Write() {
 
 
 	}
-
+/*
 if(in_cloud_xyzrgb.empty()&&in_cloud_xyzsift.empty()&&in_mean_viewpoint_features_number.empty()){
 	CLOG(LWARNING) << "There are no required datastreams enabling save of the SOM to file.";
 	return;
-}
+}*/
 
 write_json (std::string(dir) + std::string("/") + std::string(SOMname) + std::string(".json"), ptree_file);
 
