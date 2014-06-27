@@ -200,11 +200,13 @@ void ClosedCloudMerge::addViewToModel()
 	pcl::transformPointCloud(*cloudrgb, *cloudrgb, current_trans);
 	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
+
 //	current_trans = MergeUtils::computeTransformationIPCNormals(cloud, cloud_normal_merged, properties);
 //
 //	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 //	pcl::transformPointCloud(*cloudrgb, *cloudrgb, current_trans);
 //	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+
 
 	lum_sift.addPointCloud(cloud_sift);
 	*rgbn_views[counter -1] = *cloud;

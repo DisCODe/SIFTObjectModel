@@ -140,7 +140,7 @@ Eigen::Matrix4f MergeUtils::computeTransformationSAC(const pcl::PointCloud<Point
 	return sac.getBestTransformation() ;
 }
 
-Eigen::Matrix4f MergeUtils::computeTransformationIPC(const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_trg, Properties properties)
+Eigen::Matrix4f MergeUtils::computeTransformationICP(const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_trg, Properties properties)
 {
         // Use ICP to get "better" transformation.
         pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB> icp;
@@ -164,7 +164,7 @@ Eigen::Matrix4f MergeUtils::computeTransformationIPC(const pcl::PointCloud<pcl::
         return icp.getFinalTransformation().inverse();
 }
 
-Eigen::Matrix4f MergeUtils::computeTransformationIPCNormals(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_trg, Properties properties)
+Eigen::Matrix4f MergeUtils::computeTransformationICPNormals(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_trg, Properties properties)
 {
     // Use ICP to get "better" transformation.
     pcl::IterativeClosestPointWithNormals<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal> icp;

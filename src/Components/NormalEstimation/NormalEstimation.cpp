@@ -77,10 +77,13 @@ void NormalEstimation::compute() {
 
 	point_cloud_ptr=in_cloud_xyzrgb.read();
 
+	CLOG(LINFO) << "NormalEstimation->in_cloud_xyzrgb->size(): "<< point_cloud_ptr->size();
+
 	// Remove NaNs.
 	point_cloud_ptr->is_dense = false;
 	pcl::removeNaNFromPointCloud(*point_cloud_ptr, *point_cloud_ptr, indices);
 
+	CLOG(LINFO) << "NormalEstimation->in_cloud_xyzrgb->size(): "<< point_cloud_ptr->size();
 
 	pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
 	ne.setInputCloud (point_cloud_ptr);
