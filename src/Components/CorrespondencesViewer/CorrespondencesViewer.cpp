@@ -29,7 +29,10 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 		display_cloud_xyzsift1("display_cloud_xyzsift1", true),
 		display_cloud_xyzsift2("display_cloud_xyzsift2", true),
 		display_correspondences("display_correspondences", true),
-		prop_coordinate_system("coordinate_system", false) {
+		prop_coordinate_system("coordinate_system", false),
+		tx("tx", 0.3f),
+		ty("ty", 0.0f),
+		tz("tz", 0.0f){
 			registerProperty(prop_window_name);
 			registerProperty(cloud_xyzsift1_point_size);
 			registerProperty(cloud_xyzsift2_point_size);
@@ -41,6 +44,9 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 			registerProperty(display_cloud_xyzsift2);
 			registerProperty(display_correspondences);
 			registerProperty(prop_coordinate_system);
+			registerProperty(tx);
+			registerProperty(ty);
+			registerProperty(tz);
 			
 			  // Set red as default.
 			((cv::Mat)clouds_colours).at<uchar>(0,0) = 255;
@@ -101,6 +107,7 @@ bool CorrespondencesViewer::onStart() {
 }
 
 void CorrespondencesViewer::on_clouds() {
+	LOG(LTRACE) << "CorrespondencesViewer::on_clouds()";
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb1 = in_cloud_xyzrgb1.read();
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb2 = in_cloud_xyzrgb2.read();
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift1 = in_cloud_xyzsift1.read();
@@ -110,7 +117,7 @@ void CorrespondencesViewer::on_clouds() {
 	
 	//Define a small translation between clouds	
 	Eigen::Matrix4f trans = Eigen::Matrix4f::Identity() ;
-	float tx = 0.3f, ty = 0.0f, tz = 0.0f ;
+	//float tx = 0.3f, ty = 0.0f, tz = 0.0f ;
 	trans(0, 3) = tx ; trans(1, 3) = ty ; trans(2, 3) = tz ;
 
 	//Transform one of the clouds	

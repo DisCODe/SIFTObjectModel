@@ -112,6 +112,10 @@ protected:
 	
 	Base::Property<bool> prop_coordinate_system;
 	
+	Base::Property<float> tx;
+	Base::Property<float> ty;
+	Base::Property<float> tz;
+	
 };
 
 } //: namespace CorrespondencesViewer
