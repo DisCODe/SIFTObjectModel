@@ -26,6 +26,7 @@
 #include "pcl/registration/correspondence_rejection_sample_consensus.h"
 
 #include <opencv2/core/core.hpp>
+#include "CorrespondenceEstimationColor.hpp"
 
 class MergeUtils {
 public:
@@ -48,7 +49,7 @@ public:
 		const pcl::CorrespondencesConstPtr& correspondences, pcl::Correspondences& inliers, Properties properties);
 
     static Eigen::Matrix4f computeTransformationICP(const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_trg, Properties properties);
-
+    static Eigen::Matrix4f computeTransformationICPColor(const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_trg, Properties properties);
     static Eigen::Matrix4f computeTransformationICPNormals(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_trg, Properties properties);
 };
 

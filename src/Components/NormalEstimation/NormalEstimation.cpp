@@ -112,7 +112,7 @@ void NormalEstimation::compute() {
 
 	//ne.setViewPoint(x_, y_, z_);
 
-	ne.setViewPoint(point_cloud_ptr->points[1].x,point_cloud_ptr->points[1].y,point_cloud_ptr->points[1].z);
+    ne.setViewPoint(point_cloud_ptr->points[1].x,point_cloud_ptr->points[1].y,point_cloud_ptr->points[1].z);
 
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_out (new pcl::PointCloud<pcl::PointXYZRGBNormal>);
 
