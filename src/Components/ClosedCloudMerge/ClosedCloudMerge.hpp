@@ -130,7 +130,7 @@ public:
     Base::Property<float> RanSAC_inliers_threshold;
     Base::Property<float> RanSAC_max_iterations;
 
-    Base::Property<int> threshold, maxIterations;
+    Base::Property<int> viewNumber, maxIterations, corrTreshold;
 };
 
 REGISTER_COMPONENT("ClosedCloudMerge", Processors::ClosedCloudMerge::ClosedCloudMerge)

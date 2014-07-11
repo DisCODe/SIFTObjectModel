@@ -17,17 +17,17 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
 					<param name="sequence.pattern">.*\_color.png</param>
 					<param name="mode.loop">0</param>					
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 					<param name="mode.loop">0</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>	
 				</Component>
@@ -48,8 +48,9 @@
 				<param name="radius">0.02</param>
 				</Component>
                 <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="10" bump="1">
-					<param name="View.Number">10</param>
+					<param name="View.Number">15</param>
 					<param name="Interations.Max">5</param>
+					<param name="Correspondenc.Treshold">3</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
 					<param name="LeafSize.x">0.005</param>

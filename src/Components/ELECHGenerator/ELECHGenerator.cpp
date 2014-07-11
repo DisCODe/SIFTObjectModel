@@ -227,6 +227,7 @@ bool loopDetection (int end, std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>
         min_dist = norm;
         first = i;
         last = end;
+        break;
       }
     }
   }
@@ -339,9 +340,9 @@ void ELECHGenerator::addViewToModel() {
 		elch_rgb.setLoopEnd(last);
 		pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>::Ptr icp (new pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>);
 		icp->setMaximumIterations(2000);
-		icp->setMaxCorrespondenceDistance(0.005);
+		icp->setMaxCorrespondenceDistance(0.0005);
 		icp->setRANSACOutlierRejectionThreshold(0.001f);
-		elch_rgb.setReg (icp);
+		elch_rgb.setReg(icp);
 		elch_rgb.compute();
 	}
 

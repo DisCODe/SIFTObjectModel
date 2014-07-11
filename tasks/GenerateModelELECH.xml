@@ -17,17 +17,17 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
-					<param name="sequence.directory">/home/kamion/RGB-D/food_box_R/</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
 					<param name="sequence.pattern">.*\_color.png</param>
 					<param name="mode.loop">0</param>					
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/kamion/RGB-D/food_box_R/</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 					<param name="mode.loop">0</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/kamion/RGB-D/food_box_R/</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>	
 				</Component>
@@ -44,7 +44,7 @@
 				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
 				</Component>
                 <Component name="Generator" type="SIFTObjectModel:ELECHGenerator" priority="9" bump="1">
-					<param name="ELCH.distance">0.08</param>
+					<param name="ELCH.distance">0.05</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="10" bump="0">
 					<param name="LeafSize.x">0.005</param>

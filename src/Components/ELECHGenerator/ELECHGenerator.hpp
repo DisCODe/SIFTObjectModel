@@ -121,6 +121,7 @@ protected:
 	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> rgb_views;
 	pcl::registration::LUM<PointXYZSIFT> lum_sift;
 	pcl::registration::ELCH<pcl::PointXYZRGB> elch_rgb;
+	pcl::registration::ELCH<PointXYZSIFT> elch_sift;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
