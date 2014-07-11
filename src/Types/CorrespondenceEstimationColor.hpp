@@ -83,7 +83,7 @@ namespace pcl
         determineCorrespondences (pcl::Correspondences &correspondences,
                                   double max_distance = std::numeric_limits<double>::max ())
         {
-            std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR";
+            //std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR";
           if (!initCompute ())
             return;
 
@@ -94,7 +94,12 @@ namespace pcl
           std::vector<int> index (1);
           std::vector<float> distance (1);
           std::vector<float> distanceRGB (1);
-          //int min;
+
+          //narazie na pale
+          float minRGB = 2000;
+          int minIndex = -2;
+          float DontForgetDistance = 1000;
+
           pcl::Correspondence corr;
           unsigned int nr_valid_correspondences = 0;
           LOG(LNOTICE)<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUsdfsdfswwwEFGWKUR";
@@ -104,15 +109,18 @@ namespace pcl
           if (isSamePointType<PointSource, PointTarget> ())
           {
         	  distanceRGB.clear();
+        	  distanceRGB.push_back(2000);
+        	  minRGB = 2000;
             // Iterate over the input set of source indices
             for (std::vector<int>::const_iterator idx = indices_->begin (); idx != indices_->end (); ++idx)
             {
-              tree_->nearestKSearch (input_->points[*idx], 20, index, distance);
+              tree_->nearestKSearch (input_->points[*idx], 25, index, distance);
 
               int r = input_->points[*idx].r;
               int g = input_->points[*idx].g;
               int b = input_->points[*idx].b;
 
+              //LOG(LNOTICE) << index.size();
              // LOG(LNOTICE)<<"DUPOA" << target_->points[index[0] ];
               for(int i=0; i< index.size(); i++){
             	 // LOG(LNOTICE)<<"DUPOA" << target_->points[index[i] ] << " DISTANCE:L::: " << distance[i];
@@ -126,8 +134,15 @@ namespace pcl
 
             	  distanceRGB.push_back(sqrt(rd*rd+gd*gd+bd*bd));
 
+            	  if ((distanceRGB.back() < minRGB)){
+            		  minRGB = distanceRGB.back();
+            		  minIndex = index[i];
+            		  DontForgetDistance = distance[i];
+            	  }
 
-            	 //LOG(LNOTICE) << "DISTANCE : XD " << distanceRGB[i];
+                 	 corr.index_match = minIndex;
+            	  //LOG(LNOTICE) << "index: " << minIndex;
+            	  //LOG(LNOTICE) << "DISTANCE : XD " << distanceRGB[i];
               //LOG(LNOTICE)<<(int)input_->points[*idx].r;
               //LOG(LNOTICE)<<(int)input_->points[*idx].g;
              // LOG(LNOTICE)<<(int)input_->points[*idx].b;
@@ -136,8 +151,12 @@ namespace pcl
                 continue;
 
               corr.index_query = *idx;
-              corr.index_match = index[0];
-              corr.distance = distance[0];
+
+
+
+             LOG(LNOTICE) << DontForgetDistance;
+
+              corr.distance = DontForgetDistance;
               correspondences[nr_valid_correspondences++] = corr;
             }
           }
@@ -176,7 +195,7 @@ namespace pcl
         determineReciprocalCorrespondences (pcl::Correspondences &correspondences,
                                             double max_distance = std::numeric_limits<double>::max ())
         {
-            std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR";
+            std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR reciprocl";
           if (!initCompute ())
             return;
 
