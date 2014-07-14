@@ -55,7 +55,7 @@ void NormalEstimation::prepareInterface() {
 }
 
 bool NormalEstimation::onInit() {
-	point_cloud_ptr =  pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>);
+	//point_cloud_ptr =  pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>);
 	return true;
 }
 
@@ -75,7 +75,7 @@ void NormalEstimation::compute() {
 
 	std::vector<int> indices;
 
-	point_cloud_ptr=in_cloud_xyzrgb.read();
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_ptr = in_cloud_xyzrgb.read();
 
 	CLOG(LINFO) << "NormalEstimation->in_cloud_xyzrgb->size(): "<< point_cloud_ptr->size();
 
@@ -94,24 +94,6 @@ void NormalEstimation::compute() {
 
 	pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
 	ne.setRadiusSearch(radius_search);
-
-	float x_;
-	float y_;
-	float z_;
-
-
-	for(int i=0; i<point_cloud_ptr->size(); i++){
-		x_+=point_cloud_ptr->points[i].x;
-		y_+=point_cloud_ptr->points[i].y;
-		z_+=point_cloud_ptr->points[i].z;
-	}
-
-	x_/=point_cloud_ptr->size();
-	y_/=point_cloud_ptr->size();
-	z_/=point_cloud_ptr->size();
-
-	//ne.setViewPoint(x_, y_, z_);
-
     ne.setViewPoint(point_cloud_ptr->points[1].x,point_cloud_ptr->points[1].y,point_cloud_ptr->points[1].z);
 
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_out (new pcl::PointCloud<pcl::PointXYZRGBNormal>);

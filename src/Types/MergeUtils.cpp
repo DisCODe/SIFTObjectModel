@@ -162,7 +162,7 @@ Eigen::Matrix4f MergeUtils::computeTransformationICP(const pcl::PointCloud<pcl::
       //  CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
 
         // Get the transformation from target to source.
-        return icp.getFinalTransformation().inverse();
+        return icp.getFinalTransformation();//.inverse();
 }
 
 Eigen::Matrix4f MergeUtils::computeTransformationICPColor(const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud_trg, Properties properties)
@@ -187,13 +187,12 @@ Eigen::Matrix4f MergeUtils::computeTransformationICPColor(const pcl::PointCloud<
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr Final (new pcl::PointCloud<pcl::PointXYZRGB>());
         icp.align(*Final);
 
-        LOG(LNOTICE)<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUEFGWKUR";
 
 
       //  CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
 
         // Get the transformation from target to source.
-        return icp.getFinalTransformation().inverse();
+        return icp.getFinalTransformation();//.inverse();
 }
 
 
@@ -224,7 +223,7 @@ Eigen::Matrix4f MergeUtils::computeTransformationICPNormals(const pcl::PointClou
     pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr reg_result (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
     reg_result = cloud_src;
 
-    for (int i = 0; i < 30; ++i)
+    for (int i = 0; i < 100; ++i)
     {
 
       // Estimate
@@ -252,5 +251,5 @@ Eigen::Matrix4f MergeUtils::computeTransformationICPNormals(const pcl::PointClou
     }
 
     // Get the transformation from target to source.
-    return icp.getFinalTransformation().inverse();
+    return icp.getFinalTransformation();//.inverse();
 }

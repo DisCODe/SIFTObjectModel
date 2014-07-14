@@ -80,7 +80,7 @@ protected:
 	 */
 	bool onStop();
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_ptr;
+//	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_ptr;
 
 	Base::Property<float> radius_search;
 // Input data streams

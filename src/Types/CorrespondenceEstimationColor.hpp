@@ -5,8 +5,6 @@
  *      Author: mlepicka
  */
 
-
-
 #ifndef CORRESPONDENCE_ESTIMATION_COLOR_H_
 #define CORRESPONDENCE_ESTIMATION_COLOR_H_
 
@@ -24,274 +22,254 @@
 #include <pcl/common/concatenate.h>
 #include <pcl/common/io.h>
 
+namespace pcl {
+namespace registration {
+template<typename PointSource, typename PointTarget, typename Scalar = float>
+class CorrespondenceEstimationColor: // public CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>,
+public CorrespondenceEstimation<PointSource, PointTarget, Scalar> {
+public:
+	typedef boost::shared_ptr<
+			CorrespondenceEstimation<PointSource, PointTarget, Scalar> > Ptr;
+	typedef boost::shared_ptr<
+			const CorrespondenceEstimation<PointSource, PointTarget, Scalar> > ConstPtr;
 
-namespace pcl
-{
-  namespace registration
-  {
-    template <typename PointSource, typename PointTarget, typename Scalar = float>
-    class CorrespondenceEstimationColor :// public CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>,
-    public CorrespondenceEstimation<PointSource, PointTarget, Scalar>
-    {
-      public:
-        typedef boost::shared_ptr<CorrespondenceEstimation<PointSource, PointTarget, Scalar> > Ptr;
-        typedef boost::shared_ptr<const CorrespondenceEstimation<PointSource, PointTarget, Scalar> > ConstPtr;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::point_representation_;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::input_transformed_;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::tree_;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::tree_reciprocal_;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::target_;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::corr_name_;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::target_indices_;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::getClassName;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::initCompute;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::initComputeReciprocal;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::input_;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::indices_;
+	using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::input_fields_;
+	using PCLBase<PointSource>::deinitCompute;
 
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::point_representation_;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::input_transformed_;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::tree_;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::tree_reciprocal_;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::target_;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::corr_name_;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::target_indices_;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::getClassName;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::initCompute;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::initComputeReciprocal;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::input_;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::indices_;
-        using CorrespondenceEstimationBase<PointSource, PointTarget, Scalar>::input_fields_;
-        using PCLBase<PointSource>::deinitCompute;
+	typedef pcl::search::KdTree<PointTarget> KdTree;
+	typedef typename pcl::search::KdTree<PointTarget>::Ptr KdTreePtr;
 
-        typedef pcl::search::KdTree<PointTarget> KdTree;
-        typedef typename pcl::search::KdTree<PointTarget>::Ptr KdTreePtr;
+	typedef pcl::PointCloud<PointSource> PointCloudSource;
+	typedef typename PointCloudSource::Ptr PointCloudSourcePtr;
+	typedef typename PointCloudSource::ConstPtr PointCloudSourceConstPtr;
 
-        typedef pcl::PointCloud<PointSource> PointCloudSource;
-        typedef typename PointCloudSource::Ptr PointCloudSourcePtr;
-        typedef typename PointCloudSource::ConstPtr PointCloudSourceConstPtr;
+	typedef pcl::PointCloud<PointTarget> PointCloudTarget;
+	typedef typename PointCloudTarget::Ptr PointCloudTargetPtr;
+	typedef typename PointCloudTarget::ConstPtr PointCloudTargetConstPtr;
 
-        typedef pcl::PointCloud<PointTarget> PointCloudTarget;
-        typedef typename PointCloudTarget::Ptr PointCloudTargetPtr;
-        typedef typename PointCloudTarget::ConstPtr PointCloudTargetConstPtr;
+	typedef typename KdTree::PointRepresentationConstPtr PointRepresentationConstPtr;
 
-        typedef typename KdTree::PointRepresentationConstPtr PointRepresentationConstPtr;
+	/** \brief Empty constructor. */
+	CorrespondenceEstimationColor() {
+		corr_name_ = "CorrespondenceEstimationColor";
+		std::cout << "DUPOA"
+				<< "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUEFGWKUR";
+	}
 
-        /** \brief Empty constructor. */
-        CorrespondenceEstimationColor ()
-        {
-          corr_name_ = "CorrespondenceEstimationColor";
-          std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUEFGWKUR";
-        }
+	/** \brief Empty destructor */
+	virtual ~CorrespondenceEstimationColor() {
+	}
 
-        /** \brief Empty destructor */
-        virtual ~CorrespondenceEstimationColor () {}
+	/** \brief Determine the correspondences between input and target cloud.
+	 * \param[out] correspondences the found correspondences (index of query point, index of target point, distance)
+	 * \param[in] max_distance maximum allowed distance between correspondences
+	 */
+	virtual void determineCorrespondences(pcl::Correspondences &correspondences,
+			double max_distance = std::numeric_limits<double>::max()) {
+		//std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR";
+		if (!initCompute())
+			return;
 
-        /** \brief Determine the correspondences between input and target cloud.
-* \param[out] correspondences the found correspondences (index of query point, index of target point, distance)
-* \param[in] max_distance maximum allowed distance between correspondences
-*/
-        virtual void
-        determineCorrespondences (pcl::Correspondences &correspondences,
-                                  double max_distance = std::numeric_limits<double>::max ())
-        {
-            //std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR";
-          if (!initCompute ())
-            return;
+		double max_dist_sqr = max_distance * max_distance;
 
-          double max_dist_sqr = max_distance * max_distance;
+		correspondences.resize(indices_->size());
 
-          correspondences.resize (indices_->size ());
+		std::vector<int> index(1);
+		std::vector<float> distance(1);
+		std::vector<float> distanceRGB(1);
 
-          std::vector<int> index (1);
-          std::vector<float> distance (1);
-          std::vector<float> distanceRGB (1);
+		//narazie na pale
+		float minRGB = 2000;
+		int minIndex = -2;
+		float distance_ = 1000;
 
-          //narazie na pale
-          float minRGB = 2000;
-          int minIndex = -2;
-          float DontForgetDistance = 1000;
+		pcl::Correspondence corr;
+		unsigned int nr_valid_correspondences = 0;
+		LOG(LNOTICE) << "DUPOA"
+				<< "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUsdfsdfswwwEFGWKUR";
 
-          pcl::Correspondence corr;
-          unsigned int nr_valid_correspondences = 0;
-          LOG(LNOTICE)<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUsdfsdfswwwEFGWKUR";
-          std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUEdsfsdfFGWKUR";
-          // Check if the template types are the same. If true, avoid a copy.
-          // Both point types MUST be registered using the POINT_CLOUD_REGISTER_POINT_STRUCT macro!
-          if (isSamePointType<PointSource, PointTarget> ())
-          {
-        	  distanceRGB.clear();
-        	  distanceRGB.push_back(2000);
-        	  minRGB = 2000;
-            // Iterate over the input set of source indices
-            for (std::vector<int>::const_iterator idx = indices_->begin (); idx != indices_->end (); ++idx)
-            {
-              tree_->nearestKSearch (input_->points[*idx], 25, index, distance);
+		// Check if the template types are the same. If true, avoid a copy.
+		// Both point types MUST be registered using the POINT_CLOUD_REGISTER_POINT_STRUCT macro!
+		if (isSamePointType<PointSource, PointTarget>()) {
+			// Iterate over the input set of source indices
+			for (std::vector<int>::const_iterator idx = indices_->begin(); idx != indices_->end(); ++idx) {
 
-              int r = input_->points[*idx].r;
-              int g = input_->points[*idx].g;
-              int b = input_->points[*idx].b;
+				int r = input_->points[*idx].r;
+				int g = input_->points[*idx].g;
+				int b = input_->points[*idx].b;
 
-              //LOG(LNOTICE) << index.size();
-             // LOG(LNOTICE)<<"DUPOA" << target_->points[index[0] ];
-              for(int i=0; i< index.size(); i++){
-            	 // LOG(LNOTICE)<<"DUPOA" << target_->points[index[i] ] << " DISTANCE:L::: " << distance[i];
-            	  int rr = target_->points[index[i]].r;
-				  int gg = target_->points[index[i]].g;
-				  int bb = target_->points[index[i]].b;
+				tree_->nearestKSearch (input_->points[*idx], 25, index, distance);
+				float mindist = distance[24];
+				float minrgbdist = 999999;
+				int minind = 24;
+				for (int i = 0; i < index.size(); i++) {
 
-				  int rd = r-rr;
-				  int gd = g-gg;
-				  int bd = b-bb;
+					int rr = target_->points[index[i]].r;
+					int gg = target_->points[index[i]].g;
+					int bb = target_->points[index[i]].b;
 
-            	  distanceRGB.push_back(sqrt(rd*rd+gd*gd+bd*bd));
+					float rd = r - rr;
+					float gd = g - gg;
+					float bd = b - bb;
 
-            	  if ((distanceRGB.back() < minRGB)){
-            		  minRGB = distanceRGB.back();
-            		  minIndex = index[i];
-            		  DontForgetDistance = distance[i];
-            	  }
+					float distancergb = sqrt(rd*rd + gd*gd + bd*bd);
 
-                 	 corr.index_match = minIndex;
-            	  //LOG(LNOTICE) << "index: " << minIndex;
-            	  //LOG(LNOTICE) << "DISTANCE : XD " << distanceRGB[i];
-              //LOG(LNOTICE)<<(int)input_->points[*idx].r;
-              //LOG(LNOTICE)<<(int)input_->points[*idx].g;
-             // LOG(LNOTICE)<<(int)input_->points[*idx].b;
-              }
-              if (distance[0] > max_dist_sqr)
-                continue;
+					if (distancergb < minrgbdist) {
+						minrgbdist = distancergb;
+						minind = i;
+						mindist = distance[i];
+					}
+				}
+				if (mindist > max_dist_sqr)
+					continue;
 
-              corr.index_query = *idx;
+				corr.index_query = *idx;
+				corr.index_match = index[minind];
+				corr.distance = mindist;
+				correspondences[nr_valid_correspondences++] = corr;
+			}
+		} else {
+			PointTarget pt;
+			LOG(LNOTICE) << "tu byc nie powinnnnnaaaaaaaam";
+			// Iterate over the input set of source indices
+			for (std::vector<int>::const_iterator idx = indices_->begin();
+					idx != indices_->end(); ++idx) {
+				// Copy the source data to a target PointTarget format so we can search in the tree
+				pt = input_->points[*idx];
 
+				tree_->nearestKSearch(pt, 1, index, distance);
+				if (distance[0] > max_dist_sqr)
+					continue;
 
+				corr.index_query = *idx;
+				corr.index_match = index[0];
+				corr.distance = distance[0];
+				correspondences[nr_valid_correspondences++] = corr;
+			}
+		}
+		correspondences.resize(nr_valid_correspondences);
+		deinitCompute();
+	}
 
-             LOG(LNOTICE) << DontForgetDistance;
+	/** \brief Determine the reciprocal correspondences between input and target cloud.
+	 * A correspondence is considered reciprocal if both Src_i has Tgt_i as a
+	 * correspondence, and Tgt_i has Src_i as one.
+	 *
+	 * \param[out] correspondences the found correspondences (index of query and target point, distance)
+	 * \param[in] max_distance maximum allowed distance between correspondences
+	 */
+	virtual void determineReciprocalCorrespondences(
+			pcl::Correspondences &correspondences, double max_distance =
+					std::numeric_limits<double>::max()) {
+		LOG(LNOTICE) << "ROBIE ICP COLOR JEEEE ICPCOLORUR reciprocl";
+		if (!initCompute())
+			return;
 
-              corr.distance = DontForgetDistance;
-              correspondences[nr_valid_correspondences++] = corr;
-            }
-          }
-          else
-          {
-            PointTarget pt;
+		// setup tree for reciprocal search
+		// Set the internal point representation of choice
+		if (!initComputeReciprocal())
+			return;
+		double max_dist_sqr = max_distance * max_distance;
 
-            // Iterate over the input set of source indices
-            for (std::vector<int>::const_iterator idx = indices_->begin (); idx != indices_->end (); ++idx)
-            {
-              // Copy the source data to a target PointTarget format so we can search in the tree
-              pt = input_->points[*idx];
+		correspondences.resize(indices_->size());
+		std::vector<int> index(1);
+		std::vector<float> distance(1);
+		std::vector<int> index_reciprocal(1);
+		std::vector<float> distance_reciprocal(1);
+		pcl::Correspondence corr;
+		unsigned int nr_valid_correspondences = 0;
+		int target_idx = 0;
 
-              tree_->nearestKSearch (pt, 1, index, distance);
-              if (distance[0] > max_dist_sqr)
-                continue;
+		// Check if the template types are the same. If true, avoid a copy.
+		// Both point types MUST be registered using the POINT_CLOUD_REGISTER_POINT_STRUCT macro!
+		if (isSamePointType<PointSource, PointTarget>()) {
+			// Iterate over the input set of source indices
+			for (std::vector<int>::const_iterator idx = indices_->begin();
+					idx != indices_->end(); ++idx) {
+				tree_->nearestKSearch(input_->points[*idx], 1, index, distance);
+				LOG(LNOTICE) << "DUPOA" << target_->points[index[0]];
+				for (int i = 0; i < index.size(); i++) {
+					LOG(LNOTICE) << "DUPOA" << target_->points[index[i]];
+				}
 
-              corr.index_query = *idx;
-              corr.index_match = index[0];
-              corr.distance = distance[0];
-              correspondences[nr_valid_correspondences++] = corr;
-            }
-          }
-          correspondences.resize (nr_valid_correspondences);
-          deinitCompute ();
-        }
+				//z tych sasiadow wybierac index... size()
+				if (distance[0] > max_dist_sqr)
+					continue;
 
-        /** \brief Determine the reciprocal correspondences between input and target cloud.
-* A correspondence is considered reciprocal if both Src_i has Tgt_i as a
-* correspondence, and Tgt_i has Src_i as one.
-*
-* \param[out] correspondences the found correspondences (index of query and target point, distance)
-* \param[in] max_distance maximum allowed distance between correspondences
-*/
-        virtual void
-        determineReciprocalCorrespondences (pcl::Correspondences &correspondences,
-                                            double max_distance = std::numeric_limits<double>::max ())
-        {
-            std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR reciprocl";
-          if (!initCompute ())
-            return;
+				target_idx = index[0];
 
-          // setup tree for reciprocal search
-          // Set the internal point representation of choice
-          if (!initComputeReciprocal())
-            return;
-          double max_dist_sqr = max_distance * max_distance;
+				tree_reciprocal_->nearestKSearch(target_->points[target_idx], 1,
+						index_reciprocal, distance_reciprocal);
+				if (distance_reciprocal[0] > max_dist_sqr
+						|| *idx != index_reciprocal[0])
+					continue;
 
-          correspondences.resize (indices_->size());
-          std::vector<int> index (1);
-          std::vector<float> distance (1);
-          std::vector<int> index_reciprocal (1);
-          std::vector<float> distance_reciprocal (1);
-          pcl::Correspondence corr;
-          unsigned int nr_valid_correspondences = 0;
-          int target_idx = 0;
+				corr.index_query = *idx;
+				corr.index_match = index[0];
+				corr.distance = distance[0];
+				correspondences[nr_valid_correspondences++] = corr;
+			}
+		} else {
+			LOG(LNOTICE) << "DUPOA" << "ROBIE NIE";
+			PointTarget pt_src;
+			PointSource pt_tgt;
 
-          // Check if the template types are the same. If true, avoid a copy.
-          // Both point types MUST be registered using the POINT_CLOUD_REGISTER_POINT_STRUCT macro!
-          if (isSamePointType<PointSource, PointTarget> ())
-          {
-            // Iterate over the input set of source indices
-            for (std::vector<int>::const_iterator idx = indices_->begin (); idx != indices_->end (); ++idx)
-            {
-              tree_->nearestKSearch (input_->points[*idx], 1, index, distance);
-              LOG(LNOTICE)<<"DUPOA" << target_->points[index[0] ];
-              for(int i=0; i< index.size(); i++){
-            	  LOG(LNOTICE)<<"DUPOA" << target_->points[index[i] ];
-              }
+			// Iterate over the input set of source indices
+			for (std::vector<int>::const_iterator idx = indices_->begin();
+					idx != indices_->end(); ++idx) {
+				// Copy the source data to a target PointTarget format so we can search in the tree
+				pt_src = input_->points[*idx];
 
-              //z tych sasiadow wybierac index... size()
-              if (distance[0] > max_dist_sqr)
-                continue;
+				tree_->nearestKSearch(pt_src, 1, index, distance);
+				//
 
-              target_idx = index[0];
+				if (distance[0] > max_dist_sqr)
+					continue;
 
-              tree_reciprocal_->nearestKSearch (target_->points[target_idx], 1, index_reciprocal, distance_reciprocal);
-              if (distance_reciprocal[0] > max_dist_sqr || *idx != index_reciprocal[0])
-                continue;
+				target_idx = index[0];
 
-              corr.index_query= *idx;
-              corr.index_match = index[0];
-              corr.distance = distance[0];
-              correspondences[nr_valid_correspondences++] = corr;
-            }
-          }
-          else
-          {
-        	  LOG(LNOTICE)<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUEFGWKUR";
-            PointTarget pt_src;
-            PointSource pt_tgt;
+				// Copy the target data to a target PointSource format so we can search in the tree_reciprocal
+				pt_tgt = target_->points[target_idx];
 
-            // Iterate over the input set of source indices
-            for (std::vector<int>::const_iterator idx = indices_->begin (); idx != indices_->end (); ++idx)
-            {
-              // Copy the source data to a target PointTarget format so we can search in the tree
-              pt_src = input_->points[*idx];
+				tree_reciprocal_->nearestKSearch(pt_tgt, 1, index_reciprocal,
+						distance_reciprocal);
+				if (distance_reciprocal[0] > max_dist_sqr
+						|| *idx != index_reciprocal[0])
+					continue;
 
-              tree_->nearestKSearch (pt_src, 1, index, distance);
-              //
+				corr.index_query = *idx;
+				corr.index_match = index[0];
+				corr.distance = distance[0];
+				correspondences[nr_valid_correspondences++] = corr;
+			}
+		}
+		correspondences.resize(nr_valid_correspondences);
+		deinitCompute();
+		std::cout << "DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR";
+	}
 
-              if (distance[0] > max_dist_sqr)
-                continue;
-
-              target_idx = index[0];
-
-              // Copy the target data to a target PointSource format so we can search in the tree_reciprocal
-              pt_tgt = target_->points[target_idx];
-
-              tree_reciprocal_->nearestKSearch (pt_tgt, 1, index_reciprocal, distance_reciprocal);
-              if (distance_reciprocal[0] > max_dist_sqr || *idx != index_reciprocal[0])
-                continue;
-
-              corr.index_query = *idx;
-              corr.index_match = index[0];
-              corr.distance = distance[0];
-              correspondences[nr_valid_correspondences++] = corr;
-            }
-          }
-          correspondences.resize (nr_valid_correspondences);
-          deinitCompute ();
-          std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR";
-        }
-
-
-
-        /** \brief Clone and cast to CorrespondenceEstimationBase */
-        virtual boost::shared_ptr< CorrespondenceEstimationBase<PointSource, PointTarget, Scalar> >
-        clone () const
-        {
-          Ptr copy (new CorrespondenceEstimation<PointSource, PointTarget, Scalar> (*this));
-          return (copy);
-        }
-     };
-  }
+	/** \brief Clone and cast to CorrespondenceEstimationBase */
+	virtual boost::shared_ptr<
+			CorrespondenceEstimationBase<PointSource, PointTarget, Scalar> > clone() const {
+		Ptr copy(
+				new CorrespondenceEstimation<PointSource, PointTarget, Scalar>(
+						*this));
+		return (copy);
+	}
+};
+}
 }
 
 #include <pcl/registration/impl/correspondence_estimation.hpp>

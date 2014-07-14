@@ -60,6 +60,8 @@ OpenCloudMerge::OpenCloudMerge(const std::string & name) :
 	RanSAC_inliers_threshold("RanSac.Inliers_threshold", 0.01f),
 	RanSAC_max_iterations("RanSac.Iterations", 2000) {
 
+	ICP_max_iterations.addConstraint("1");
+	ICP_max_iterations.addConstraint("2000");
 	registerProperty (prop_ICP_alignment);
 	registerProperty (prop_ICP_alignment_normal);
 	registerProperty (prop_ICP_alignment_color);
@@ -231,7 +233,7 @@ void OpenCloudMerge::addViewToModel(){
 	    	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	    	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 	    }
-	    else if(prop_ICP_alignment_color)
+	    if(prop_ICP_alignment_color)
 	    {
 
 	    	LOG(LNOTICE)<<"DUPOA" << "ROBIE ICP COLOR JEEEEEEEEEEEEEEEEEEEEE";
