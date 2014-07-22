@@ -64,8 +64,6 @@ public:
 	/** \brief Empty constructor. */
 	CorrespondenceEstimationColor() {
 		corr_name_ = "CorrespondenceEstimationColor";
-		std::cout << "DUPOA"
-				<< "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUEFGWKUR";
 	}
 
 	/** \brief Empty destructor */
@@ -78,7 +76,7 @@ public:
 	 */
 	virtual void determineCorrespondences(pcl::Correspondences &correspondences,
 			double max_distance = std::numeric_limits<double>::max()) {
-		//std::cout<<"DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR";
+
 		if (!initCompute())
 			return;
 
@@ -97,8 +95,6 @@ public:
 
 		pcl::Correspondence corr;
 		unsigned int nr_valid_correspondences = 0;
-		LOG(LNOTICE) << "DUPOA"
-				<< "ROBIE ICP COLOR JEEEE ICPCOLOROSHIDUFKAGIKUFWAUsdfsdfswwwEFGWKUR";
 
 		// Check if the template types are the same. If true, avoid a copy.
 		// Both point types MUST be registered using the POINT_CLOUD_REGISTER_POINT_STRUCT macro!
@@ -142,7 +138,6 @@ public:
 			}
 		} else {
 			PointTarget pt;
-			LOG(LNOTICE) << "tu byc nie powinnnnnaaaaaaaam";
 			// Iterate over the input set of source indices
 			for (std::vector<int>::const_iterator idx = indices_->begin();
 					idx != indices_->end(); ++idx) {
@@ -173,7 +168,7 @@ public:
 	virtual void determineReciprocalCorrespondences(
 			pcl::Correspondences &correspondences, double max_distance =
 					std::numeric_limits<double>::max()) {
-		LOG(LNOTICE) << "ROBIE ICP COLOR JEEEE ICPCOLORUR reciprocl";
+
 		if (!initCompute())
 			return;
 
@@ -199,12 +194,7 @@ public:
 			for (std::vector<int>::const_iterator idx = indices_->begin();
 					idx != indices_->end(); ++idx) {
 				tree_->nearestKSearch(input_->points[*idx], 1, index, distance);
-				LOG(LNOTICE) << "DUPOA" << target_->points[index[0]];
-				for (int i = 0; i < index.size(); i++) {
-					LOG(LNOTICE) << "DUPOA" << target_->points[index[i]];
-				}
 
-				//z tych sasiadow wybierac index... size()
 				if (distance[0] > max_dist_sqr)
 					continue;
 
@@ -222,7 +212,6 @@ public:
 				correspondences[nr_valid_correspondences++] = corr;
 			}
 		} else {
-			LOG(LNOTICE) << "DUPOA" << "ROBIE NIE";
 			PointTarget pt_src;
 			PointSource pt_tgt;
 
@@ -257,7 +246,6 @@ public:
 		}
 		correspondences.resize(nr_valid_correspondences);
 		deinitCompute();
-		std::cout << "DUPOA" << "ROBIE ICP COLOR JEEEE ICPCOLORUR";
 	}
 
 	/** \brief Clone and cast to CorrespondenceEstimationBase */

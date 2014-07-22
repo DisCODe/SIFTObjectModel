@@ -225,7 +225,6 @@ void OpenCloudMerge::addViewToModel(){
 		pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
 	    if (prop_ICP_alignment) {
-
 	    	current_trans = MergeUtils::computeTransformationICP(cloud, cloud_merged, properties);
 	    	CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
 
@@ -235,8 +234,6 @@ void OpenCloudMerge::addViewToModel(){
 	    }
 	    if(prop_ICP_alignment_color)
 	    {
-
-	    	LOG(LNOTICE)<<"DUPOA" << "ROBIE ICP COLOR JEEEEEEEEEEEEEEEEEEEEE";
 	    	current_trans = MergeUtils::computeTransformationICPColor(cloud, cloud_merged, properties);
 	    	CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
 
@@ -244,7 +241,6 @@ void OpenCloudMerge::addViewToModel(){
 	    	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	    	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 	    }
-
 
 		// Add clouds.
 
