@@ -33,13 +33,13 @@
 					<param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
 				</Component>
 
-				<Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="3" bump="0">
+				<Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="3">
 					<param name="chessboard.board_width">3</param>
 					<param name="chessboard.board_height">5</param>
 					<param name="chessboard.square_size">0.06</param>
 				</Component>
 				
-				<Component name="DetectCirclesInv" type="CvBasic:CvFindCirclesGrid" priority="4" bump="0">
+				<Component name="DetectCirclesInv" type="CvBasic:CvFindCirclesGrid" priority="4">
 					<param name="chessboard.board_width">3</param>
 					<param name="chessboard.board_height">5</param>
 					<param name="chessboard.square_size">0.06</param>
@@ -47,10 +47,12 @@
 				</Component>
 				<Component name="SolvePNP" type="CvBasic:CvSolvePnP" priority="5">
 				</Component>
-
-				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="6">
+				<Component name="SolvePNPinv" type="CvBasic:CvSolvePnP" priority="6">
 				</Component>
-
+				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="7">
+				</Component>
+				<Component name="Drawinv" type="SIFTObjectModel:DrawCSystem" priority="8">
+				</Component>
 			</Executor>
 			<Executor name="Visualization" period="0.1">
 				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
@@ -74,12 +76,15 @@
 			<sink>Window.in_draw0</sink>
 			<sink>SolvePNP.in_object3d</sink>		
 		</Source>
-		<!--<Source name="DetectCirclesInv.out_chessboard">
-			<sink>Window.in_draw1</sink>		
-		</Source>-->
+		<Source name="DetectCirclesInv.out_chessboard">
+			<sink>Window.in_draw1</sink>	
+			<sink>SolvePNPinv.in_object3d</sink>	
+		</Source>
 		<Source name="CameraInfo.out_camera_info">
 			<sink>SolvePNP.in_camerainfo</sink>
 			<sink>Draw.in_camera_matrix</sink>
+			<sink>SolvePNPinv.in_camerainfo</sink>
+			<sink>Drawinv.in_camera_matrix</sink>
 		</Source>
 		<Source name="SolvePNP.out_rvec">
 			<sink>Draw.in_rvec</sink>
@@ -88,6 +93,15 @@
 			<sink>Draw.in_tvec</sink>
 		</Source>
 		<Source name="Draw.out_csystem">
+			<sink>Window.in_draw0</sink>		
+		</Source>
+		<Source name="SolvePNPinv.out_rvec">
+			<sink>Drawinv.in_rvec</sink>
+		</Source>
+		<Source name="SolvePNPinv.out_tvec">
+			<sink>Drawinv.in_tvec</sink>
+		</Source>
+		<Source name="Drawinv.out_csystem">
 			<sink>Window.in_draw1</sink>		
 		</Source>
 	</DataStreams>

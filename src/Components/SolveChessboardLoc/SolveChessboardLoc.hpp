@@ -4,8 +4,8 @@
  * \author Marta Lepicka
  */
 
-#ifndef DRAWCSYSTEM_HPP_
-#define DRAWCSYSTEM_HPP_
+#ifndef SOLVECHESSBOARDLOC_HPP_
+#define SOLVECHESSBOARDLOC_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -20,26 +20,27 @@
 #include "Types/DrawableContainer.hpp"
 #include "Types/Line.hpp"
 
+
 namespace Processors {
-namespace DrawCSystem {
+namespace SolveChessboardLoc {
 
 /*!
- * \class DrawCSystem
- * \brief DrawCSystem processor class.
+ * \class SolveChessboardLoc
+ * \brief SolveChessboardLoc processor class.
  *
  * 
  */
-class DrawCSystem: public Base::Component {
+class SolveChessboardLoc: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	DrawCSystem(const std::string & name = "DrawCSystem");
+	SolveChessboardLoc(const std::string & name = "SolveChessboardLoc");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~DrawCSystem();
+	virtual ~SolveChessboardLoc();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -72,13 +73,8 @@ protected:
 
 
 	// Input data streams
-	Base::DataStreamIn <cv::Mat> in_rvec;
-	Base::DataStreamIn <cv::Mat> in_tvec;
-	Base::DataStreamIn <Types::CameraInfo> in_camera_matrix;
+	Base::DataStreamIn <std::vector<cv::Point2f> > in_impoints;
 	// Output data streams
-
-	Base::DataStreamOut <Types::DrawableContainer> out_csystem;
-	Base::DataStreamOut <std::vector<cv::Point2f> > out_impoints;
 
 	// Handlers
 
@@ -87,17 +83,16 @@ protected:
 	
 	// Handlers
 
-	void projectPoints();
-	Base::EventHandler <DrawCSystem> h_projectPoints;
 
+	void solveLocation();
 };
 
-} //: namespace DrawCSystem
+} //: namespace SolveChessboardLoc
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("DrawCSystem", Processors::DrawCSystem::DrawCSystem)
+REGISTER_COMPONENT("SolveChessboardLoc", Processors::SolveChessboardLoc::SolveChessboardLoc)
 
-#endif /* DRAWCSYSTEM_HPP_ */
+#endif /* SOLVECHESSBOARDLOC_HPP_ */

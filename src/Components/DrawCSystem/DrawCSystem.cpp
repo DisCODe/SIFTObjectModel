@@ -30,6 +30,7 @@ void DrawCSystem::prepareInterface() {
 	registerStream("in_camera_matrix", &in_camera_matrix);
 
 	registerStream("out_csystem", &out_csystem);
+	registerStream("out_impoints", &out_impoints);
 
 	// Register handlers
 	h_projectPoints.setup(this, &DrawCSystem::projectPoints);
@@ -84,7 +85,10 @@ void DrawCSystem::projectPoints(){
 	ctr.add(ay.clone());
 	ctr.add(az.clone());
 
+	CLOG(LINFO)<<"Image Points: "<<image_points;
+
 	out_csystem.write(ctr);
+	out_impoints.write(image_points);
 }
 
 
