@@ -46,12 +46,18 @@
 					<param name="image.inverse">1</param>
 				</Component>
 				<Component name="SolvePNP" type="CvBasic:CvSolvePnP" priority="5">
+					<param name="offset.X">-0.075</param>
+					<param name="offset.Y">0.113</param>
 				</Component>
 				<Component name="SolvePNPinv" type="CvBasic:CvSolvePnP" priority="6">
+					<param name="offset.X">-0.075</param>
+					<param name="offset.Y">-0.233</param>
 				</Component>
 				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="7">
 				</Component>
 				<Component name="Drawinv" type="SIFTObjectModel:DrawCSystem" priority="8">
+				</Component>
+				<Component name="Statistic" type="CvBasic:CalcStatistics" priority="9">
 				</Component>
 			</Executor>
 			<Executor name="Visualization" period="0.1">
@@ -96,9 +102,11 @@
 			<sink>Window.in_draw0</sink>		
 		</Source>
 		<Source name="SolvePNPinv.out_rvec">
+			<sink>Statistic.in_rvec</sink>
 			<sink>Drawinv.in_rvec</sink>
 		</Source>
 		<Source name="SolvePNPinv.out_tvec">
+			<sink>Statistic.in_tvec</sink>
 			<sink>Drawinv.in_tvec</sink>
 		</Source>
 		<Source name="Drawinv.out_csystem">

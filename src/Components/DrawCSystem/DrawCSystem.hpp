@@ -20,6 +20,8 @@
 #include "Types/DrawableContainer.hpp"
 #include "Types/Line.hpp"
 
+#include "Property.hpp"
+
 namespace Processors {
 namespace DrawCSystem {
 
@@ -84,7 +86,6 @@ protected:
 
 	// Properties
 
-	
 	// Handlers
 
 	void projectPoints();

@@ -12,12 +12,13 @@
 
 #include <boost/bind.hpp>
 
+#include "Property.hpp"
+
 namespace Processors {
 namespace DrawCSystem {
 
 DrawCSystem::DrawCSystem(const std::string & name) :
-		Base::Component(name)  {
-
+		Base::Component(name){
 }
 
 DrawCSystem::~DrawCSystem() {
