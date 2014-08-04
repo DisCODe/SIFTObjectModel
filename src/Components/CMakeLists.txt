@@ -38,4 +38,3 @@ ADD_COMPONENT(SIFTNOMReader)
 
 ADD_COMPONENT(DrawCSystem)
 
-ADD_COMPONENT(SolveChessboardLoc)

@@ -6,7 +6,7 @@ FILE(GLOB files *.cpp)
 
 # Find required packages
 FIND_PACKAGE( OpenCV REQUIRED )
-FIND_PACKAGE(  REQUIRED )
+
 
 
 # Create an executable file from sources:

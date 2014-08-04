@@ -26,6 +26,7 @@ DrawCSystem::~DrawCSystem() {
 
 void DrawCSystem::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
+	registerStream("in_homogMatrix", &in_homogMatrix);
 	registerStream("in_rvec", &in_rvec);
 	registerStream("in_tvec", &in_tvec);
 	registerStream("in_camera_matrix", &in_camera_matrix);
@@ -36,8 +37,6 @@ void DrawCSystem::prepareInterface() {
 	// Register handlers
 	h_projectPoints.setup(this, &DrawCSystem::projectPoints);
 	registerHandler("projectPoints", &h_projectPoints);
-	addDependency("projectPoints", &in_tvec);
-	addDependency("projectPoints", &in_rvec);
 	addDependency("projectPoints", &in_camera_matrix);
 }
 
@@ -59,9 +58,29 @@ bool DrawCSystem::onStart() {
 }
 
 void DrawCSystem::projectPoints(){
+	cv::Mat_<double> rvec(3,1);
+	cv::Mat_<double> tvec(3,1);
+	Types::HomogMatrix homogMatrix;
+	cv::Mat_<double> rotMatrix;
+	rotMatrix.create(3,3);
 
-	cv::Mat rvec = in_rvec.read();
-	cv::Mat tvec = in_tvec.read();
+	if(!in_rvec.empty()&&!in_tvec.empty()){
+		rvec = in_rvec.read();
+		tvec = in_tvec.read();
+	}
+	else if(!in_homogMatrix.empty()){
+		homogMatrix = in_homogMatrix.read();
+
+		for (int i = 0; i < 3; ++i) {
+			for (int j = 0; j < 3; ++j) {
+				rotMatrix(i,j)=homogMatrix.elements[i][j];
+			}
+			tvec(i, 0) = homogMatrix.elements[i][3];
+		}
+		Rodrigues(rotMatrix, rvec);
+	}
+	else
+		return;
 	Types::CameraInfo camera_matrix = in_camera_matrix.read();
 
 	vector<cv::Point3f> object_points;

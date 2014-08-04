@@ -74,6 +74,7 @@ protected:
 
 
 	// Input data streams
+	Base::DataStreamIn <Types::HomogMatrix> in_homogMatrix;
 	Base::DataStreamIn <cv::Mat> in_rvec;
 	Base::DataStreamIn <cv::Mat> in_tvec;
 	Base::DataStreamIn <Types::CameraInfo> in_camera_matrix;
