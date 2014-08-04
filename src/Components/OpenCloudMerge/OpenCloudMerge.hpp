@@ -1,11 +1,11 @@
 /*!
  * \file
  * \brief 
- * \author Micha Laszkowski
+ * \author Marta Lepicka
  */
 
-#ifndef SOMGENERATOR_HPP_
-#define SOMGENERATOR_HPP_
+#ifndef OPENCLOUDMERGE_HPP_
+#define OPENCLOUDMERGE_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -15,9 +15,10 @@
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-#include <Types/PointXYZSIFT.hpp> 
-#include <Types/SIFTObjectModel.hpp> 
-#include <Types/SIFTObjectModelFactory.hpp> 
+#include <Types/MergeUtils.hpp>
+#include <Types/PointXYZSIFT.hpp>
+#include <Types/SIFTObjectModel.hpp>
+#include <Types/SIFTObjectModelFactory.hpp>
 
 #include <Types/MergeUtils.hpp>
 
@@ -28,25 +29,25 @@
 
 
 namespace Processors {
-namespace SOMGenerator {
+namespace OpenCloudMerge {
 
 /*!
- * \class SOMGenerator
- * \brief SOMGenerator processor class.
+ * \class OpenCloudMerge
+ * \brief OpenCloudMerge processor class.
  *
- * SOMGenerator processor.
+ * OpenCloudMerge processor.
  */
-class SOMGenerator: public Base::Component,SIFTObjectModelFactory {
+class OpenCloudMerge: public Base::Component, SIFTObjectModelFactory {
 public:
 	/*!
 	 * Constructor.
 	 */
-    SOMGenerator(const std::string & name = "SOMGenerator");
+	OpenCloudMerge(const std::string & name = "OpenCloudMerged");
 
 	/*!
 	 * Destructor
 	 */
-    virtual ~SOMGenerator();
+	virtual ~OpenCloudMerge();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -54,7 +55,6 @@ public:
 	 * values set in config file.
 	 */
 	void prepareInterface();
-
 
 protected:
 
@@ -86,9 +86,9 @@ protected:
 
 	/// Input data stream containing feature cloud from a given view.
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
-
+	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift_n;
 	/// Output data stream containing SIFTObjectModel - depricated.
-	Base::DataStreamOut<AbstractObject*> out_instance; 
+	Base::DataStreamOut<AbstractObject*> out_instance;
 
 	/// Output data stream containing object model point cloud.
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
@@ -100,7 +100,7 @@ protected:
 	/// Output data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 
-	// Mean number of features per view. 
+	// Mean number of features per view.
 	Base::DataStreamOut<int> out_mean_viewpoint_features_number;
 
 	// Handlers
@@ -108,28 +108,13 @@ protected:
     Base::EventHandler2 h_addViewToModel_normals;
 	
 	// Handlers
-    void addViewToModel();
+	void addViewToModel();
     void addViewToModel_normals();
 
-	/// Computes the transformation between two XYZSIFT clouds basing on the found correspondences.
-	Eigen::Matrix4f computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg, 
-		const pcl::CorrespondencesConstPtr& correspondences, pcl::Correspondences& inliers);
-
-	/// Number of views.	
-	int counter;
+    MergeUtils::Properties properties;
 
 
-	/// Total number of features (in all views).	
-	int total_viewpoint_features_number;
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normal_merged;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
-	Eigen::Matrix4f global_trans;
-
-    /// Alignment mode: use ICP alignment or not.
-	/// ICP properties
-public:
     Base::Property<bool> prop_ICP_alignment;
     Base::Property<bool> prop_ICP_alignment_normal;
     Base::Property<bool> prop_ICP_alignment_color;
@@ -141,14 +126,25 @@ public:
     Base::Property<float> RanSAC_inliers_threshold;
     Base::Property<float> RanSAC_max_iterations;
 
+	/// Number of views.
+	int counter;
+
+
+	/// Total number of features (in all views).
+	int total_viewpoint_features_number;
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normal_merged;
+	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
+	Eigen::Matrix4f global_trans;
 };
 
-} //: namespace SOMGenerator
+} //: namespace OpenCloudMerge
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("SOMGenerator", Processors::SOMGenerator::SOMGenerator)
+REGISTER_COMPONENT("OpenCloudMerge", Processors::OpenCloudMerge::OpenCloudMerge)
 
-#endif /* SOMGENERATOR_HPP_ */
+#endif /* OPENCLOUDMERGE_HPP_ */
