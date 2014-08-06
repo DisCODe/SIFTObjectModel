@@ -16,21 +16,24 @@
 	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="0.2">
-				<Component name="Sequence" type="CameraNUI:CameraNUI" priority="1" bump="0">
+				<!--<Component name="Sequence" type="CameraNUI:CameraNUI" priority="1" bump="0">
 					<param name="lib">freenect</param>
 					<param name="skip_stop">1</param>
 					<param name="camera_mode">rgb</param>
 					<param name="sync">1</param>
 					<param name="index">0</param>
-				</Component>
-				<!--<Component name="Sequence" type="CvBasic:Sequence" priority="1" bump="0">
-					<param name="sequence.directory">/home/mlepicka/012/deska/</param>
-					<param name="sequence.pattern">.*\_rgb.png</param>
-					<param name="mode.loop">1</param>
 				</Component>-->
+				<Component name="Sequence" type="CvBasic:Sequence" priority="1" bump="0">
+					<param name="sequence.directory">/home/discode/14.08.2014/inka_stereo/left/</param>
+					<param name="sequence.pattern">.*\.png</param>
+					<param name="mode.loop">1</param>
+				</Component>
+
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="2" bump="1">
-					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
-					<param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
+	<param name="camera_matrix">1445.69543371487 0 622.89561146331; 0 1451.60719632398 499.310147973752; 0 0 1</param>
+<param name="dist_coeffs">-0.213368795840596 0.133203194326672 0.00176762788151009 -0.00218227169891789 0</param>
+					<!--<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
+					<param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>-->
 				</Component>
 
 				<Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="3">
@@ -53,11 +56,13 @@
 					<param name="offset.X">-0.075</param>
 					<param name="offset.Y">-0.233</param>
 				</Component>
-				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="7">
+				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="9">
 				</Component>
 				<Component name="Drawinv" type="SIFTObjectModel:DrawCSystem" priority="8">
 				</Component>
-				<Component name="Statistic" type="CvBasic:CalcStatistics" priority="9">
+				<!--<Component name="Statistic" type="CvBasic:CalcStatistics" priority="9">
+				</Component>-->
+				<Component name="SolveLocation" type="CvBasic:CalcObjectLocation" priority="7">
 				</Component>
 			</Executor>
 			<Executor name="Visualization" period="0.1">
@@ -92,25 +97,38 @@
 			<sink>SolvePNPinv.in_camerainfo</sink>
 			<sink>Drawinv.in_camera_matrix</sink>
 		</Source>
-		<Source name="SolvePNP.out_rvec">
+		<!--<Source name="SolvePNP.out_rvec">
 			<sink>Draw.in_rvec</sink>
 		</Source>
 		<Source name="SolvePNP.out_tvec">
 			<sink>Draw.in_tvec</sink>
-		</Source>
+		</Source>-->
 		<Source name="Draw.out_csystem">
 			<sink>Window.in_draw0</sink>		
 		</Source>
-		<Source name="SolvePNPinv.out_rvec">
-			<sink>Statistic.in_rvec</sink>
+		<!--<Source name="SolvePNPinv.out_rvec">
+			<sink>Statistic.in_tvec</sink>
 			<sink>Drawinv.in_rvec</sink>
 		</Source>
 		<Source name="SolvePNPinv.out_tvec">
 			<sink>Statistic.in_tvec</sink>
 			<sink>Drawinv.in_tvec</sink>
-		</Source>
+		</Source>-->
 		<Source name="Drawinv.out_csystem">
 			<sink>Window.in_draw1</sink>		
+		</Source>
+		<Source name = "SolvePNPinv.out_homogMatrix">
+
+			<sink>SolveLocation.in_homogMatrix</sink>
+		</Source>
+		<Source name= "SolvePNP.out_homogMatrix">
+
+			<sink>SolveLocation.in_homogMatrix</sink>
+		</Source>
+
+		<Source name= "SolveLocation.out_homogMatrix">
+			<sink>Draw.in_homogMatrix</sink>
+			<sink>Drawinv.in_homogMatrix</sink>
 		</Source>
 	</DataStreams>
 </Task>
