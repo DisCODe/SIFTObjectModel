@@ -2,13 +2,13 @@
 	<!-- reference task information -->
 	<Reference>
 		<Author>
-			<name>Tomasz Kornuta</name>
+			<name>Marta Lepicka</name>
 			<link></link>
 		</Author>
 		
 		<Description>
-			<brief>ecovi:t1/SequenceViewer</brief>
-			<full>Loads and displays a sequence of images</full>	
+			<brief>SIFTObjectModel:DetectCircles</brief>
+			<full>Detect circles on images loaded by sequence or via Kinect</full>	
 		</Description>
 	</Reference>
 	
@@ -24,14 +24,14 @@
 					<param name="index">0</param>
 				</Component>-->
 				<Component name="Sequence" type="CvBasic:Sequence" priority="1" bump="0">
-					<param name="sequence.directory">/home/discode/08_2014/inka_stereo/left/</param>
+					<param name="sequence.directory">/home/mort/data/</param>
 					<param name="sequence.pattern">.*\.png</param>
 					<param name="mode.loop">1</param>
 				</Component>
 
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="2" bump="1">
-	<param name="camera_matrix">1445.69543371487 0 622.89561146331; 0 1451.60719632398 499.310147973752; 0 0 1</param>
-<param name="dist_coeffs">-0.213368795840596 0.133203194326672 0.00176762788151009 -0.00218227169891789 0</param>
+					<param name="camera_matrix">1445.69543371487 0 622.89561146331; 0 1451.60719632398 499.310147973752; 0 0 1</param>
+					<param name="dist_coeffs">-0.213368795840596 0.133203194326672 0.00176762788151009 -0.00218227169891789 0</param>
 					<!--<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
 					<param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>-->
 				</Component>
@@ -61,8 +61,8 @@
 				</Component>
 				<Component name="Drawinv" type="SIFTObjectModel:DrawCSystem" priority="8">
 				</Component>
-				<!--<Component name="Statistic" type="CvBasic:CalcStatistics" priority="9">
-				</Component>-->
+				<Component name="Statistic" type="CvBasic:CalcStatistics" priority="10">
+				</Component>
 				<Component name="SolveLocation" type="CvBasic:CalcObjectLocation" priority="7">
 				</Component>
 			</Executor>
@@ -98,36 +98,22 @@
 			<sink>SolvePNPinv.in_camerainfo</sink>
 			<sink>Drawinv.in_camera_matrix</sink>
 		</Source>
-		<!--<Source name="SolvePNP.out_rvec">
-			<sink>Draw.in_rvec</sink>
-		</Source>
-		<Source name="SolvePNP.out_tvec">
-			<sink>Draw.in_tvec</sink>
-		</Source>-->
 		<Source name="Draw.out_csystem">
 			<sink>Window.in_draw0</sink>		
 		</Source>
-		<!--<Source name="SolvePNPinv.out_rvec">
-			<sink>Statistic.in_tvec</sink>
-			<sink>Drawinv.in_rvec</sink>
-		</Source>
-		<Source name="SolvePNPinv.out_tvec">
-			<sink>Statistic.in_tvec</sink>
-			<sink>Drawinv.in_tvec</sink>
-		</Source>-->
 		<Source name="Drawinv.out_csystem">
 			<sink>Window.in_draw1</sink>		
 		</Source>
 		<Source name = "SolvePNPinv.out_homogMatrix">
-
+			
 			<sink>SolveLocation.in_homogMatrix</sink>
 		</Source>
 		<Source name= "SolvePNP.out_homogMatrix">
-
+			
 			<sink>SolveLocation.in_homogMatrix</sink>
 		</Source>
-
 		<Source name= "SolveLocation.out_homogMatrix">
+			<sink>Statistic.in_homogMatrix</sink>
 			<sink>Draw.in_homogMatrix</sink>
 			<sink>Drawinv.in_homogMatrix</sink>
 		</Source>
