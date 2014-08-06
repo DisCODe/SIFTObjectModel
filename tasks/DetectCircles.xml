@@ -24,7 +24,7 @@
 					<param name="index">0</param>
 				</Component>-->
 				<Component name="Sequence" type="CvBasic:Sequence" priority="1" bump="0">
-					<param name="sequence.directory">/home/discode/14.08.2014/inka_stereo/left/</param>
+					<param name="sequence.directory">/home/discode/08_2014/inka_stereo/left/</param>
 					<param name="sequence.pattern">.*\.png</param>
 					<param name="mode.loop">1</param>
 				</Component>
@@ -50,11 +50,12 @@
 				</Component>
 				<Component name="SolvePNP" type="CvBasic:CvSolvePnP" priority="5">
 					<param name="offset.X">-0.075</param>
-					<param name="offset.Y">0.113</param>
+					<param name="offset.Y">-0.233</param>
 				</Component>
 				<Component name="SolvePNPinv" type="CvBasic:CvSolvePnP" priority="6">
+
 					<param name="offset.X">-0.075</param>
-					<param name="offset.Y">-0.233</param>
+					<param name="offset.Y">0.113</param>
 				</Component>
 				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="9">
 				</Component>
