@@ -31,10 +31,10 @@
 				</Component>-->
 
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="2" bump="1">
-					<param name="camera_matrix">1445.69543371487 0 622.89561146331; 0 1451.60719632398 499.310147973752; 0 0 1</param>
-					<param name="dist_coeffs">-0.213368795840596 0.133203194326672 0.00176762788151009 -0.00218227169891789 0</param>
-					<!--<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
-					<param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>-->
+					<!--<param name="camera_matrix">1445.69543371487 0 622.89561146331; 0 1451.60719632398 499.310147973752; 0 0 1</param>
+					<param name="dist_coeffs">-0.213368795840596 0.133203194326672 0.00176762788151009 -0.00218227169891789 0</param>-->
+					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
+					<param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
 				</Component>
 
 				<Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="3">
@@ -51,13 +51,12 @@
 				</Component>
 				<Component name="SolvePNP" type="CvBasic:CvSolvePnP" priority="5">
 					<param name="offset.x">0.075</param>
-					<param name="offset.y">0.233</param>
+					<param name="offset.y">-0.113</param>
 					<param name="offset.roll">3.14159265359</param>
 				</Component>
 				<Component name="SolvePNPinv" type="CvBasic:CvSolvePnP" priority="6">
-
 					<param name="offset.x">0.075</param>
-					<param name="offset.y">-0.113</param>
+					<param name="offset.y">0.233</param>
 					<param name="offset.roll">3.14159265359</param>
 				</Component>
 				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="9">
