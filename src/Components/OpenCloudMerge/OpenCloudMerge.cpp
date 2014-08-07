@@ -86,7 +86,6 @@ void OpenCloudMerge::prepareInterface() {
 	registerStream("in_cloud_xyzrgb", &in_cloud_xyzrgb);
 	registerStream("in_cloud_xyzrgb_normals", &in_cloud_xyzrgb_normals);
 	registerStream("in_cloud_xyzsift", &in_cloud_xyzsift);
-	//registerStream("in_cloud_xyzsift_n", &in_cloud_xyzsift_n);
 	registerStream("out_instance", &out_instance);
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzrgb_normals", &out_cloud_xyzrgb_normals);
@@ -99,10 +98,10 @@ void OpenCloudMerge::prepareInterface() {
     addDependency("addViewToModel", &in_cloud_xyzsift);
     addDependency("addViewToModel", &in_cloud_xyzrgb);
 
-    h_addViewToModel_normals.setup(boost::bind(&OpenCloudMerge::addViewToModel_normals, this));
-    registerHandler("addViewToModel_normals", &h_addViewToModel_normals);
-    addDependency("addViewToModel_normals", &in_cloud_xyzsift);
-    addDependency("addViewToModel_normals", &in_cloud_xyzrgb_normals);
+    h_addViewToModelNormals.setup(boost::bind(&OpenCloudMerge::addViewToModelNormals, this));
+    registerHandler("addViewToModelNormals", &h_addViewToModelNormals);
+    addDependency("addViewToModelNormals", &in_cloud_xyzsift);
+    addDependency("addViewToModelNormals", &in_cloud_xyzrgb_normals);
 }
 
 bool OpenCloudMerge::onInit() {
@@ -260,12 +259,11 @@ void OpenCloudMerge::addViewToModel(){
 		out_cloud_xyzsift.write(cloud_sift_merged);
 
 		// Push SOM - depricated.
-
 }
 
-void OpenCloudMerge::addViewToModel_normals() {
+void OpenCloudMerge::addViewToModelNormals() {
 
-		CLOG(LTRACE) << "SOMGenerator::addViewToModel_normals";
+		CLOG(LTRACE) << "SOMGenerator::addViewToModelNormals";
 
 		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud = in_cloud_xyzrgb_normals.read();
 		pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift = in_cloud_xyzsift.read();

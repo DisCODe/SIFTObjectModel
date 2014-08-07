@@ -6,7 +6,6 @@ FILE(GLOB files *.cpp)
 
 # Find required packages
 FIND_PACKAGE( OpenCV REQUIRED )
-FIND_PACKAGE( PCL 1.7.1 REQUIRED )
 
 # Create an executable file from sources:
 ADD_LIBRARY(DrawCSystem SHARED ${files})

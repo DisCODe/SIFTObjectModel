@@ -20,6 +20,8 @@
 #include "Types/DrawableContainer.hpp"
 #include "Types/Line.hpp"
 
+#include "Property.hpp"
+
 namespace Processors {
 namespace DrawCSystem {
 
@@ -72,6 +74,7 @@ protected:
 
 
 	// Input data streams
+	Base::DataStreamIn <Types::HomogMatrix> in_homogMatrix;
 	Base::DataStreamIn <cv::Mat> in_rvec;
 	Base::DataStreamIn <cv::Mat> in_tvec;
 	Base::DataStreamIn <Types::CameraInfo> in_camera_matrix;
@@ -84,7 +87,6 @@ protected:
 
 	// Properties
 
-	
 	// Handlers
 
 	void projectPoints();

@@ -4,8 +4,8 @@
  * \author Marta Lepicka
  */
 
-#ifndef SIFTNOMJSONWRITER_HPP_
-#define SIFTNOMJSONWRITER_HPP_
+#ifndef SIFTNOMWRITER_HPP_
+#define SIFTNOMWRITER_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -16,25 +16,25 @@
 #include <Types/SIFTObjectModel.hpp>
 
 namespace Processors {
-namespace SIFTNOMJSONWriter {
+namespace SIFTNOMWriter {
 
 /*!
- * \class SIFTNOMJSONWriter
- * \brief SIFTNOMJSONWriter processor class.
+ * \class SIFTNOMWriter
+ * \brief SIFTNOMWriter processor class.
  *
- * SIFTNOMJSONWriter processor.
+ * SIFTNOMWriter processor.
  */
-class SIFTNOMJSONWriter: public Base::Component {
+class SIFTNOMWriter: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	SIFTNOMJSONWriter(const std::string & name = "SIFTNOMJSONWriter");
+	SIFTNOMWriter(const std::string & name = "SIFTNOMWriter");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~SIFTNOMJSONWriter();
+	virtual ~SIFTNOMWriter();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -93,10 +93,10 @@ protected:
 // Output data streams
 
 	// Handlers
-	Base::EventHandler2 h_Write_normals;
+	Base::EventHandler2 h_WriteNormals;
 	
 	// Handlers
-	void Write_normals();
+	void WriteNormals();
 
 	/// Name of the model - used for generation of names of JSON ("major" file) and PCDs ("minor" files containing clouds).
 	Base::Property<std::string> SOMname;
@@ -105,12 +105,12 @@ protected:
 	Base::Property<std::string> dir;
 };
 
-} //: namespace SIFTNOMJSONWriter
+} //: namespace SIFTNOMWriter
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("SIFTNOMJSONWriter", Processors::SIFTNOMJSONWriter::SIFTNOMJSONWriter)
+REGISTER_COMPONENT("SIFTNOMWriter", Processors::SIFTNOMWriter::SIFTNOMWriter)
 
-#endif /* SIFTNOMJSONWRITER_HPP_ */
+#endif /* SIFTNOMWRITER_HPP_ */
