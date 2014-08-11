@@ -51,12 +51,12 @@
 				</Component>
 				<Component name="SolvePNP" type="CvBasic:CvSolvePnP" priority="5">
 					<param name="offset.x">0.075</param>
-					<param name="offset.y">-0.113</param>
+					<param name="offset.y">0.233</param>
 					<param name="offset.roll">3.14159265359</param>
 				</Component>
 				<Component name="SolvePNPinv" type="CvBasic:CvSolvePnP" priority="6">
 					<param name="offset.x">0.075</param>
-					<param name="offset.y">0.233</param>
+					<param name="offset.y">-0.113</param>
 					<param name="offset.roll">3.14159265359</param>
 				</Component>
 				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="9">
