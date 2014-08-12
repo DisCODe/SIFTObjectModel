@@ -75,7 +75,7 @@ void SOMJSONReader::loadModels() {
 	// Temporary variables - names.
 	std::string name_cloud_xyzrgb;
 	std::string name_cloud_xyzsift;
-	std::string name_cloud_xyzrgbnormal;
+
 	
 	// Iterate through JSON files.
 	for (size_t i = 0; i < namesList.size(); i++){
@@ -88,7 +88,7 @@ void SOMJSONReader::loadModels() {
 			mean_viewpoint_features_number = ptree_file.get<int>("mean_viewpoint_features_number");
 			name_cloud_xyzrgb = ptree_file.get<std::string>("cloud_xyzrgb");
 			name_cloud_xyzsift = ptree_file.get<std::string>("cloud_xyzsift");
-			name_cloud_xyzrgbnormal= ptree_file.get<std::string>("cloud_xyzrgb_normal");
+
 		}//: try
 		catch(std::exception const& e){
 			LOG(LERROR) << "SOMJSONReader: file "<< namesList[i] <<" not found or invalid\n";
@@ -97,7 +97,6 @@ void SOMJSONReader::loadModels() {
 
 		LOG(LDEBUG) << "name_cloud_xyzrgb:" << name_cloud_xyzrgb;
 		LOG(LDEBUG) << "name_cloud_xyzsift:" << name_cloud_xyzsift;
-		LOG(LDEBUG) << "name_cloud_xyzrgbnormal:" << name_cloud_xyzrgbnormal;
 		
 
 		// Read XYZRGB cloud.
@@ -115,15 +114,6 @@ void SOMJSONReader::loadModels() {
 		if (pcl::io::loadPCDFile<PointXYZSIFT> (name_cloud_xyzsift, *cloud_xyzsift) == -1) 
 		{
 			LOG(LERROR) << "SOMJSONReader: file "<< name_cloud_xyzsift <<" not found\n";
-			continue;
-		}//: if
-
-		// Read XYZRGBNormal cloud.
-		cloud_xyzrgb_normals = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
-		// Try to load the file.
-		if (pcl::io::loadPCDFile<pcl::PointXYZRGBNormal> (name_cloud_xyzrgbnormal, *cloud_xyzrgb_normals) == -1)
-		{
-			LOG(LERROR) << "SOMJSONReader: file "<< name_cloud_xyzrgbnormal <<" not found\n";
 			continue;
 		}//: if
 

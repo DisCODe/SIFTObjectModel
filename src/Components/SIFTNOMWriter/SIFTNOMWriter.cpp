@@ -1,14 +1,17 @@
 /*!
  * \file
  * \brief
- * \author tkornuta,,,
+ * \author Marta Lepicka
  */
 
 #include <memory>
 #include <string>
 
-#include "SOMJSONWriter.hpp"
+#include "SIFTNOMWriter.hpp"
 #include "Common/Logger.hpp"
+
+#include <boost/bind.hpp>
+
 
 #include <boost/bind.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -19,69 +22,73 @@ using boost::property_tree::read_json;
 using boost::property_tree::write_json;
 
 namespace Processors {
-namespace SOMJSONWriter {
+namespace SIFTNOMWriter {
 
-SOMJSONWriter::SOMJSONWriter(const std::string & name) :
+SIFTNOMWriter::SIFTNOMWriter(const std::string & name) :
 		Base::Component(name),
-		dir("directory", boost::bind(&SOMJSONWriter::onDirChanged, this, _1, _2), "./"),
-		SOMname("SOM", boost::bind(&SOMJSONWriter::onSOMNameChanged, this, _1, _2), "SOM")
-{
-	CLOG(LTRACE) << "Hello SOMJSONWriter\n";
-	registerProperty(SOMname);
-	registerProperty(dir);
+		dir("directory", boost::bind(&SIFTNOMWriter::onDirChanged, this, _1, _2), "./"),
+		SOMname("SOM", boost::bind(&SIFTNOMWriter::onSOMNameChanged, this, _1, _2), "SOM")
+		{
+			CLOG(LTRACE) << "Hello SIFTNOMWriter\n";
+			registerProperty(SOMname);
+			registerProperty(dir);
+		}
+
+
+SIFTNOMWriter::~SIFTNOMWriter() {
 }
 
-
-SOMJSONWriter::~SOMJSONWriter() {
-	CLOG(LTRACE) << "Bye SOMJSONWriter\n";
-}
-
-void SOMJSONWriter::prepareInterface() {
+void SIFTNOMWriter::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
 	registerStream("in_som", &in_som);
-	registerStream("in_cloud_xyzrgb", &in_cloud_xyzrgb);
+	registerStream("in_cloud_xyzrgb_normals", &in_cloud_xyzrgb_normals);
 	registerStream("in_cloud_xyzsift", &in_cloud_xyzsift);
 	registerStream("in_mean_viewpoint_features_number", &in_mean_viewpoint_features_number);
 
 	// Register handlers
-	h_Write.setup(boost::bind(&SOMJSONWriter::Write, this));
-	registerHandler("Write", &h_Write);
-
+	h_WriteNormals.setup(boost::bind(&SIFTNOMWriter::WriteNormals, this));
+	registerHandler("WriteNormals", &h_WriteNormals);
 }
 
-bool SOMJSONWriter::onInit() {
+bool SIFTNOMWriter::onInit() {
 
 	return true;
 }
 
-bool SOMJSONWriter::onFinish() {
-	return true;
-}
-
-bool SOMJSONWriter::onStop() {
-	return true;
-}
-
-bool SOMJSONWriter::onStart() {
-	return true;
-}
-
-void SOMJSONWriter::onSOMNameChanged(const std::string & old_SOMname, const std::string & new_SOMname) {
+void SIFTNOMWriter::onSOMNameChanged(const std::string & old_SOMname, const std::string & new_SOMname) {
 	SOMname = new_SOMname;
 	CLOG(LTRACE) << "onSOMNameChanged: " << std::string(SOMname) << std::endl;
 }
 
-void SOMJSONWriter::onDirChanged(const std::string & old_dir,
+void SIFTNOMWriter::onDirChanged(const std::string & old_dir,
 		const std::string & new_dir) {
 	dir = new_dir;
 	CLOG(LTRACE) << "onDirChanged: " << std::string(dir) << std::endl;
 }
 
 
-void SOMJSONWriter::Write() {
-	LOG(LTRACE) << "SOMJSONWriter::Write";
+bool SIFTNOMWriter::onFinish() {
+	return true;
+}
+
+bool SIFTNOMWriter::onStop() {
+	return true;
+}
+
+bool SIFTNOMWriter::onStart() {
+	return true;
+}
+
+void SIFTNOMWriter::WriteNormals() {
+
+	LOG(LTRACE) << "SIFTNOMWriter::WriteNormals";
 	// Try to save the model retrieved from the SOM data stream.
 	ptree ptree_file;
+
+	//if(in_cloud_xyzrgb_normals.empty()&&in_cloud_xyzsift.empty()&&in_mean_viewpoint_features_number.empty()){
+	//	CLOG(LWARNING) << "There are no required datastreams enabling save of the SOM to file.";
+	//	return;
+	//}
 
 	if (!in_som.empty()) {
 		LOG(LDEBUG) << "!in_som.empty()";
@@ -90,9 +97,9 @@ void SOMJSONWriter::Write() {
 		SIFTObjectModel* som = in_som.read();
 
 		// Save point cloud.
-		std::string name_cloud_xyzrgb = std::string(dir) + std::string("/") + std::string(SOMname) + std::string("_xyzrgb.pcd");
-		pcl::io::savePCDFileASCII (name_cloud_xyzrgb, *(som->cloud_xyzrgb));
-		CLOG(LTRACE) << "Write: saved " << som->cloud_xyzrgb->points.size () << " cloud points to "<< name_cloud_xyzrgb;
+		std::string name_cloud_xyzrgb_normals = std::string(dir) + std::string("/") + std::string(SOMname) + std::string("_xyzrgb_normals.pcd");
+		pcl::io::savePCDFileASCII (name_cloud_xyzrgb_normals, *(som->cloud_xyzrgb_normals));
+		CLOG(LTRACE) << "Write: saved " << som->cloud_xyzrgb_normals->points.size () << " cloud points to "<< name_cloud_xyzrgb_normals;
 
 		// Save feature cloud.
 		std::string name_cloud_xyzsift = std::string(dir) + std::string("/") + std::string(SOMname) + std::string("_xyzsift.pcd");
@@ -129,42 +136,33 @@ void SOMJSONWriter::Write() {
 		ptree_file.put("mean_viewpoint_features_number", mean_viewpoint_features_number);
 		ptree_file.put("cloud_xyzsift", name_cloud_xyzsift);
 
-
 	}
 
-	if (!in_cloud_xyzrgb.empty()) {
-		LOG(LDEBUG) << "!in_cloud_xyzrgb.empty()";
+	if (!in_cloud_xyzrgb_normals.empty()) {
+		LOG(LDEBUG) << "!in_cloud_xyzrgb_normals.empty()";
 
 		// Get model from datastreams.
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb = in_cloud_xyzrgb.read();
+		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_xyzrgb_normals = in_cloud_xyzrgb_normals.read();
 
 
 		// Save point cloud.
-		std::string name_cloud_xyzrgb = std::string(dir) + std::string("/") + std::string(SOMname) + std::string("_xyzrgb.pcd");
-		pcl::io::savePCDFileASCII (name_cloud_xyzrgb, *(cloud_xyzrgb));
-		CLOG(LTRACE) << "Write: saved " << cloud_xyzrgb->points.size () << " cloud points to "<< name_cloud_xyzrgb;
+		std::string name_cloud_xyzrgb_normals = std::string(dir) + std::string("/") + std::string(SOMname) + std::string("_xyzrgb_normals.pcd");
+		pcl::io::savePCDFileASCII (name_cloud_xyzrgb_normals, *(cloud_xyzrgb_normals));
+		CLOG(LTRACE) << "Write: saved " << cloud_xyzrgb_normals->points.size () << " cloud points to "<< name_cloud_xyzrgb_normals;
 
 
 		// Save JSON model description.
 		//ptree ptree_file;
 		ptree_file.put("name", SOMname);
 		ptree_file.put("type", "SIFTObjectModel");
-
-		ptree_file.put("cloud_xyzrgb", name_cloud_xyzrgb);
-
-
+		ptree_file.put("cloud_xyzrgb_normals", name_cloud_xyzrgb_normals);
 	}
-/*
-if(in_cloud_xyzrgb.empty()&&in_cloud_xyzsift.empty()&&in_mean_viewpoint_features_number.empty()){
-	CLOG(LWARNING) << "There are no required datastreams enabling save of the SOM to file.";
-	return;
-}*/
 
-write_json (std::string(dir) + std::string("/") + std::string(SOMname) + std::string(".json"), ptree_file);
+	write_json (std::string(dir) + std::string("/") + std::string(SOMname) + std::string(".json"), ptree_file);
 
 
 }
 
 
-} //: namespace SOMJSONWriter
+} //: namespace SIFTNOMNWriter
 } //: namespace Processors

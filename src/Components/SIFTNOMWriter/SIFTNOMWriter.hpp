@@ -1,11 +1,11 @@
 /*!
  * \file
  * \brief 
- * \author tkornuta,,,
+ * \author Marta Lepicka
  */
 
-#ifndef SOMJSONWRITER_HPP_
-#define SOMJSONWRITER_HPP_
+#ifndef SIFTNOMWRITER_HPP_
+#define SIFTNOMWRITER_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -13,29 +13,28 @@
 #include "Property.hpp"
 #include "EventHandler2.hpp"
 
-#include <Types/SIFTObjectModel.hpp> 
-
+#include <Types/SIFTObjectModel.hpp>
 
 namespace Processors {
-namespace SOMJSONWriter {
+namespace SIFTNOMWriter {
 
 /*!
- * \class SOMJSONWriter
- * \brief SOMJSONWriter processor class.
+ * \class SIFTNOMWriter
+ * \brief SIFTNOMWriter processor class.
  *
- * SOMJSONWriter processor.
+ * SIFTNOMWriter processor.
  */
-class SOMJSONWriter: public Base::Component {
+class SIFTNOMWriter: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	SOMJSONWriter(const std::string & name = "SOMJSONWriter");
+	SIFTNOMWriter(const std::string & name = "SIFTNOMWriter");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~SOMJSONWriter();
+	virtual ~SIFTNOMWriter();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -80,37 +79,38 @@ protected:
 	/// Input data stream containing SIFT Object Model
 	Base::DataStreamIn<SIFTObjectModel*, Base::DataStreamBuffer::Newest> in_som;
 
-	/// Input data stream containing object model point cloud.
-	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr, Base::DataStreamBuffer::Newest> in_cloud_xyzrgb;
+// Input data streams
+
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr, Base::DataStreamBuffer::Newest> in_cloud_xyzrgb_normals;
 
 
 	/// Input data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr, Base::DataStreamBuffer::Newest> in_cloud_xyzsift;
 
-	// Input stream containing mean number of features per view. 
+	// Input stream containing mean number of features per view.
 	Base::DataStreamIn<int, Base::DataStreamBuffer::Newest> in_mean_viewpoint_features_number;
 
+// Output data streams
 
 	// Handlers
-	Base::EventHandler2 h_Write;
+	Base::EventHandler2 h_WriteNormals;
 	
 	// Handlers
-	void Write();
+	void WriteNormals();
 
 	/// Name of the model - used for generation of names of JSON ("major" file) and PCDs ("minor" files containing clouds).
 	Base::Property<std::string> SOMname;
 
 	/// Directory to which model will be saved.
 	Base::Property<std::string> dir;
-
 };
 
-} //: namespace SOMJSONWriter
+} //: namespace SIFTNOMWriter
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("SOMJSONWriter", Processors::SOMJSONWriter::SOMJSONWriter)
+REGISTER_COMPONENT("SIFTNOMWriter", Processors::SIFTNOMWriter::SIFTNOMWriter)
 
-#endif /* SOMJSONWRITER_HPP_ */
+#endif /* SIFTNOMWRITER_HPP_ */

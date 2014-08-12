@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Marta Łępicka</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>Test pcd reader</brief>
+			<full></full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name= "cos">
+			<Executor name="Reader"  period="0.1">
+				<Component name="Reader" type="SIFTObjectModel:SIFTNOMReader" priority="1" bump="2">
+					<param name="filenames">/home/mlepicka/modele/Normalne_test_2.json</param>
+				</Component>
+			</Executor>
+
+		
+
+			<Executor name="Visualization" period="0.01">
+				<Component name="Visualizer" type="SIFTObjectModel:Visualization" priority="1" bump="1">
+					<param name="filenames">x</param>
+				</Component>
+			</Executor>
+
+		</Subtask>
+	</Subtasks>
+	
+	<!-- connections between events and handelrs -->
+	<Events>
+	</Events>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+		<Source name="Reader.out_cloud_xyzrgb_normals">
+			<sink>Visualizer.in_cloud_xyzrgb_normals</sink>
+		</Source>
+	</DataStreams>
+</Task>
+

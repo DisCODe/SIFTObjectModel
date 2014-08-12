@@ -1,11 +1,11 @@
 /*!
  * \file
  * \brief 
- * \author tkornuta,,,
+ * \author Marta Lepicka
  */
 
-#ifndef SOMJSONREADER_HPP_
-#define SOMJSONREADER_HPP_
+#ifndef SIFTNOMREADER_HPP_
+#define SIFTNOMREADER_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -13,29 +13,29 @@
 #include "Property.hpp"
 #include "EventHandler2.hpp"
 
-//#include <Types/SIFTObjectModel.hpp> 
-#include <Types/SIFTObjectModelFactory.hpp> 
+#include <Types/SIFTObjectModel.hpp>
+#include <Types/SIFTObjectModelFactory.hpp>
 
 namespace Processors {
-namespace SOMJSONReader {
+namespace SIFTNOMReader {
 
 /*!
- * \class SOMJSONReader
- * \brief SOMJSONReader processor class.
+ * \class SIFTNOMReader
+ * \brief SIFTNOMReader processor class.
  *
- * SOMJSONReader processor.
+ * SIFTNOMReader processor.
  */
-class SOMJSONReader: public Base::Component, SIFTObjectModelFactory {
+class SIFTNOMReader: public Base::Component, SIFTObjectModelFactory {
 public:
 	/*!
 	 * Constructor.
 	 */
-	SOMJSONReader(const std::string & name = "SOMJSONReader");
+	SIFTNOMReader(const std::string & name = "SIFTNOMReader");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~SOMJSONReader();
+	virtual ~SIFTNOMReader();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -68,15 +68,17 @@ protected:
 
 	/// Output data stream containing models.
 	Base::DataStreamOut<std::vector<AbstractObject*> > out_models;
+	/// Output data stream containing object model point cloud with normals.
+	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> out_cloud_xyzrgb_normals;
 
 
-	// Handlerswas
+	// Handlers
 	Base::EventHandler2 h_loadModels;
 
 	/// List of the files containing models to be read.
 	Base::Property<string> filenames;
 
-	
+
 	/// Load models from files.
 	void loadModels();
 
@@ -84,15 +86,24 @@ protected:
 	 * Callback called when list of filenames changes.
 	 */
 	void onFilenamesChanged(const std::string & old_filenames, const std::string & new_filenames);
+// Input data streams
+
+
+// Output data streams
+
+	// Handlers
+
+	
+	// Handlers
 
 };
 
-} //: namespace SOMJSONReader
+} //: namespace SIFTNOMReader
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("SOMJSONReader", Processors::SOMJSONReader::SOMJSONReader)
+REGISTER_COMPONENT("SIFTNOMReader", Processors::SIFTNOMReader::SIFTNOMReader)
 
-#endif /* SOMJSONREADER_HPP_ */
+#endif /* SIFTNOMREADER_HPP_ */
