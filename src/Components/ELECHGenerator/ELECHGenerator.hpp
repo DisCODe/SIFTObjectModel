@@ -18,6 +18,8 @@
 #include <Types/PointXYZSIFT.hpp>
 #include <Types/SIFTObjectModel.hpp>
 #include <Types/SIFTObjectModelFactory.hpp>
+#include <Types/MergeUtils.hpp>
+
 
 #include <pcl/registration/correspondence_estimation.h>
 #include "pcl/registration/correspondence_rejection_sample_consensus.h"
@@ -92,6 +94,9 @@ protected:
 	/// Output data stream containing object model point cloud.
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
 
+	/// Input data stream containing point cloud with normals from a given view.
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> in_cloud_xyzrgb_normals;
+
 	/// Output data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 
@@ -105,12 +110,8 @@ protected:
 
 	// Handlers
     void addViewToModel();
-    void out_trigger();
 
-	/// Computes the transformation between two XYZSIFT clouds basing on the found correspondences.
-	Eigen::Matrix4f computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg,
-		const pcl::CorrespondencesConstPtr& correspondences, pcl::Correspondences& inliers);
-
+    MergeUtils::Properties properties;
 
 	/// Number of views.
 	int counter;
@@ -123,8 +124,17 @@ protected:
 	pcl::registration::ELCH<pcl::PointXYZRGB> elch_rgb;
 	pcl::registration::ELCH<PointXYZSIFT> elch_sift;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normal_merged;
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
+
+    Base::Property<double> ICP_transformation_epsilon;
+    Base::Property<float> ICP_max_correspondence_distance;
+    Base::Property<int> ICP_max_iterations;
+
+    ///RanSAC Properties
+    Base::Property<float> RanSAC_inliers_threshold;
+    Base::Property<float> RanSAC_max_iterations;
 
     /// Alignment mode: use ICP alignment or not.
 	/// ICP properties

@@ -137,6 +137,8 @@ void ClosedCloudMerge::addViewToModel()
 
 	// Remove NaNs.
 	std::vector<int> indices;
+	cloudrgb->is_dense = false;
+	pcl::removeNaNFromPointCloud(*cloudrgb, *cloudrgb, indices);
 	cloud->is_dense = false;
 	pcl::removeNaNFromPointCloud(*cloud, *cloud, indices);
 	cloud_sift->is_dense = false;
