@@ -79,6 +79,7 @@ protected:
 	Base::DataStreamIn<Types::Features> in_features;
 	Base::DataStreamIn<cv::Mat> in_descriptors;
 	Base::DataStreamIn<Types::CameraInfo> in_camera_info;
+    Base::DataStreamIn<cv::Mat> in_depth_xyz;
 
 	/// Output data stream containing resulting feature cloud.
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
@@ -86,10 +87,14 @@ protected:
 	// Handlers
 	Base::EventHandler2 h_process;
 	Base::EventHandler2 h_process_mask;
-	
+    Base::EventHandler2 h_process_depth_xyz;
+    Base::EventHandler2 h_process_depth_xyz_mask;
 	// Handlers
 	void process();
 	void process_mask();
+    void process_depth_xyz();
+    void process_depth_xyz_mask();
+
 
 };
 

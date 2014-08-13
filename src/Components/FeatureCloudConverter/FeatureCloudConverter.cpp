@@ -30,6 +30,7 @@ void FeatureCloudConverter::prepareInterface() {
 	registerStream("in_features", &in_features);
 	registerStream("in_descriptors", &in_descriptors);
 	registerStream("in_camera_info", &in_camera_info);
+    registerStream("in_depth_xyz", &in_depth_xyz);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 
 	// Register handlers
@@ -46,6 +47,17 @@ void FeatureCloudConverter::prepareInterface() {
 	addDependency("process_mask", &in_features);
 	addDependency("process_mask", &in_descriptors);
 	addDependency("process_mask", &in_camera_info);
+    h_process_depth_xyz.setup(boost::bind(&FeatureCloudConverter::process_depth_xyz, this));
+    registerHandler("process_depth_xyz", &h_process_depth_xyz);
+    addDependency("process_depth_xyz", &in_features);
+    addDependency("process_depth_xyz", &in_descriptors);
+    addDependency("proces_depth_xyzs", &in_depth_xyz);
+    h_process_depth_xyz_mask.setup(boost::bind(&FeatureCloudConverter::process_depth_xyz_mask, this));
+    registerHandler("process_depth_xyz_mask", &h_process_mask);
+    addDependency("process_depth_xyz_mask", &in_mask);
+    addDependency("process_depth_xyz_mask", &in_features);
+    addDependency("process_depth_xyz_mask", &in_descriptors);
+    addDependency("process_depth_xyz_mask", &in_depth_xyz);
 
 }
 
@@ -162,6 +174,77 @@ void FeatureCloudConverter::process_mask() {
 	out_cloud_xyzsift.write(cloud);
 }
 
+void FeatureCloudConverter::process_depth_xyz() {
+    CLOG(LTRACE) << "FeatureCloudConverter::process";
+    cv::Mat depth_xyz = in_depth_xyz.read();
+    cv::Mat descriptors = in_descriptors.read();
+    Types::Features features = in_features.read();
+
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud (new pcl::PointCloud<PointXYZSIFT>());
+
+
+    for(int i=0; i < features.features.size(); i++){
+
+        PointXYZSIFT point;
+        int u = round(features.features[i].pt.x);
+        int v = round(features.features[i].pt.y);
+
+        cv::Vec3f p = depth_xyz.at<cv::Vec3f>(v, u);
+
+
+        point.x = p[0];
+        point.y = p[1];
+        point.z = p[2];
+
+
+        for(int j=0; j<descriptors.cols;j++){
+            point.descriptor[j] = descriptors.row(i).at<float>(j);
+        }
+
+        point.multiplicity = 1;
+
+        cloud->push_back(point);
+    }
+
+    out_cloud_xyzsift.write(cloud);
+}
+
+void FeatureCloudConverter::process_depth_xyz_mask() {
+    CLOG(LTRACE) << "FeatureCloudConverter::process";
+    cv::Mat depth_xyz = in_depth_xyz.read();
+    cv::Mat descriptors = in_descriptors.read();
+    Types::Features features = in_features.read();
+    cv::Mat mask = in_mask.read();
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud (new pcl::PointCloud<PointXYZSIFT>());
+
+
+    for(int i=0; i < features.features.size(); i++){
+
+        PointXYZSIFT point;
+        int u = round(features.features[i].pt.x);
+        int v = round(features.features[i].pt.y);
+        if (mask.at<float>(v, u)==0) {
+                continue;
+        }
+        cv::Vec3f p = depth_xyz.at<cv::Vec3f>(v, u);
+
+
+        point.x = p[0];
+        point.y = p[1];
+        point.z = p[2];
+
+
+        for(int j=0; j<descriptors.cols;j++){
+            point.descriptor[j] = descriptors.row(i).at<float>(j);
+        }
+
+        point.multiplicity = 1;
+
+        cloud->push_back(point);
+    }
+
+    out_cloud_xyzsift.write(cloud);
+}
 
 } //: namespace FeatureCloudConverter
 } //: namespace Processors
