@@ -16,8 +16,6 @@
 #include <Types/SIFTObjectModel.hpp>
 #include <Types/SIFTObjectModelFactory.hpp>
 
-#include <Types/MergeUtils.hpp>
-
 #include <pcl/registration/correspondence_estimation.h>
 #include "pcl/registration/correspondence_rejection_sample_consensus.h"
 

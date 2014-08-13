@@ -37,7 +37,7 @@
 ////////////////////////////////////////////////////////////////////////
 #include <pcl/filters/filter.h>
 
-#include<pcl/registration/icp.h>
+#include <pcl/registration/icp.h>
 #include <pcl/registration/icp_nl.h>
 
 #include <pcl/filters/voxel_grid.h>
@@ -105,37 +105,34 @@ class SIFTFeatureRepresentation: public pcl::DefaultFeatureRepresentation <Point
 };
 
 
-Eigen::Matrix4f ELECHGenerator::computeTransformationSAC(const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_src, const pcl::PointCloud<PointXYZSIFT>::ConstPtr &cloud_trg,
-		const pcl::CorrespondencesConstPtr& correspondences, pcl::Correspondences& inliers)
-{
-	CLOG(LTRACE) << "Computing SAC" << std::endl ;
-
-	pcl::registration::CorrespondenceRejectorSampleConsensus<PointXYZSIFT> sac ;
-	sac.setInputSource(cloud_src) ;
-	sac.setInputTarget(cloud_trg) ;
-	sac.setInlierThreshold(0.01f) ; //property RanSAC
-	sac.setMaximumIterations(2000) ; //property RanSAC
-	sac.setInputCorrespondences(correspondences) ;
-	sac.getCorrespondences(inliers) ;
-
-	//CLOG(LINFO) << "SAC inliers " << inliers.size();
-
-
-	return sac.getBestTransformation() ;
-}
-
-
 ELECHGenerator::ELECHGenerator(const std::string & name) :
     Base::Component(name),
     Elch_loop_dist("ELCH.distance", 0.05),
     Elch_rejection_threshold("ELCH.rejection", 0.001),
     ICP_max_iterations("ELCH.maxIPCiterations", 2000),
-    ICP_max_correspondence_distance("ELCH.maxIPCdistance", 0.0005)
+    ICP_max_correspondence_distance("ELCH.maxIPCdistance", 0.0005),
+    ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
+    ICP_max_correspondence_distance("ICP.Correspondence_distance",0.1),
+    ICP_max_iterations("ICP.Iterations",2000),
+    RanSAC_inliers_threshold("RanSac.Inliers_threshold",0.01f),
+    RanSAC_max_iterations("RanSac.Iterations",2000)
 {
 	registerProperty(Elch_loop_dist);
 	registerProperty(Elch_rejection_threshold);
 	registerProperty(ICP_max_iterations);
 	registerProperty(ICP_max_correspondence_distance);
+	registerProperty(Elch_loop_dist);
+    registerProperty(ICP_transformation_epsilon);
+    registerProperty(ICP_max_correspondence_distance);
+    registerProperty(ICP_max_iterations);
+    registerProperty(RanSAC_inliers_threshold);
+    registerProperty(RanSAC_max_iterations);
+
+	properties.ICP_transformation_epsilon = ICP_transformation_epsilon;
+	properties.ICP_max_iterations = ICP_max_iterations;
+	properties.ICP_max_correspondence_distance = ICP_max_correspondence_distance;
+	properties.RanSAC_inliers_threshold = RanSAC_inliers_threshold;
+	properties.RanSAC_max_iterations = RanSAC_max_iterations;
 }
 
 ELECHGenerator::~ELECHGenerator() {
@@ -150,25 +147,13 @@ void ELECHGenerator::prepareInterface() {
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
-	//registerStream("out_trigger", &out_Trigger);
-	//registerStream("in_trigger", &in_trigger);
 
     // Register single handler - the "addViewToModel" function.
     h_addViewToModel.setup(boost::bind(&ELECHGenerator::addViewToModel, this));
     registerHandler("addViewToModel", &h_addViewToModel);
     addDependency("addViewToModel", &in_cloud_xyzsift);
     addDependency("addViewToModel", &in_cloud_xyzrgb);
-
-
-
-   // h_Trigger.setup(Trigger::trigger(),this);
-   // registerHandler("Trigger", &h_Trigger);
-	//addDependency("Trigger", &h_Trigger);
-
-	//h_Trigger.setup(boost::bind(&ELECHGenerator::out_trigger, this));
-	//registerHandler("trigger", &h_Trigger);
-	//addDependency("trigger", &out_Trigger);
-	//addDependency("trigger", &in_trigger);
+    addDependency("addViewToModel", &in_cloud_xyzrgb_normals);
 
 }
 
@@ -249,7 +234,8 @@ bool loopDetection (int end, std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>
 void ELECHGenerator::addViewToModel() {
     CLOG(LTRACE) << "LUMGenerator::addViewToModel";
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud = in_cloud_xyzrgb.read();
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudrgb = in_cloud_xyzrgb.read();
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud = in_cloud_xyzrgb_normals.read();
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift = in_cloud_xyzsift.read();
 
 	// TODO if empty()
@@ -259,6 +245,8 @@ void ELECHGenerator::addViewToModel() {
 
 	// Remove NaNs.
 	std::vector<int> indices;
+	cloudrgb->is_dense = false;
+	pcl::removeNaNFromPointCloud(*cloudrgb, *cloudrgb, indices);
 	cloud->is_dense = false;
 	pcl::removeNaNFromPointCloud(*cloud, *cloud, indices);
 	cloud_sift->is_dense = false;
@@ -284,11 +272,12 @@ void ELECHGenerator::addViewToModel() {
 		out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
 
 		lum_sift.addPointCloud(cloud_sift);
-		*rgb_views[0] = *cloud;
+		*rgb_views[0] = *cloudrgb;
 		elch_rgb.addPointCloud(rgb_views[0]);
 
 
-		*cloud_merged = *cloud;
+		*cloud_merged = *cloudrgb;
+		*cloud_normal_merged = *cloud;
 		*cloud_sift_merged = *cloud_sift;
 
 		out_cloud_xyzrgb.write(cloud_merged);
@@ -298,45 +287,40 @@ void ELECHGenerator::addViewToModel() {
 		CLOG(LINFO) << "return ";
 		return;
 	}
-
-	// Find corespondences between feature clouds.
-	// Initialize parameters.
+	//	 Find corespondences between feature clouds.
+	//	 Initialize parameters.
 	pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
-	pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst;
-	SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation()) ;
-	correst.setPointRepresentation(point_representation) ;
-	correst.setInputSource(cloud_sift) ;
-	correst.setInputTarget(cloud_sift_merged) ;
-	// Find correspondences.
-	correst.determineReciprocalCorrespondences(*correspondences) ;
+	MergeUtils::computeCorrespondences(cloud_sift, cloud_sift_merged, correspondences);
 	CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences->size() << " out of " << cloud_sift->size() << " features";
-
 
     // Compute transformation between clouds and SOMGenerator global transformation of cloud.
 	pcl::Correspondences inliers;
-	Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
-
-	int i=0;
-
-	while ( (inliers.size()) < 10 && (i <50)) //ICP property ?
+	Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
+	if (current_trans == Eigen::Matrix4f::Identity())
 	{
-
-		Eigen::Matrix4f current_trans = computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers) ;
-		i++;
+		CLOG(LINFO) << "cloud couldn't be merged";
+		counter--;
+		out_cloud_xyzrgb.write(cloud_merged);
+		out_cloud_xyzsift.write(cloud_sift_merged);
+		// Push SOM - depricated.
+//		out_instance.write(produce());
+		return;
 	}
 
-	cout<<"i: "<<i<<endl;
-
 	pcl::transformPointCloud(*cloud, *cloud, current_trans);
+	pcl::transformPointCloud(*cloudrgb, *cloudrgb, current_trans);
 	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
+	//	current_trans = MergeUtils::computeTransformationIPCNormals(cloud, cloud_normal_merged, properties);
+	//
+	//	pcl::transformPointCloud(*cloud, *cloud, current_trans);
+	//	pcl::transformPointCloud(*cloudrgb, *cloudrgb, current_trans);
+	//	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+
 	lum_sift.addPointCloud(cloud_sift);
-	*rgb_views[counter -1] = *cloud;
+	*rgb_views[counter -1] = *cloudrgb;
 	elch_rgb.addPointCloud(rgb_views[counter -1]);
 //	*cloud_sift_merged += *cloud_sift;
-
-
-
 
 	int first, last;
 	if (loopDetection(counter-1, rgb_views, Elch_loop_dist, first, last))
@@ -376,15 +360,7 @@ void ELECHGenerator::addViewToModel() {
 	out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
 	out_cloud_xyzrgb.write(cloud_merged);
 	out_cloud_xyzsift.write(cloud_sift_merged);
-
-	// Push SOM - depricated.
-//	out_instance.write(produce());
 }
-
-void ELECHGenerator::out_trigger(){
-
-}
-
 
 } //: namespace ELECHGenerator
 } //: namespace Processors

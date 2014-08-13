@@ -5,13 +5,13 @@
 			<name>Michał Laszkowski</name>
 			<link></link>
 		</Author>
-		
+
 		<Description>
 			<brief>Generates SOM and stores it in PCD file</brief>
 			<full>Loads a sequence of object views and joins them into SIFT object model (SOM)</full>	
 		</Description>
 	</Reference>
-	
+
 	<!-- task definition -->
 	<Subtasks>
 		<Subtask name="Main">
@@ -31,7 +31,7 @@
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>	
 				</Component>
-				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="4" bump="0">
+				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="4" bum="0">
 					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
 				</Component>
 				<Component name="SIFT" type="CvBasic:CvSIFT" priority="5" bump="0">
@@ -40,23 +40,25 @@
 				</Component>
 				<Component name="StatisticalOutlierRemoval" type="PCL:StatisticalOutlierRemoval" priority="7" bump="0">
 					<param name="negative">0</param>
-					<param name="StddevMulThresh">1</param>
-					<param name="MeanK">50</param>
+					<param name="MeanK">15</param>
+					<param name="StddevMulThresh">0.10</param>
 				</Component>
 				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
 				</Component>
-               <Component name="Generator" type="SIFTObjectModel:ELECHGenerator" priority="9" bump="1">
-					<param name="ELCH.distance">0.05</param>
-					<param name="ELCH.maxIPCdistance">0.00005</param>
-					<param name="ELCH.rejection">0.001</param>
-				</Component>  
-				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="10" bump="0">
-
+				<Component name="Normals" type="SIFTObjectModel:NormalEstimation" priority="9">
+				<param name="radius">0.02</param>
 				</Component>
-		        <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="11" bump="10">
-					<param name="SOM">ElchModel</param>
-					<param name="directory">/home/mkamionk/DisCODe/RGB-D/Model</param> 
-			    </Component>
+                <Component name="Generator" type="SIFTObjectModel:ELECHGenerator" priority="10" bump="1">
+					<param name="ELCH.distance">0.05</param>
+				</Component>
+				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
+					<param name="LeafSize.x">0.005</param>
+					<param name="LeafSize.y">0.005</param>
+					<param name="LeafSize.z">0.005</param>
+				</Component>
+		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="12" bump="10">
+					<param name="SOM">binder_1</param>
+			        </Component>
 			</Executor>
 
 			<Executor name="Visualization" period="1">
@@ -96,12 +98,18 @@
 		</Source>
 
 		<Source name="StatisticalOutlierRemoval.out_cloud_xyzrgb">
+			<sink>Normals.in_cloud_xyzrgb</sink>
 			<sink>Generator.in_cloud_xyzrgb</sink>
 		</Source>
 
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
 			<sink>Generator.in_cloud_xyzsift</sink>	
 		</Source>
+		
+		<Source name="Normals.out_cloud_xyzrgb_normals">
+			<sink>Generator.in_cloud_xyzrgb_normals</sink>
+		</Source>
+		
 		<Source name="Generator.out_cloud_xyzrgb">
 			<sink>VoxelGrid.in_cloud_xyzrgb</sink>
 		</Source>
