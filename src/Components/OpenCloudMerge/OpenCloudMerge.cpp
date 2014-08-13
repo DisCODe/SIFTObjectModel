@@ -53,13 +53,15 @@ OpenCloudMerge::OpenCloudMerge(const std::string & name) :
 	Base::Component(name),
 	prop_ICP_alignment("ICP.Points", true),
 	prop_ICP_alignment_normal("ICP.Normals", true),
-	prop_ICP_alignment_color("ICP.Color",false),
+	prop_ICP_alignment_color("ICP.Color",true),
 	ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
 	ICP_max_correspondence_distance("ICP.Correspondence_distance", 0.1),
 	ICP_max_iterations("ICP.Iterations", 2000),
 	RanSAC_inliers_threshold("RanSac.Inliers_threshold", 0.01f),
 	RanSAC_max_iterations("RanSac.Iterations", 2000) {
 
+	ICP_max_iterations.addConstraint("1");
+	ICP_max_iterations.addConstraint("2000");
 	registerProperty (prop_ICP_alignment);
 	registerProperty (prop_ICP_alignment_normal);
 	registerProperty (prop_ICP_alignment_color);
@@ -84,7 +86,6 @@ void OpenCloudMerge::prepareInterface() {
 	registerStream("in_cloud_xyzrgb", &in_cloud_xyzrgb);
 	registerStream("in_cloud_xyzrgb_normals", &in_cloud_xyzrgb_normals);
 	registerStream("in_cloud_xyzsift", &in_cloud_xyzsift);
-	//registerStream("in_cloud_xyzsift_n", &in_cloud_xyzsift_n);
 	registerStream("out_instance", &out_instance);
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzrgb_normals", &out_cloud_xyzrgb_normals);
@@ -97,10 +98,10 @@ void OpenCloudMerge::prepareInterface() {
     addDependency("addViewToModel", &in_cloud_xyzsift);
     addDependency("addViewToModel", &in_cloud_xyzrgb);
 
-    h_addViewToModel_normals.setup(boost::bind(&OpenCloudMerge::addViewToModel_normals, this));
-    registerHandler("addViewToModel_normals", &h_addViewToModel_normals);
-    addDependency("addViewToModel_normals", &in_cloud_xyzsift);
-    addDependency("addViewToModel_normals", &in_cloud_xyzrgb_normals);
+    h_addViewToModelNormals.setup(boost::bind(&OpenCloudMerge::addViewToModelNormals, this));
+    registerHandler("addViewToModelNormals", &h_addViewToModelNormals);
+    addDependency("addViewToModelNormals", &in_cloud_xyzsift);
+    addDependency("addViewToModelNormals", &in_cloud_xyzrgb_normals);
 }
 
 bool OpenCloudMerge::onInit() {
@@ -195,16 +196,8 @@ void OpenCloudMerge::addViewToModel(){
 
 		if (current_trans.isIdentity()){
 			// Add clouds.
-
-				//*cloud_merged += *cloud;
-				//*cloud_sift_merged += *cloud_sift;
-
 				CLOG(LINFO) << "model cloud->size(): "<<cloud_merged->size();
 				CLOG(LINFO) << "model cloud_sift->size(): "<<cloud_sift_merged->size();
-
-
-				// Compute mean number of features.
-				//mean_viewpoint_features_number = total_viewpoint_features_number/counter;
 
 				// Push results to output data ports.
 				out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
@@ -231,7 +224,6 @@ void OpenCloudMerge::addViewToModel(){
 		pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
 	    if (prop_ICP_alignment) {
-
 	    	current_trans = MergeUtils::computeTransformationICP(cloud, cloud_merged, properties);
 	    	CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
 
@@ -239,11 +231,15 @@ void OpenCloudMerge::addViewToModel(){
 	    	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	    	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 	    }
-	    else if(prop_ICP_alignment_color)
+	    if(prop_ICP_alignment_color)
 	    {
+	    	current_trans = MergeUtils::computeTransformationICPColor(cloud, cloud_merged, properties);
+	    	CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
 
+	    	// Refine the transformation.
+	    	pcl::transformPointCloud(*cloud, *cloud, current_trans);
+	    	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 	    }
-
 
 		// Add clouds.
 
@@ -263,12 +259,11 @@ void OpenCloudMerge::addViewToModel(){
 		out_cloud_xyzsift.write(cloud_sift_merged);
 
 		// Push SOM - depricated.
-
 }
 
-void OpenCloudMerge::addViewToModel_normals() {
+void OpenCloudMerge::addViewToModelNormals() {
 
-		CLOG(LTRACE) << "SOMGenerator::addViewToModel_normals";
+		CLOG(LTRACE) << "SOMGenerator::addViewToModelNormals";
 
 		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud = in_cloud_xyzrgb_normals.read();
 		pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift = in_cloud_xyzsift.read();
@@ -286,7 +281,6 @@ void OpenCloudMerge::addViewToModel_normals() {
 		    cloud_xyzrgb->points[i].g = cloud_xyzrgbnormal->points[i].g;
 		    cloud_xyzrgb->points[i].b = cloud_xyzrgbnormal->points[i].b;
 		    cloud_xyzrgb->points[i].a = cloud_xyzrgbnormal->points[i].a;
-		 //  cloud_xyzrgb->points[i].data = cloud_xyzrgbnormal->points[i].data;
 		}
 		// TODO if empty()
 
@@ -332,8 +326,8 @@ void OpenCloudMerge::addViewToModel_normals() {
 			    cloud_xyzrgb->points[i].r = cloud_xyzrgbnormal->points[i].r;
 			    cloud_xyzrgb->points[i].g = cloud_xyzrgbnormal->points[i].g;
 			    cloud_xyzrgb->points[i].b = cloud_xyzrgbnormal->points[i].b;
-			 //  cloud_xyzrgb->points[i].data = cloud_xyzrgbnormal->points[i].data;
 			}
+			out_cloud_xyzrgb.write(cloud_xyzrgb);
 			return;
 		}
 
@@ -403,12 +397,6 @@ void OpenCloudMerge::addViewToModel_normals() {
 			}//: if
 	        pcl::transformPointCloudWithNormals(*cloud, *cloud, current_trans);
 	        pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
-			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb(new pcl::PointCloud<pcl::PointXYZRGB>());
-			// [...]
-			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_xyzrgbnormal(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
-			//copyPointCloud(cloud_xyz, cloud_xyzrgb);
-
-			cloud_xyzrgbnormal = cloud_normal_merged;
 	    }
 
 
@@ -421,10 +409,7 @@ void OpenCloudMerge::addViewToModel_normals() {
 		    cloud_xyzrgb->points[i].g = cloud_xyzrgbnormal->points[i].g;
 		    cloud_xyzrgb->points[i].b = cloud_xyzrgbnormal->points[i].b;
 		    cloud_xyzrgb->points[i].a = cloud_xyzrgbnormal->points[i].a;
-		 //  cloud_xyzrgb->points[i].data = cloud_xyzrgbnormal->points[i].data;
 		}
-
-
 
 		// Add clouds.
 
@@ -433,18 +418,6 @@ void OpenCloudMerge::addViewToModel_normals() {
 
 		CLOG(LINFO) << "model cloud->size(): "<<cloud_normal_merged->size();
 		CLOG(LINFO) << "model cloud_sift->size(): "<<cloud_sift_merged->size();
-
-
-//		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb(new pcl::PointCloud<pcl::PointXYZRGB>());
-		// [...]
-//		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_xyzrgbnormal(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
-		//copyPointCloud(cloud_xyz, cloud_xyzrgb);
-
-		//cloud_xyzrgbnormal = cloud_normal_merged;
-
-
-
-		CLOG(LTRACE) << "SOMGenerator::addViewToModel_normals::rgb size:"<<cloud_xyzrgb->points.size();
 
 		// Compute mean number of features.
 		mean_viewpoint_features_number = total_viewpoint_features_number/counter;
