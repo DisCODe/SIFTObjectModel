@@ -127,9 +127,15 @@ Eigen::Matrix4f ELECHGenerator::computeTransformationSAC(const pcl::PointCloud<P
 
 ELECHGenerator::ELECHGenerator(const std::string & name) :
     Base::Component(name),
-    Elch_loop_dist("ELCH.distance", 0.05)
+    Elch_loop_dist("ELCH.distance", 0.05),
+    Elch_rejection_threshold("ELCH.rejection", 0.001),
+    ICP_max_iterations("ELCH.maxIPCiterations", 2000),
+    ICP_max_correspondence_distance("ELCH.maxIPCdistance", 0.0005)
 {
 	registerProperty(Elch_loop_dist);
+	registerProperty(Elch_rejection_threshold);
+	registerProperty(ICP_max_iterations);
+	registerProperty(ICP_max_correspondence_distance);
 }
 
 ELECHGenerator::~ELECHGenerator() {
@@ -339,9 +345,9 @@ void ELECHGenerator::addViewToModel() {
 		elch_rgb.setLoopStart(first);
 		elch_rgb.setLoopEnd(last);
 		pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>::Ptr icp (new pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>);
-		icp->setMaximumIterations(2000);
-		icp->setMaxCorrespondenceDistance(0.0005);
-		icp->setRANSACOutlierRejectionThreshold(0.001f);
+		icp->setMaximumIterations(ICP_max_iterations);
+		icp->setMaxCorrespondenceDistance(ICP_max_correspondence_distance);
+		icp->setRANSACOutlierRejectionThreshold(Elch_rejection_threshold);
 		elch_rgb.setReg(icp);
 		elch_rgb.compute();
 	}
