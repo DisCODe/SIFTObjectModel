@@ -59,6 +59,7 @@ bool CloudCutter::onStart() {
 }
 
 void CloudCutter::cut() {
+	LOG(LTRACE) << "CloudCutter::cut()";
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud = in_cloud.read();
 	pcl::PointCloud<pcl::PointXYZ>::Ptr indices = in_indices.read();
 	
@@ -78,12 +79,14 @@ void CloudCutter::cut() {
         { 
                 cout<<"Znaleziono " <<pointIdxRadiusSearch.size() << " punktów"<<endl;
                 for (size_t i = 0; i < pointIdxRadiusSearch.size (); ++i){
-					cloud->erase(cloud->begin() + pointIdxRadiusSearch[i] -1);//-1??
+					cloud->erase(cloud->begin() + pointIdxRadiusSearch[i]);//-1??
 				}
                 
                 
         } 
 	}
+	
+	out_cloud.write(cloud);
 
 }
 

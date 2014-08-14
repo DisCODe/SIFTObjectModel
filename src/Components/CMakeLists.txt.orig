@@ -16,7 +16,7 @@ ADD_COMPONENT(Downsampling)
 
 ADD_COMPONENT(PC2Octree)
 
-ADD_COMPONENT(ELECHGenerator)
+ADD_COMPONENT(LUMGenerator)
 
 ADD_COMPONENT(Visualization)
 
@@ -29,6 +29,9 @@ ADD_COMPONENT(SIFTClusterExtraction)
 ADD_COMPONENT(PCDReader)
 
 ADD_COMPONENT(ClosedCloudMerge)
+<<<<<<< HEAD
+ADD_COMPONENT(PCDWriter)
+=======
 
 ADD_COMPONENT(OpenCloudMerge)
 
@@ -38,4 +41,4 @@ ADD_COMPONENT(SIFTNOMReader)
 
 ADD_COMPONENT(DrawCSystem)
 
-ADD_COMPONENT(PCDWriter)
+>>>>>>> discode/master
