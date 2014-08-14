@@ -17,18 +17,18 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
-					<param name="filenames">/home/mlepicka/modele/savanah_v2.json</param>
+					<param name="filenames">/home/mlaszkow/jsonmodels/CB1.json</param>
 				</Component>
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/mlepicka/Objects/food_box_8/rgbd-dataset/food_box/food_box_8/</param>
+					<param name="sequence.directory">/home/mlaszkow/obiekty/food_box_12/</param>
 					<param name="sequence.pattern">.*\_color.png</param>				
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/mlepicka/Objects/food_box_8/rgbd-dataset/food_box/food_box_8/</param>
+					<param name="sequence.directory">/home/mlaszkow/obiekty/food_box_12/</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
-					<param name="sequence.directory">/home/mlepicka/Objects/food_box_8/rgbd-dataset/food_box/food_box_8/</param>
+					<param name="sequence.directory">/home/mlaszkow/obiekty/food_box_12/</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 				</Component>
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="5" bump="0">
@@ -46,10 +46,7 @@
             </Executor>
 
 			<Executor name="Visualization" period="1">
-				<Component name="WindowPCL" type="PCL:XYZCloudViewer" priority="1" bump="0">
-					<param name="title">RGB(white), SIFT(red)</param>
-					<param name="count">2</param>
-					<param name="clouds_colours"> 255 255 255;255 0 0</param>
+				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
 				</Component>
             </Executor>
 		</Subtask>	
@@ -81,19 +78,34 @@
 			<sink>FeatureCloudConverter.in_features</sink>	
 		</Source>		
 		<Source name="Converter.out_cloud_xyzrgb">
-			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
-			<sink>WindowPCL.in_cloud_xyz0</sink>			
+			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>		
 		</Source>
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
 			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>	
-			<sink>WindowPCL.in_cloud_xyz1</sink>
 		</Source>
 
 		<Source name="SOMJSONReader.out_models">
 			<sink>SIFTObjectMatcher.in_models</sink>
 		</Source>
 
-
+		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
+			<sink>Window.in_cloud_xyzrgb1</sink>
+		</Source>
+		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
+			<sink>Window.in_cloud_xyzrgb2</sink>
+		</Source>
+		<Source name="SIFTObjectMatcher.out_cloud_xyzsift">
+			<sink>Window.in_cloud_xyzsift1</sink>
+		</Source>
+		<Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
+			<sink>Window.in_cloud_xyzsift2</sink>
+		</Source>
+		<Source name="SIFTObjectMatcher.out_correspondences">
+			<sink>Window.in_correspondences</sink>
+		</Source>
+		<Source name="SIFTObjectMatcher.out_good_correspondences">
+			<sink>Window.in_good_correspondences</sink>
+		</Source>
 
 			
 	</DataStreams>

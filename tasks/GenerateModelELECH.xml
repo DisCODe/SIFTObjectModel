@@ -5,29 +5,29 @@
 			<name>Michał Laszkowski</name>
 			<link></link>
 		</Author>
-		
+
 		<Description>
 			<brief>Generates SOM and stores it in PCD file</brief>
 			<full>Loads a sequence of object views and joins them into SIFT object model (SOM)</full>	
 		</Description>
 	</Reference>
-	
+
 	<!-- task definition -->
 	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3R</param>
 					<param name="sequence.pattern">.*\_color.png</param>
 					<param name="mode.loop">0</param>					
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3R</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 					<param name="mode.loop">0</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3R</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>	
 				</Component>
@@ -39,6 +39,7 @@
 				<Component name="Converter" type="PCL:DepthConverter" priority="6" bump="0">
 				</Component>
 				<Component name="StatisticalOutlierRemoval" type="PCL:StatisticalOutlierRemoval" priority="7" bump="0">
+					<param name="negative">0</param>
 					<param name="MeanK">15</param>
 					<param name="StddevMulThresh">0.10</param>
 				</Component>
@@ -47,31 +48,22 @@
 				<Component name="Normals" type="SIFTObjectModel:NormalEstimation" priority="9">
 				<param name="radius">0.02</param>
 				</Component>
-                <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="10" bump="1">
-					<param name="View.Number">14</param>
-					<param name="Interations.Max">5</param>
-					<param name="Correspondenc.Treshold">9</param>
+                <Component name="Generator" type="SIFTObjectModel:ELECHGenerator" priority="10" bump="1">
+					<param name="ELCH.distance">0.05</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
 					<param name="LeafSize.x">0.005</param>
 					<param name="LeafSize.y">0.005</param>
 					<param name="LeafSize.z">0.005</param>
 				</Component>
-				<Component name="VoxelGridRGB" type="PCL:VoxelGrid" priority="12" bump="0">
-					<param name="LeafSize.x">0.005</param>
-					<param name="LeafSize.y">0.005</param>
-					<param name="LeafSize.z">0.005</param>
-				</Component>
-		        <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="13" bump="10">
-					<param name="SOM">model</param>
-					<param name="directory">/home/mkamionk/DisCODe/RGB-D/Model</param>
-			    </Component>
+		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="12" bump="10">
+					<param name="SOM">binder_1</param>
+			        </Component>
 			</Executor>
 
-			<Executor name="Visualization" period="0.1">
-				<Component name="Visualizer" type="SIFTObjectModel:Visualization" priority="1" bump="1">
-					<param name="filenames">/home/mkamionk/DisCODe/RGB-D/Model/model.pcd</param>
-				</Component>
+			<Executor name="Visualization" period="1">
+				<Component name="WindowPCL" type="PCL:CloudViewer" priority="1" bump="0">
+				</Component> 
 			</Executor>
 		</Subtask>	
 	
@@ -93,14 +85,14 @@
 		</Source>
 		<Source name="CameraInfo.out_camera_info">
 			<sink>Converter.in_camera_info</sink>	
-			<sink>FeatureCloudConverter.in_camera_info</sink>
+			<sink>FeatureCloudConverter.in_camera_info</sink> 
 		</Source>
 		<Source name="SIFT.out_descriptors">
 			<sink>FeatureCloudConverter.in_descriptors</sink>	
 		</Source>
 		<Source name="SIFT.out_features">
 			<sink>FeatureCloudConverter.in_features</sink>	
-		</Source>	
+		</Source>		
 		<Source name="Converter.out_cloud_xyzrgb">
 			<sink>StatisticalOutlierRemoval.in_cloud_xyzrgb</sink>
 		</Source>
@@ -111,34 +103,28 @@
 		</Source>
 
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
-			<sink>Generator.in_cloud_xyzsift</sink>		
+			<sink>Generator.in_cloud_xyzsift</sink>	
 		</Source>
-
+		
 		<Source name="Normals.out_cloud_xyzrgb_normals">
 			<sink>Generator.in_cloud_xyzrgb_normals</sink>
 		</Source>
-		<Source name="Generator.out_cloud_xyzrgb_normals">
-			<sink>VoxelGrid.in_cloud_xyzrgb_normal</sink>
-		</Source>
+		
 		<Source name="Generator.out_cloud_xyzrgb">
-			<sink>VoxelGridRGB.in_cloud_xyzrgb</sink>
-		</Source>
-		<Source name="VoxelGrid.out_cloud_xyzrgb_normal">
-			<sink>Visualizer.in_cloud_xyzrgb_normals</sink>
-			<sink>Writer.in_cloud_xyzrgb_normals</sink>
-		</Source>	
-		<Source name="VoxelGridRGB.out_cloud_xyzrgb">
-			<sink>Writer.in_cloud_xyzrgb</sink>
-		</Source>	
-		<Source name="Generator.out_cloud_xyzsift">
-			<sink>Writer.in_cloud_xyzsift</sink>	
+			<sink>VoxelGrid.in_cloud_xyzrgb</sink>
 		</Source>
 
+		<Source name="VoxelGrid.out_cloud_xyzrgb">
+			<sink>WindowPCL.in_cloud_xyzrgb</sink>
+			<sink>Writer.in_cloud_xyzrgb</sink>	
+		</Source>
+
+		<Source name="Generator.out_cloud_xyzsift">
+			<sink>Writer.in_cloud_xyzsift</sink>
+		</Source>
 		<Source name="Generator.out_mean_viewpoint_features_number">
 			<sink>Writer.in_mean_viewpoint_features_number</sink>
 		</Source>
-
-
 				
 	</DataStreams>
 </Task>
