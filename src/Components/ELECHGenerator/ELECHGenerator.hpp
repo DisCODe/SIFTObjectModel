@@ -129,8 +129,8 @@ protected:
 	Eigen::Matrix4f global_trans;
 
     Base::Property<double> ICP_transformation_epsilon;
-    Base::Property<float> ICP_max_correspondence_distance;
-    Base::Property<int> ICP_max_iterations;
+    Base::Property<float> Loop_max_correspondence_distance;
+    Base::Property<int> Loop_ICP_max_iterations;
 
     ///RanSAC Properties
     Base::Property<float> RanSAC_inliers_threshold;

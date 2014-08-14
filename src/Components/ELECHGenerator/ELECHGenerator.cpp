@@ -109,8 +109,8 @@ ELECHGenerator::ELECHGenerator(const std::string & name) :
     Base::Component(name),
     Elch_loop_dist("ELCH.distance", 0.05),
     Elch_rejection_threshold("ELCH.rejection", 0.001),
-    ICP_max_iterations("ELCH.maxIPCiterations", 2000),
-    ICP_max_correspondence_distance("ELCH.maxIPCdistance", 0.0005),
+    Loop_ICP_max_iterations("ELCH.maxIPCiterations", 2000),
+    Loop_max_correspondence_distance("ELCH.maxIPCdistance", 0.0005),
     ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
     ICP_max_correspondence_distance("ICP.Correspondence_distance",0.1),
     ICP_max_iterations("ICP.Iterations",2000),
@@ -119,8 +119,8 @@ ELECHGenerator::ELECHGenerator(const std::string & name) :
 {
 	registerProperty(Elch_loop_dist);
 	registerProperty(Elch_rejection_threshold);
-	registerProperty(ICP_max_iterations);
-	registerProperty(ICP_max_correspondence_distance);
+	registerProperty(Loop_ICP_max_iterations);
+	registerProperty(Loop_max_correspondence_distance);
 	registerProperty(Elch_loop_dist);
     registerProperty(ICP_transformation_epsilon);
     registerProperty(ICP_max_correspondence_distance);
@@ -329,8 +329,8 @@ void ELECHGenerator::addViewToModel() {
 		elch_rgb.setLoopStart(first);
 		elch_rgb.setLoopEnd(last);
 		pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>::Ptr icp (new pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>);
-		icp->setMaximumIterations(ICP_max_iterations);
-		icp->setMaxCorrespondenceDistance(ICP_max_correspondence_distance);
+		icp->setMaximumIterations(Loop_ICP_max_iterations);
+		icp->setMaxCorrespondenceDistance(Loop_max_correspondence_distance);
 		icp->setRANSACOutlierRejectionThreshold(Elch_rejection_threshold);
 		elch_rgb.setReg(icp);
 		elch_rgb.compute();
