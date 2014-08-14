@@ -17,19 +17,19 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
                             <Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
-                                    <param name="sequence.directory">%[TASK_LOCATION]%/../data/kinect_inka_views/</param>
+                                    <param name="sequence.directory">%[TASK_LOCATION]%/../../ModelViewAcquisition/data/kinect_inka_views/</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.auto_trigger">0</param>
                             </Component>
                             <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="2" bump="0">
-                                    <param name="sequence.directory">%[TASK_LOCATION]%/../data/kinect_inka_views/</param>
+                                    <param name="sequence.directory">%[TASK_LOCATION]%/../../ModelViewAcquisition/data/kinect_inka_views/</param>
                                     <param name="sequence.pattern">.*\_xyz\.yml</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.auto_trigger">0</param>
                             </Component>
                             <Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
-                                    <param name="sequence.directory">%[TASK_LOCATION]%/../data/kinect_inka_views/</param>
+                                    <param name="sequence.directory">%[TASK_LOCATION]%/../../ModelViewAcquisition/data/kinect_inka_views/</param>
                                     <param name="sequence.pattern">.*\_mask\.png</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.auto_trigger">0</param>
