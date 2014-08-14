@@ -48,8 +48,9 @@
 				<param name="radius">0.02</param>
 				</Component>
                 <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="10" bump="1">
-					<param name="threshold">14</param>
+					<param name="View.Number">8</param>
 					<param name="Interations.Max">10</param>
+					<param name="Correspondenc.Treshold">9</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
 					<param name="LeafSize.x">0.005</param>
@@ -96,6 +97,7 @@
 
 		<Source name="StatisticalOutlierRemoval.out_cloud_xyzrgb">
 			<sink>Normals.in_cloud_xyzrgb</sink>
+			<sink>Generator.in_cloud_xyzrgb</sink>
 		</Source>
 
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
