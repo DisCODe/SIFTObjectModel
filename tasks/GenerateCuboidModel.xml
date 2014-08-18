@@ -1,0 +1,53 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Michał Laszkowski</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>Generates SOM and stores it in PCD file</brief>
+                        <full></full>
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+			<Executor name="Processing"  period="1">
+                                <Component name="Generator" type="SIFTObjectModel:CuboidModelGenerator" priority="1" bump="0">
+                                        <param name="dataJSONname">/home/mlaszkow/cuboidjson/test.json</param>
+				</Component>
+<!--		                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="11" bump="10">
+					<param name="SOM">binder_1</param>
+                                </Component>-->
+			</Executor>
+
+			<Executor name="Visualization" period="1">
+				<Component name="WindowPCL" type="PCL:CloudViewer" priority="1" bump="0">
+<!--                                    <param name="coordinate_system">false</param>-->
+				</Component>
+                                <Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
+                                        <param name="count">1</param>
+                                        <param name="title">test</param>
+                                </Component>
+			</Executor>
+		</Subtask>	
+	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+                <Source name="Generator.out_cloud_xyzrgb">
+                        <sink>WindowPCL.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="Generator.out_img">
+                        <sink>Window.in_img0</sink>
+                </Source>
+	</DataStreams>
+</Task>
+
+
+
+

@@ -63,9 +63,11 @@
 			</Executor>
 
 			<Executor name="Visualization" period="0.1">
-				<Component name="Visualizer" type="SIFTObjectModel:Visualization" priority="1" bump="1">
+<!--				<Component name="Visualizer" type="SIFTObjectModel:Visualization" priority="1" bump="1">
 					<param name="filenames">/home/kamion/RGB-D/Models/LUMModel.pcd</param>
-				</Component>
+                                </Component>-->
+                                <Component name="Visualizer" type="PCL:CloudViewer" priority="1" bump="1">
+                                </Component>
 			</Executor>
 		</Subtask>	
 	
@@ -96,7 +98,7 @@
 		</Source>
 
 		<Source name="StatisticalOutlierRemoval.out_cloud_xyzrgb">
-			<sink>Normals.in_cloud_xyzrgb</sink>
+<!--			<sink>Normals.in_cloud_xyzrgb</sink>-->
 			<sink>Generator.in_cloud_xyzrgb</sink>
 		</Source>
 
@@ -104,15 +106,15 @@
 			<sink>Generator.in_cloud_xyzsift</sink>		
 		</Source>
 
-		<Source name="Normals.out_cloud_xyzrgb_normals">
+<!--		<Source name="Normals.out_cloud_xyzrgb_normals">
 			<sink>Generator.in_cloud_xyzrgb_normals</sink>
+                </Source>-->
+                <Source name="Generator.out_cloud_xyzrgb">
+                        <sink>VoxelGrid.in_cloud_xyzrgb</sink>
 		</Source>
-		<Source name="Generator.out_cloud_xyzrgb_normals">
-			<sink>VoxelGrid.in_cloud_xyzrgb_normal</sink>
-		</Source>
-		<Source name="VoxelGrid.out_cloud_xyzrgb_normal">
-			<sink>Visualizer.in_cloud_xyzrgb_normals</sink>
-			<sink>Writer.in_cloud_xyzrgb_normals</sink>
+                <Source name="VoxelGrid.out_cloud_xyzrgb">
+                        <sink>Visualizer.in_cloud_xyzrgb</sink>
+                        <sink>Writer.in_cloud_xyzrgb</sink>
 		</Source>	
 
 		<Source name="Generator.out_cloud_xyzsift">
