@@ -174,7 +174,7 @@ void CuboidModelGenerator::generate() {
 
     //bottom
     z= 0;//stale
-    cout <<"top " << bottom.cols << " x " <<bottom.rows << endl;
+    cout <<"bottom " << bottom.cols << " x " <<bottom.rows << endl;
     for(x = 0; x < a; x++){
         for(y = 0; y < b; y++){
             pcl::PointXYZRGB point;
@@ -184,6 +184,44 @@ void CuboidModelGenerator::generate() {
             int xx = 0 + (x-0)*(bottom.cols-1-0)/(a-1-0);
             int yy = 0 + (y-0)*(bottom.rows-1-0)/(b-1-0);
             cv::Vec3b bgr = bottom.at<cv::Vec3b>(yy, xx);
+            point.r = bgr[2];
+            point.g = bgr[1];
+            point.b = bgr[0];
+            cloud_xyzrgb->push_back(point);
+        }
+    }
+
+    //left
+    x= a;//stale
+    cout <<"left " << left.cols << " x " <<left.rows << endl;
+    for(y = 0; y < b; y++){
+        for(z = 0; z < c; z++){
+            pcl::PointXYZRGB point;
+            point.x = float(x)/1000;
+            point.y = float(-b+y)/1000;
+            point.z = float(c-z)/1000;
+            int yy = 0 + (y-0)*(left.cols-1-0)/(b-1-0);
+            int zz = 0 + (z-0)*(left.rows-1-0)/(c-1-0);
+            cv::Vec3b bgr = left.at<cv::Vec3b>(zz, yy);
+            point.r = bgr[2];
+            point.g = bgr[1];
+            point.b = bgr[0];
+            cloud_xyzrgb->push_back(point);
+        }
+    }
+
+    //right
+    x= 0;//stale
+    cout <<"left " << right.cols << " x " <<right.rows << endl;
+    for(y = 0; y < b; y++){
+        for(z = 0; z < c; z++){
+            pcl::PointXYZRGB point;
+            point.x = float(x)/1000;
+            point.y = float(-y)/1000;
+            point.z = float(c-z)/1000;
+            int yy = 0 + (y-0)*(right.cols-1-0)/(b-1-0);
+            int zz = 0 + (z-0)*(right.rows-1-0)/(c-1-0);
+            cv::Vec3b bgr = right.at<cv::Vec3b>(zz, yy);
             point.r = bgr[2];
             point.g = bgr[1];
             point.b = bgr[0];
