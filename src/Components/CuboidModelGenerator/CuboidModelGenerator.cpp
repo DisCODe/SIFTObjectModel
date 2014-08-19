@@ -42,7 +42,6 @@ void CuboidModelGenerator::prepareInterface() {
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 	registerStream("out_model", &out_model);
 
-    registerStream("out_img", &out_img);
 	// Register handlers
 	h_generate.setup(boost::bind(&CuboidModelGenerator::generate, this));
 	registerHandler("generate", &h_generate);
@@ -64,6 +63,24 @@ bool CuboidModelGenerator::onStop() {
 
 bool CuboidModelGenerator::onStart() {
 	return true;
+}
+
+void CuboidModelGenerator::sift(cv::Mat input, cv::Mat &descriptors, Types::Features &features) {
+    LOG(LTRACE) << "CuboidModelGenerator::sift()\n";
+    try {
+        //-- Step 1: Detect the keypoints.
+        cv::SiftFeatureDetector detector;
+        std::vector<cv::KeyPoint> keypoints;
+        detector.detect(input, keypoints);
+
+        //-- Step 2: Calculate descriptors (feature vectors).
+        cv::SiftDescriptorExtractor extractor;
+        extractor.compute( input, keypoints, descriptors);
+
+        features = Types::Features(keypoints);
+    } catch (...) {
+        LOG(LERROR) << "CuboidModelGenerator::sift() failed\n";
+    }
 }
 
 void CuboidModelGenerator::loadData(){
@@ -103,7 +120,6 @@ void CuboidModelGenerator::loadData(){
     front = cv::imread(front_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
     back = cv::imread(back_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
 
-    out_img.write(back);
 }
 
 void CuboidModelGenerator::generate() {
@@ -111,12 +127,10 @@ void CuboidModelGenerator::generate() {
     loadData();
 
 
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb(new pcl::PointCloud<pcl::PointXYZRGB>());
+    //pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb(new pcl::PointCloud<pcl::PointXYZRGB>());
     int x,y,z;
     //front
     y=0;//stałe
-    cout <<"front " << front.cols << " x " <<front.rows << endl;
-
     for(x = 0; x < a; x++){
         for(z = 0; z < c; z++){
             pcl::PointXYZRGB point;
@@ -232,6 +246,143 @@ void CuboidModelGenerator::generate() {
 //osie wizualizacji: niebieki z, zielony y, czerwony x
     out_cloud_xyzrgb.write(cloud_xyzrgb);
 
+    //SIFT
+    //pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift (new pcl::PointCloud<PointXYZSIFT>());
+    cv::Mat descriptors;
+    Types::Features features;
+    //front
+    sift(front,descriptors,features);
+    CLOG(LTRACE)<<"SIFT front " << features.features.size() <<endl;
+    for(int i=0; i < features.features.size(); i++){
+        PointXYZSIFT point;
+        int u = round(features.features[i].pt.x);
+        int v = round(features.features[i].pt.y);
+
+        int xx = 0 + (u-0)*(a-1-0)/(front.cols-1-0);
+        int zz = 0 + (v-0)*(c-1-0)/(front.rows-1-0);
+
+        point.x = float(a-xx)/1000;
+        point.y = float(0)/1000;
+        point.z = float(c-zz)/1000;
+        for(int j=0; j<descriptors.cols;j++){
+            point.descriptor[j] = descriptors.row(i).at<float>(j);
+        }
+        point.multiplicity = 1;
+        cloud_xyzsift->push_back(point);
+    }
+
+    //back
+    cv::Mat descriptors_back;
+    Types::Features features_back;
+    sift(back,descriptors,features);
+    CLOG(LTRACE)<<"SIFT back " << features.features.size() <<endl;
+    for(int i=0; i < features.features.size(); i++){
+        PointXYZSIFT point;
+        int u = round(features.features[i].pt.x);
+        int v = round(features.features[i].pt.y);
+
+        int xx = 0 + (u-0)*(a-1-0)/(back.cols-1-0);
+        int zz = 0 + (v-0)*(c-1-0)/(back.rows-1-0);
+
+        point.x = float(xx)/1000;
+        point.y = float(-b)/1000;
+        point.z = float(c-zz)/1000;
+        for(int j=0; j<descriptors.cols;j++){
+            point.descriptor[j] = descriptors.row(i).at<float>(j);
+        }
+        point.multiplicity = 1;
+        cloud_xyzsift->push_back(point);
+    }
+    //top
+    sift(top,descriptors,features);
+    CLOG(LTRACE)<<"SIFT top " << features.features.size() <<endl;
+    for(int i=0; i < features.features.size(); i++){
+        PointXYZSIFT point;
+        int u = round(features.features[i].pt.x);
+        int v = round(features.features[i].pt.y);
+
+        int xx = 0 + (u-0)*(a-1-0)/(top.cols-1-0);
+        int yy = 0 + (v-0)*(b-1-0)/(top.rows-1-0);
+
+        point.x = float(a-xx)/1000;
+        point.y = float(-b+yy)/1000;
+        point.z = float(c)/1000;
+        for(int j=0; j<descriptors.cols;j++){
+            point.descriptor[j] = descriptors.row(i).at<float>(j);
+        }
+        point.multiplicity = 1;
+        cloud_xyzsift->push_back(point);
+    }
+
+    //bottom
+    sift(bottom,descriptors,features);
+    CLOG(LTRACE)<<"SIFT bottom " << features.features.size() <<endl;
+    for(int i=0; i < features.features.size(); i++){
+        PointXYZSIFT point;
+        int u = round(features.features[i].pt.x);
+        int v = round(features.features[i].pt.y);
+
+        int xx = 0 + (u-0)*(a-1-0)/(bottom.cols-1-0);
+        int yy = 0 + (v-0)*(b-1-0)/(bottom.rows-1-0);
+
+        point.x = float(xx)/1000;
+        point.y = float(-b+yy)/1000;
+        point.z = float(0)/1000;
+        for(int j=0; j<descriptors.cols;j++){
+            point.descriptor[j] = descriptors.row(i).at<float>(j);
+        }
+        point.multiplicity = 1;
+        cloud_xyzsift->push_back(point);
+    }
+
+    //left
+    sift(left,descriptors,features);
+    CLOG(LTRACE)<<"SIFT left " << features.features.size() <<endl;
+    for(int i=0; i < features.features.size(); i++){
+        PointXYZSIFT point;
+        int u = round(features.features[i].pt.x);
+        int v = round(features.features[i].pt.y);
+
+        int yy = 0 + (u-0)*(b-1-0)/(left.cols-1-0);
+        int zz = 0 + (v-0)*(c-1-0)/(left.rows-1-0);
+
+        point.x = float(a)/1000;
+        point.y = float(-b+yy)/1000;
+        point.z = float(c-zz)/1000;
+        for(int j=0; j<descriptors.cols;j++){
+            point.descriptor[j] = descriptors.row(i).at<float>(j);
+        }
+        point.multiplicity = 1;
+        cloud_xyzsift->push_back(point);
+    }
+
+    //right
+    sift(right,descriptors,features);
+    CLOG(LTRACE)<<"SIFT right " << features.features.size() <<endl;
+    for(int i=0; i < features.features.size(); i++){
+        PointXYZSIFT point;
+        int u = round(features.features[i].pt.x);
+        int v = round(features.features[i].pt.y);
+
+        int yy = 0 + (u-0)*(b-1-0)/(right.cols-1-0);
+        int zz = 0 + (v-0)*(c-1-0)/(right.rows-1-0);
+
+        point.x = float(0)/1000;
+        point.y = float(-yy)/1000;
+        point.z = float(c-zz)/1000;
+        for(int j=0; j<descriptors.cols;j++){
+            point.descriptor[j] = descriptors.row(i).at<float>(j);
+        }
+        point.multiplicity = 1;
+        cloud_xyzsift->push_back(point);
+    }
+
+    out_cloud_xyzsift.write(cloud_xyzsift);
+
+
+    SIFTObjectModel* model;
+    model = dynamic_cast<SIFTObjectModel*>(produce());
+    out_model.write(model);
 }
 
 

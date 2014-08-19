@@ -14,6 +14,7 @@
 #include "EventHandler2.hpp"
 
 #include <opencv2/opencv.hpp>
+#include "Types/Features.hpp"
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -30,7 +31,7 @@ namespace CuboidModelGenerator {
  *
  * 
  */
-class CuboidModelGenerator: public Base::Component {
+class CuboidModelGenerator: public Base::Component, SIFTObjectModelFactory {
 public:
 	/*!
 	 * Constructor.
@@ -72,6 +73,7 @@ protected:
 	bool onStop();
 
     void loadData();
+    void sift(cv::Mat input, cv::Mat &descriptors, Types::Features &features);
 
 
 	// Input data streams
@@ -80,8 +82,6 @@ protected:
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 	Base::DataStreamOut<AbstractObject*> out_model;
-
-    Base::DataStreamOut<cv::Mat> out_img;
 
 	// Handlers
 	Base::EventHandler2 h_generate;
