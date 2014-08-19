@@ -82,14 +82,13 @@ protected:
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 	Base::DataStreamOut<AbstractObject*> out_model;
-
+    Base::DataStreamOut<int> out_mean_viewpoint_features_number;
 	// Handlers
 	Base::EventHandler2 h_generate;
 
 	// Properties
 	Base::Property<std::string> dataJSONname;
-	Base::Property<std::string> dir;
-	Base::Property<std::string> SOMname;
+
 
 	
 	// Handlers
