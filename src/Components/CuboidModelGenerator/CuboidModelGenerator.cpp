@@ -127,6 +127,7 @@ void CuboidModelGenerator::generate() {
     int x,y,z;
     //front
     y=0;//stałe
+    CLOG(LTRACE) <<"front " << front.cols << " x " <<front.rows << endl;
     for(x = 0; x < a; x++){
         for(z = 0; z < c; z++){
             pcl::PointXYZRGB point;
@@ -146,7 +147,7 @@ void CuboidModelGenerator::generate() {
     }
     //back
     y=-b;//stale
-    cout <<"back " << back.cols << " x " <<back.rows << endl;
+    CLOG(LTRACE) <<"back " << back.cols << " x " <<back.rows << endl;
     for(x = 0; x < a; x++){
         for(z = 0; z < c; z++){
             pcl::PointXYZRGB point;
@@ -165,7 +166,7 @@ void CuboidModelGenerator::generate() {
 
     //top
     z= c;//stale
-    cout <<"top " << top.cols << " x " <<top.rows << endl;
+    CLOG(LTRACE) <<"top " << top.cols << " x " <<top.rows << endl;
     for(x = 0; x < a; x++){
         for(y = 0; y < b; y++){
             pcl::PointXYZRGB point;
@@ -184,7 +185,7 @@ void CuboidModelGenerator::generate() {
 
     //bottom
     z= 0;//stale
-    cout <<"bottom " << bottom.cols << " x " <<bottom.rows << endl;
+    CLOG(LTRACE) <<"bottom " << bottom.cols << " x " <<bottom.rows << endl;
     for(x = 0; x < a; x++){
         for(y = 0; y < b; y++){
             pcl::PointXYZRGB point;
@@ -203,7 +204,7 @@ void CuboidModelGenerator::generate() {
 
     //left
     x= a;//stale
-    cout <<"left " << left.cols << " x " <<left.rows << endl;
+    CLOG(LTRACE) <<"left " << left.cols << " x " <<left.rows << endl;
     for(y = 0; y < b; y++){
         for(z = 0; z < c; z++){
             pcl::PointXYZRGB point;
@@ -222,7 +223,7 @@ void CuboidModelGenerator::generate() {
 
     //right
     x= 0;//stale
-    cout <<"left " << right.cols << " x " <<right.rows << endl;
+    CLOG(LTRACE) <<"right " << right.cols << " x " <<right.rows << endl;
     for(y = 0; y < b; y++){
         for(z = 0; z < c; z++){
             pcl::PointXYZRGB point;

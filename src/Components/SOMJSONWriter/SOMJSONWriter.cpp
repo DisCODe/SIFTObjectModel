@@ -46,8 +46,8 @@ void SOMJSONWriter::prepareInterface() {
 	// Register handlers
 	h_Write.setup(boost::bind(&SOMJSONWriter::Write, this));
 	registerHandler("Write", &h_Write);
-	addDependency("Write", &in_cloud_xyzsift);
-	addDependency("Write", &in_cloud_xyzrgb);
+//	addDependency("Write", &in_cloud_xyzsift);
+//	addDependency("Write", &in_cloud_xyzrgb);
 
 }
 
