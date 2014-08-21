@@ -17,11 +17,11 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
                                 <Component name="Generator" type="SIFTObjectModel:CuboidModelGenerator" priority="1" bump="0">
-                                        <param name="dataJSONname">/home/mlaszkow/cuboidjson/loyd.json</param>
+                                        <param name="dataJSONname">/home/discode/cuboids/dataset/loyd_kinect/loyd.json</param>
 				</Component>
                                 <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="2" bump="10">
-                                        <param name="SOM">loyd</param>
-                                        <param name="directory">/home/mlaszkow/jsonmodels/</param>
+                                        <param name="SOM">loyd_kinect</param>
+                                        <param name="directory">/home/discode/cuboids/models/</param>
                                 </Component>
 			</Executor>
 
