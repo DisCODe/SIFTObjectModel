@@ -73,7 +73,7 @@
 	<DataStreams>
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
-			<sink>Converter.in_color</sink>
+			<sink>Converter.in_color</sink>	
 		</Source>
 		<Source name="SequenceDepth.out_img">	
 			<sink>Converter.in_depth</sink>	
