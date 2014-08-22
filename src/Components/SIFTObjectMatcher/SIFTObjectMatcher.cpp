@@ -154,14 +154,19 @@ void SIFTObjectMatcher::match() {
 			sac.setInputCorrespondences(correspondences) ;
 			sac.getCorrespondences(inliers) ;
 			//std::cout << "SAC inliers " << inliers.size() << std::endl ;
-
-            CLOG(LTRACE) << setprecision(2) << fixed;
-            float percent = ((float)correspondences->size() - (float)inliers.size())/(float)models[i]->mean_viewpoint_features_number;
-            CLOG(LTRACE)  << "\nNumber of reciprocal correspondences: " << correspondences->size() <<". Bad correspondences:" << inliers.size() ;
-            CLOG(LTRACE)  << " out of " << cloud_xyzsift->size() << " keypoints of instance, = " ;
-            CLOG(LTRACE)  << percent << ". "<< models[i]->cloud_xyzsift->size() << " keypoints of model "<< models[i]->name << std::endl ;
-            if (percent > threshold)
-				std::cout <<"Rozpoznano model "<< models[i]->name<<endl;
+            Eigen::Matrix4f  trans = sac.getBestTransformation();
+            if (trans==Eigen::Matrix4f::Identity()){
+                CLOG(LTRACE)  << "0 good correspondences!!" <<endl;
+            }
+            else{
+                CLOG(LTRACE) << setprecision(2) << fixed;
+                float percent = (float)inliers.size()/(float)models[i]->mean_viewpoint_features_number;
+                CLOG(LTRACE)  << "\nNumber of reciprocal correspondences: " << correspondences->size() <<". Good correspondences:" << inliers.size() ;
+                CLOG(LTRACE)  << " out of " << cloud_xyzsift->size() << " keypoints of instance, = " ;
+                CLOG(LTRACE)  << percent << ". "<< models[i]->cloud_xyzsift->size() << " keypoints of model "<< models[i]->name << std::endl ;
+                if (percent > threshold)
+                    std::cout <<"Rozpoznano model "<< models[i]->name<<endl;
+            }
         /////////////////////////////
 		out_cloud_xyzrgb.write(cloud_xyzrgb);
 		out_cloud_xyzrgb_model.write(models[i]->cloud_xyzrgb);

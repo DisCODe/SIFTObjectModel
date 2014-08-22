@@ -175,7 +175,7 @@ void FeatureCloudConverter::process_mask() {
 }
 
 void FeatureCloudConverter::process_depth_xyz() {
-    CLOG(LTRACE) << "FeatureCloudConverter::process";
+    CLOG(LTRACE) << "FeatureCloudConverter::process_depth_xyz";
     cv::Mat depth_xyz = in_depth_xyz.read();
     cv::Mat descriptors = in_descriptors.read();
     Types::Features features = in_features.read();
@@ -210,7 +210,7 @@ void FeatureCloudConverter::process_depth_xyz() {
 }
 
 void FeatureCloudConverter::process_depth_xyz_mask() {
-    CLOG(LTRACE) << "FeatureCloudConverter::process";
+    CLOG(LTRACE) << "FeatureCloudConverter::process_depth_xyz_mask";
     cv::Mat depth_xyz = in_depth_xyz.read();
     cv::Mat descriptors = in_descriptors.read();
     Types::Features features = in_features.read();

@@ -18,14 +18,14 @@
 
 			<Executor name="Processing"  period="1">
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="0">
-					<param name="filenames">/home/mlaszkow/jsonmodels/kakao_test.json</param>
+                                        <param name="filenames">/home/discode/cuboids/models/loyd_kinect.json</param>
 <!--
 					<param name="names">/home/discode/14.06.13objects/kakao_model_ICP_normal/Kakao_normalne.json</param>
 -->
 				</Component>
 				<Component name="Source" type="CameraNUI:CameraNUI" priority="2" bump="0">
 					<param name="sync">1</param>
-                </Component>
+                                </Component>
 				<Component name="SIFT" type="CvBasic:CvSIFT" priority="5" bump="0">
 				</Component>
 				<Component name="Converter" type="PCL:DepthConverter" priority="6" bump="10">
@@ -86,8 +86,7 @@
 		</Source>
 		<Source name="CloudCutter.out_cloud">
 			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>
-        </Source>
-
+                </Source>
 		<Source name="SOMJSONReader.out_models">
 			<sink>SIFTObjectMatcher.in_models</sink>
 		</Source>
