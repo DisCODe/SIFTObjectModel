@@ -50,9 +50,11 @@ class SIFTFeatureRepresentation: public pcl::DefaultFeatureRepresentation<PointX
 SIFTObjectMatcher::SIFTObjectMatcher(const std::string & name) :
 		Base::Component(name),
 		threshold("threshold", 0.75f),
-		inlier_threshold("inlier_threshold", 0.001f)  {
+        inlier_threshold("inlier_threshold", 0.001f),
+        max_distance("max_distance", 150) {
 			registerProperty(threshold);
 			registerProperty(inlier_threshold);
+            registerProperty(max_distance);
 }
 
 SIFTObjectMatcher::~SIFTObjectMatcher() {
@@ -67,7 +69,8 @@ void SIFTObjectMatcher::prepareInterface() {
 	registerStream("out_cloud_xyzrgb_model", &out_cloud_xyzrgb_model);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 	registerStream("out_cloud_xyzsift_model", &out_cloud_xyzsift_model);
-	registerStream("out_correspondences", &out_correspondences);
+    registerStream("out_correspondences", &out_correspondences);
+    registerStream("out_good_correspondences", &out_good_correspondences);
 	// Register handlers
 	h_readModels.setup(boost::bind(&SIFTObjectMatcher::readModels, this));
 	registerHandler("readModels", &h_readModels);
@@ -143,16 +146,16 @@ void SIFTObjectMatcher::match() {
         for (int i = 0 ; i<models.size(); i++){
             correst.setInputSource(cloud_xyzsift) ;
             correst.setInputTarget(models[i]->cloud_xyzsift) ;
-            correst.determineReciprocalCorrespondences(*correspondences) ;
+            correst.determineReciprocalCorrespondences(*correspondences, max_distance) ;
 			//ransac - niepoprawne dopasowania
-			pcl::Correspondences inliers ;
+            pcl::CorrespondencesPtr inliers (new pcl::Correspondences());
         	pcl::registration::CorrespondenceRejectorSampleConsensus<PointXYZSIFT> sac ;
 			sac.setInputSource(cloud_xyzsift) ;
 			sac.setInputTarget(models[i]->cloud_xyzsift) ;
 			sac.setInlierThreshold(inlier_threshold) ;
 			sac.setMaximumIterations(2000) ;
 			sac.setInputCorrespondences(correspondences) ;
-			sac.getCorrespondences(inliers) ;
+            sac.getCorrespondences(*inliers) ;
 			//std::cout << "SAC inliers " << inliers.size() << std::endl ;
             Eigen::Matrix4f  trans = sac.getBestTransformation();
             if (trans==Eigen::Matrix4f::Identity()){
@@ -160,8 +163,8 @@ void SIFTObjectMatcher::match() {
             }
             else{
                 CLOG(LTRACE) << setprecision(2) << fixed;
-                float percent = (float)inliers.size()/(float)models[i]->mean_viewpoint_features_number;
-                CLOG(LTRACE)  << "\nNumber of reciprocal correspondences: " << correspondences->size() <<". Good correspondences:" << inliers.size() ;
+                float percent = (float)inliers->size()/(float)models[i]->mean_viewpoint_features_number;
+                CLOG(LTRACE)  << "\nNumber of reciprocal correspondences: " << correspondences->size() <<". Good correspondences:" << inliers->size() ;
                 CLOG(LTRACE)  << " out of " << cloud_xyzsift->size() << " keypoints of instance, = " ;
                 CLOG(LTRACE)  << percent << ". "<< models[i]->cloud_xyzsift->size() << " keypoints of model "<< models[i]->name << std::endl ;
                 if (percent > threshold)
@@ -172,8 +175,8 @@ void SIFTObjectMatcher::match() {
 		out_cloud_xyzrgb_model.write(models[i]->cloud_xyzrgb);
 		out_cloud_xyzsift.write(cloud_xyzsift);
 		out_cloud_xyzsift_model.write(models[i]->cloud_xyzsift);
-		out_correspondences.write(correspondences);//wszystkie dopasowania
-		//TODO dopasowania poprawne
+        out_correspondences.write(correspondences);//wszystkie dopasowania
+        out_good_correspondences.write(inliers);
         }
 }
 
