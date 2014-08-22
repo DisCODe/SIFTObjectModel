@@ -84,6 +84,13 @@ void ClosedCloudMerge::prepareInterface() {
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzrgb_normals", &out_cloud_xyzrgb_normals);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
+
+	registerStream("out_cloud_last_xyzrgb", &out_cloud_last_xyzrgb);
+	registerStream("out_cloud_last_xyzsift", &out_cloud_last_xyzsift);
+	registerStream("out_cloud_prev_xyzrgb", &out_cloud_prev_xyzrgb);
+	registerStream("out_cloud_prev_xyzsift", &out_cloud_prev_xyzsift);
+	registerStream("out_correspondences", &out_correspondences);
+
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
 
     h_addViewToModel.setup(boost::bind(&ClosedCloudMerge::addViewToModel, this));
@@ -175,6 +182,19 @@ void ClosedCloudMerge::addViewToModel()
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzrgb_normals.write(cloud_normal_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
+
+		out_cloud_prev_xyzrgb.write(cloud_merged);
+		out_cloud_last_xyzrgb.write(cloud_merged);
+
+		out_cloud_prev_xyzsift.write(cloud_sift_merged);
+		out_cloud_last_xyzsift.write(cloud_sift_merged);
+
+		pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
+		MergeUtils::computeCorrespondences(cloud_sift, cloud_sift_merged, correspondences);
+		pcl::CorrespondencesPtr inliers(new pcl::Correspondences()) ;
+		Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, *inliers, properties);
+		out_correspondences.write(inliers);
+
 		// Push SOM - depricated.
 //		out_instance.write(produce());
 		CLOG(LINFO) << "return ";
@@ -196,6 +216,7 @@ void ClosedCloudMerge::addViewToModel()
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzrgb_normals.write(cloud_normal_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
+
 		// Push SOM - depricated.
 //		out_instance.write(produce());
 		return;
@@ -218,6 +239,11 @@ void ClosedCloudMerge::addViewToModel()
 	*rgbn_views[counter -1] = *cloud;
 	*rgb_views[counter -1] = *cloudrgb;
 
+	out_cloud_prev_xyzrgb.write(rgb_views[counter-2]);
+	out_cloud_last_xyzrgb.write(cloudrgb);
+
+	out_cloud_prev_xyzsift.write(lum_sift.getPointCloud(counter-2));
+	out_cloud_last_xyzsift.write(cloud_sift);
 
 
 	int added = 0;
@@ -232,16 +258,18 @@ void ClosedCloudMerge::addViewToModel()
 		if (correspondences3->size() > corrTreshold) {
 			lum_sift.setCorrespondences(counter-1, i, correspondences3);
 			added++;
-			for(int j = 0; j< correspondences3->size();j++){
-				if (correspondences3->at(j).index_query >=lum_sift.getPointCloud(counter - 1)->size() || correspondences3->at(j).index_match >=lum_sift.getPointCloud(i)->size()){
-					continue;
-				}
-				if (lum_sift.getPointCloud(i)->at(correspondences3->at(j).index_match).multiplicity != -1) {
-					lum_sift.getPointCloud(counter - 1)->at(correspondences3->at(j).index_query).multiplicity = lum_sift.getPointCloud(i)->at(correspondences3->at(j).index_match).multiplicity + 1;
-					lum_sift.getPointCloud(i)->at(correspondences3->at(j).index_match).multiplicity=-1;
-				} else
-					lum_sift.getPointCloud(counter - 1)->at(correspondences3->at(j).index_query).multiplicity += 1;
-			}
+			if  (i == counter - 2)
+				out_correspondences.write(correspondences3);
+		//	for(int j = 0; j< correspondences3->size();j++){
+		//		if (correspondences3->at(j).index_query >=lum_sift.getPointCloud(counter - 1)->size() || correspondences3->at(j).index_match >=lum_sift.getPointCloud(i)->size()){
+		//			continue;
+		//		}
+		//		if (lum_sift.getPointCloud(i)->at(correspondences3->at(j).index_match).multiplicity != -1) {
+		//			lum_sift.getPointCloud(counter - 1)->at(correspondences3->at(j).index_query).multiplicity = lum_sift.getPointCloud(i)->at(correspondences3->at(j).index_match).multiplicity + 1;//
+	//				lum_sift.getPointCloud(i)->at(correspondences3->at(j).index_match).multiplicity=-1;
+	//			} else
+	//				lum_sift.getPointCloud(counter - 1)->at(correspondences3->at(j).index_query).multiplicity += 1;
+	//		}
 		}
 	//break;
 	//CLOG(LINFO) << "computet for "<<counter-1 <<" and "<< i << "  correspondences2: " << correspondences2->size() << " out of " << correspondences2->size();
