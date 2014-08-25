@@ -16,24 +16,24 @@
 	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
-                            <Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/kinect_inka_views/</param>
-                                    <param name="sequence.pattern">.*\_rgb\.png</param>
-                                    <param name="mode.loop">1</param>
-                                    <param name="mode.auto_trigger">0</param>
-                            </Component>
-                            <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="2" bump="0">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/kinect_inka_views/</param>
-                                    <param name="sequence.pattern">.*\_xyz\.yml</param>
-                                    <param name="mode.loop">1</param>
-                                    <param name="mode.auto_trigger">0</param>
-                            </Component>
-                            <Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/kinect_inka_views/</param>
-                                    <param name="sequence.pattern">.*\_mask\.png</param>
-                                    <param name="mode.loop">1</param>
-                                    <param name="mode.auto_trigger">0</param>
-                            </Component>
+                <Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
+                    <param name="sequence.directory">/home/discode/14.08.14/1</param>
+                    <param name="sequence.pattern">.*\_rgb\.png</param>
+                    <param name="mode.loop">1</param>
+					<param name="mode.auto_trigger">1</param>
+                </Component>
+                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="2" bump="0">
+                    <param name="sequence.directory">/home/discode/14.08.14/1</param>
+                    <param name="sequence.pattern">.*\_xyz\.yml</param>
+                    <param name="mode.loop">1</param>
+                    <param name="mode.auto_trigger">1</param>
+                </Component>
+                <Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
+                    <param name="sequence.directory">/home/discode/14.08.14/1</param>
+                    <param name="sequence.pattern">.*\_mask\.png</param>
+                    <param name="mode.loop">1</param>
+                    <param name="mode.auto_trigger">1</param>
+                </Component>
 				<Component name="SIFT" type="CvBasic:CvSIFT" priority="5" bump="0">
 				</Component>
 				<Component name="Converter" type="PCL:DepthConverter" priority="6" bump="0">
@@ -45,16 +45,16 @@
 				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
 				</Component>
 				<Component name="Normals" type="SIFTObjectModel:NormalEstimation" priority="9">
-				<param name="radius">0.02</param>
+					<param name="radius">0.02</param>
 				</Component>
                 <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="10" bump="1">
-					<param name="View.Number">8</param>
+					<param name="View.Number">20</param>
 					<param name="Interations.Max">10</param>
 					<param name="Correspondenc.Treshold">9</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
 					<param name="LeafSize.x">0.005</param>
-					<param name="LeafSize.y">0.005</param>
+					<param name="LeafSize.y">0.005</param>Visualization
 					<param name="LeafSize.z">0.005</param>
 				</Component>
 		        <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="12" bump="10">
@@ -62,22 +62,24 @@
 			    </Component>
 			</Executor>
 
-			<Executor name="Visualization" period="0.1">
-<!--				<Component name="Visualizer" type="SIFTObjectModel:Visualization" priority="1" bump="1">
-					<param name="filenames">/home/kamion/RGB-D/Models/LUMModel.pcd</param>
-                                </Component>-->
-                                <Component name="Visualizer" type="PCL:CloudViewer" priority="1" bump="1">
-                                </Component>
+			<Executor name="Visualization" period="1">
+				<Component name="WindowPCL" type="PCL:CloudViewer" priority="1" bump="0">
+				</Component> 
+
 			</Executor>
+			
+
+			
 		</Subtask>	
 	
-        </Subtasks>
+    </Subtasks>
 	
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
             <sink>Converter.in_rgb_stereo</sink>
+	
 		</Source>
         <Source name="SequenceXYZ.out_img">
             <sink>Converter.in_depth_xyz</sink>
@@ -112,11 +114,12 @@
                 <Source name="Generator.out_cloud_xyzrgb">
                         <sink>VoxelGrid.in_cloud_xyzrgb</sink>
 		</Source>
-                <Source name="VoxelGrid.out_cloud_xyzrgb">
-                        <sink>Visualizer.in_cloud_xyzrgb</sink>
-                        <sink>Writer.in_cloud_xyzrgb</sink>
-		</Source>	
 
+		<Source name="Generator.out_cloud_xyzrgb">
+			<sink>Writer.in_cloud_xyzrgb</sink>
+			<sink>WindowPCL.in_cloud_xyzrgb</sink>
+		</Source>
+		
 		<Source name="Generator.out_cloud_xyzsift">
 			<sink>Writer.in_cloud_xyzsift</sink>	
 		</Source>
