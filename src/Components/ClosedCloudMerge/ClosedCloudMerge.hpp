@@ -104,6 +104,9 @@ protected:
 	/// Output data stream containing corespondences beetwen previous and last cloud
 	Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;
 
+    /// Output data stream containing filtered corespondences beetwen previous and last cloud
+    Base::DataStreamOut<pcl::CorrespondencesPtr> out_good_correspondences;
+
 	// Mean number of features per view.
 	Base::DataStreamOut<int> out_mean_viewpoint_features_number;
 
