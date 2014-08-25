@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <string>
-
+#include <sstream>
 #include "CorrespondencesViewer.hpp"
 #include "Common/Logger.hpp"
 
@@ -73,13 +73,15 @@ registerStream("in_cloud_xyzrgb1", &in_cloud_xyzrgb1);
 registerStream("in_cloud_xyzrgb2", &in_cloud_xyzrgb2);
 registerStream("in_correspondences", &in_correspondences);
 registerStream("in_good_correspondences", &in_good_correspondences);
+registerStream("in_clustered_correspondences", &in_clustered_correspondences);
+
 	// Register handlers
 	h_on_clouds.setup(boost::bind(&CorrespondencesViewer::on_clouds, this));
 	registerHandler("on_clouds", &h_on_clouds);
 	addDependency("on_clouds", &in_cloud_xyzsift1);
 	addDependency("on_clouds", &in_cloud_xyzsift2);
 	addDependency("on_clouds", &in_cloud_xyzrgb1);
-	addDependency("on_clouds", &in_correspondences);
+    //addDependency("on_clouds", &in_correspondences);
 	addDependency("on_clouds", &in_cloud_xyzrgb2);	
 	h_on_good_correspondences.setup(boost::bind(&CorrespondencesViewer::on_good_correspondences, this));
 	registerHandler("good_correspondences", &h_on_good_correspondences);
@@ -99,6 +101,7 @@ bool CorrespondencesViewer::onInit() {
 
 	viewer->initCameraParameters ();
 	//cloud_view_xyzsift = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
+    clusters = 0;
 	return true;
 }
 
@@ -182,7 +185,7 @@ void CorrespondencesViewer::on_clouds() {
 	}
 	//Display correspondences
 	viewer->removeCorrespondences("correspondences") ;
-	if(display_correspondences){
+    if(display_correspondences && !in_correspondences.empty()){
 		viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift1, cloud_xyzsift2trans, *correspondences, "correspondences") ;
 		viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 
 			((cv::Mat)correspondences_colours).at<uchar>(0, 0),
@@ -200,6 +203,72 @@ void CorrespondencesViewer::on_clouds() {
 			viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 0, 255, 0, "good_correspondences") ;
 		}
 	}
+
+    //Display clustered correspondences
+    for(int i = 0; i <clusters; i++){
+        ostringstream ss;
+        ss << i;
+        string str = ss.str();
+        viewer->removeCorrespondences(std::string("correspondences")+str) ;
+    }
+    if(display_correspondences && !in_clustered_correspondences.empty()){
+        std::vector<pcl::Correspondences> clustered_corrs = in_clustered_correspondences.read();
+        clusters = clustered_corrs.size();
+        for(int i = 0; i< clustered_corrs.size(); i++){
+            int r,g,b;
+            r = g = b = 0;
+            int ii = i*255/clustered_corrs.size();
+            int lb = ii & 0xff;
+            if (ii > 50)
+                switch (ii>>8) {
+                case 0:
+                    b = 255;
+                    g = 255-lb;
+                    r = 255-lb;
+                    break;
+                case 1:
+                    b = 255;
+                    g = lb;
+                    r = 0;
+                    break;
+                case 2:
+                    b = 255-lb;
+                    g = 255;
+                    r = 0;
+                    break;
+                case 3:
+                    b = 0;
+                    g = 255;
+                    r = lb;
+                    break;
+                case 4:
+                    b = 0;
+                    g = 255-lb;
+                    r = 255;
+                    break;
+                case 5:
+                    b = 0;
+                    g = 0;
+                    r = 255-lb;
+                    break;
+                default:
+                    r = g = b = 0;
+                    break;
+                }
+
+
+            ostringstream ss;
+            ss << i;
+            string str = ss.str();
+            viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift1, cloud_xyzsift2trans, clustered_corrs[i], "correspondences"+str) ;
+            viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR,
+                r,
+                g,
+                b,
+                "correspondences"+str) ;
+        }
+
+    }
 }
 
 void CorrespondencesViewer::on_good_correspondences() {
