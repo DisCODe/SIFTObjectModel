@@ -22,6 +22,23 @@
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "Types/Features.hpp"
+#include <pcl/recognition/cg/hough_3d.h>
+
+//
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_cloud.h>
+#include <pcl/correspondence.h>
+#include <pcl/features/normal_3d_omp.h>
+#include <pcl/features/shot_omp.h>
+#include <pcl/features/board.h>
+#include <pcl/keypoints/uniform_sampling.h>
+#include <pcl/recognition/cg/hough_3d.h>
+#include <pcl/recognition/cg/geometric_consistency.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/kdtree/impl/kdtree_flann.hpp>
+#include <pcl/common/transforms.h>
+#include <pcl/console/parse.h>
 
 namespace Processors {
 namespace SIFTObjectMatcher {
@@ -177,6 +194,51 @@ void SIFTObjectMatcher::match() {
 		out_cloud_xyzsift_model.write(models[i]->cloud_xyzsift);
         out_correspondences.write(correspondences);//wszystkie dopasowania
         out_good_correspondences.write(inliers);
+
+
+        //Algorithm params
+        float rf_rad_ (0.015f);
+        float cg_size_ (0.01f);
+        float cg_thresh_ (5.0f);
+        //  Clustering
+        std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations;
+        std::vector<pcl::Correspondences> clustered_corrs;
+
+        pcl::Hough3DGrouping<PointXYZSIFT, PointXYZSIFT, pcl::ReferenceFrame, pcl::ReferenceFrame> clusterer;
+        clusterer.setHoughBinSize (cg_size_);
+        clusterer.setHoughThreshold (cg_thresh_);
+        clusterer.setUseInterpolation (true);
+        clusterer.setUseDistanceWeight (false);
+
+        clusterer.setLocalRfSearchRadius(rf_rad_);
+        clusterer.setInputCloud (models[i]->cloud_xyzsift);
+        //clusterer.setInputRf (model_rf);
+        clusterer.setSceneCloud (cloud_xyzsift);
+        //clusterer.setSceneRf (scene_rf);
+        clusterer.setModelSceneCorrespondences (correspondences);
+
+        clusterer.cluster (clustered_corrs);
+        //clusterer.recognize (rototranslations, clustered_corrs);//tu sie wywala
+
+        std::cout << "Model instances found: " << rototranslations.size () << std::endl;
+        for (size_t i = 0; i < rototranslations.size (); ++i)
+        {
+          std::cout << "\n    Instance " << i + 1 << ":" << std::endl;
+          std::cout << "        Correspondences belonging to this instance: " << clustered_corrs[i].size () << std::endl;
+
+          // Print the rotation matrix and translation vector
+//          Eigen::Matrix3f rotation = rototranslations[i].block<3,3>(0, 0);
+//          Eigen::Vector3f translation = rototranslations[i].block<3,1>(0, 3);
+
+//          printf ("\n");
+//          printf ("            | %6.3f %6.3f %6.3f | \n", rotation (0,0), rotation (0,1), rotation (0,2));
+//          printf ("        R = | %6.3f %6.3f %6.3f | \n", rotation (1,0), rotation (1,1), rotation (1,2));
+//          printf ("            | %6.3f %6.3f %6.3f | \n", rotation (2,0), rotation (2,1), rotation (2,2));
+//          printf ("\n");
+//          printf ("        t = < %0.3f, %0.3f, %0.3f >\n", translation (0), translation (1), translation (2));
+        }
+
+
         }
 }
 

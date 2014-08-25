@@ -256,7 +256,7 @@ void CuboidModelGenerator::generate() {
         PointXYZSIFT point;
         int u = round(features.features[i].pt.x);
         int v = round(features.features[i].pt.y);
-
+//TODO float?
         int xx = 0 + (u-0)*(a-1-0)/(front.cols-1-0);
         int zz = 0 + (v-0)*(c-1-0)/(front.rows-1-0);
 
