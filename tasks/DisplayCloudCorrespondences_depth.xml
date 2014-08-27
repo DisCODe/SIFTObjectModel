@@ -1,6 +1,7 @@
 <Task>
 	<!-- reference task information -->
 	<Reference>
+
 		<Author>
 			<name>Mikolaj Kamionka</name>
 			<link></link>
@@ -12,50 +13,79 @@
 		</Description>
 	</Reference>
 	
-		<Subtasks>
+	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="Trigger" type="CvBasic:Trigger" priority="1" bump="0">
 					<param name="">1</param>
 				</Component>
-				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
+				<Component name="Trigger2" type="CvBasic:Trigger" priority="2" bump="0">
+					<param name="">2</param>
+				</Component>
+				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="3" bump="0">
 					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
 					<param name="sequence.pattern">.*\_rgb.png</param>
 					<param name="mode.loop">0</param>
 					<param name="mode.auto_trigger">0</param>		
 				</Component>
-                                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="2" bump="0">
+	                       <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="4" bump="0">
 					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
                                         <param name="sequence.pattern">.*\_xyz\.yml</param>
                                         <param name="mode.loop">1</param>
                                         <param name="mode.auto_trigger">0</param>
                                 </Component>
-				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
+				<Component name="SequenceMask" type="CvBasic:Sequence" priority="5" bump="0">
 					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
-					<param name="mode.loop">0</param>	
-					<param name="mode.auto_trigger">0</param>	
+					<param name="mode.loop">0</param>
+					<param name="mode.auto_trigger">0</param>
 				</Component>
-				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="5" bum="0">
+				<Component name="SequenceRGB2" type="CvBasic:Sequence" priority="6" bump="0">
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
+					<param name="sequence.pattern">.*\_rgb.png</param>
+					<param name="mode.loop">0</param>
+					<param name="mode.auto_trigger">0</param>
+				</Component>
+	                       <Component name="SequenceXYZ2" type="CvBasic:Sequence" priority="7" bump="0">
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
+                                        <param name="sequence.pattern">.*\_xyz\.yml</param>
+                                        <param name="mode.loop">1</param>
+                                        <param name="mode.auto_trigger">0</param>
+                                </Component>
+				<Component name="SequenceMask2" type="CvBasic:Sequence" priority="8" bump="0">
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
+					<param name="sequence.pattern">.*\_mask.png</param>
+					<param name="mode.loop">0</param>
+					<param name="mode.auto_trigger">0</param>
+				</Component>
+
+				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="9" bum="0">
 					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
 				</Component>
-				<Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
+
+				<Component name="SIFT" type="CvBasic:CvSIFT" priority="10" bump="0">
 				</Component>
-				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
+				<Component name="Converter" type="PCL:DepthConverter" priority="11" bump="0">
 				</Component>
-				<Component name="StatisticalOutlierRemoval" type="PCL:StatisticalOutlierRemoval" priority="8" bump="0">
+				<Component name="StatisticalOutlierRemoval" type="PCL:StatisticalOutlierRemoval" priority="12" bump="0">
 					<param name="MeanK">15</param>
 					<param name="StddevMulThresh">0.10</param>
 				</Component>
-				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="9" bump="0">
+				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="13" bump="0">
 				</Component>
-				<Component name="Normals" type="SIFTObjectModel:NormalEstimation" priority="10">
-					<param name="radius">0.02</param>
+
+				<Component name="SIFT2" type="CvBasic:CvSIFT" priority="14" bump="0">
 				</Component>
-                		<Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="11" bump="1">
-					<param name="View.Number">14</param>
-					<param name="Interations.Max">5</param>
-					<param name="Correspondenc.Treshold">9</param>
+				<Component name="Converter2" type="PCL:DepthConverter" priority="15" bump="0">
+				</Component>
+				<Component name="StatisticalOutlierRemoval2" type="PCL:StatisticalOutlierRemoval" priority="16" bump="0">
+					<param name="MeanK">15</param>
+					<param name="StddevMulThresh">0.10</param>
+				</Component>
+				<Component name="FeatureCloudConverter2" type="SIFTObjectModel:FeatureCloudConverter" priority="17" bump="0">
+				</Component>
+
+                		<Component name="Macher" type="SIFTObjectModel:CorrespondencMacher" priority="18" bump="1">
 				</Component>
 			</Executor>
 
@@ -74,61 +104,95 @@
 			<sink>SequenceXYZ.in_trigger</sink>
 			<sink>SequenceMask.in_trigger</sink>
 		</Source>
+		
+		<Source name="Trigger2.out_trigger">
+			<sink>SequenceRGB2.in_trigger</sink>
+			<sink>SequenceXYZ2.in_trigger</sink>
+			<sink>SequenceMask2.in_trigger</sink>
+		</Source>
+		
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
-                        <sink>Converter.in_rgb_stereo</sink>
+			<sink>Converter.in_color</sink>
 		</Source>
-                <Source name="SequenceXYZ.out_img">
-                        <sink>Converter.in_depth_xyz</sink>
-                        <sink>FeatureCloudConverter.in_depth_xyz</sink>
+		<Source name="SequenceXYZ.out_img">	
+			<sink>Converter.in_depth_xyz</sink>	
+			<sink>FeatureCloudConverter.in_depth_xyz</sink>	
 		</Source>
 		<Source name="SequenceMask.out_img">
-			<sink>Converter.in_mask</sink>	
-			<sink>FeatureCloudConverter.in_mask</sink>		
+			<sink>Converter.in_mask</sink>
+			<sink>FeatureCloudConverter.in_mask</sink>
 		</Source>
-
+		
+		<Source name="SequenceRGB2.out_img">
+			<sink>SIFT2.in_img</sink>
+			<sink>Converter2.in_color</sink>
+		</Source>
+		<Source name="SequenceXYZ2.out_img">	
+			<sink>Converter2.in_depth_xyz</sink>	
+			<sink>FeatureCloudConverter2.in_depth_xyz</sink>	
+		</Source>
+		<Source name="SequenceMask2.out_img">
+			<sink>Converter2.in_mask</sink>	
+			<sink>FeatureCloudConverter2.in_mask</sink>		
+		</Source>
+		
+		<Source name="CameraInfo.out_camera_info">
+			<sink>Converter.in_camera_info</sink>	
+			<sink>FeatureCloudConverter.in_camera_info</sink>
+			<sink>Converter2.in_camera_info</sink>	
+			<sink>FeatureCloudConverter2.in_camera_info</sink>
+		</Source>
+		
 		<Source name="SIFT.out_descriptors">
 			<sink>FeatureCloudConverter.in_descriptors</sink>	
 		</Source>
 		<Source name="SIFT.out_features">
 			<sink>FeatureCloudConverter.in_features</sink>	
-		</Source>	
+		</Source>
+
+		<Source name="SIFT2.out_descriptors">
+			<sink>FeatureCloudConverter2.in_descriptors</sink>	
+		</Source>
+		<Source name="SIFT2.out_features">
+			<sink>FeatureCloudConverter2.in_features</sink>	
+		</Source>
+		
 		<Source name="Converter.out_cloud_xyzrgb">
 			<sink>StatisticalOutlierRemoval.in_cloud_xyzrgb</sink>
 		</Source>
 
+		<Source name="Converter2.out_cloud_xyzrgb">
+			<sink>StatisticalOutlierRemoval2.in_cloud_xyzrgb</sink>
+		</Source>
+		
 		<Source name="StatisticalOutlierRemoval.out_cloud_xyzrgb">
-			<sink>Normals.in_cloud_xyzrgb</sink>
-			<sink>Generator.in_cloud_xyzrgb</sink>
-		</Source>
-
-		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
-			<sink>Generator.in_cloud_xyzsift</sink>		
-		</Source>
-
-		<Source name="Normals.out_cloud_xyzrgb_normals">
-			<sink>Generator.in_cloud_xyzrgb_normals</sink>
-		</Source>
-		<Source name="Generator.out_cloud_last_xyzrgb">
 			<sink>Window.in_cloud_xyzrgb1</sink>
 		</Source>
-		<Source name="Generator.out_cloud_prev_xyzrgb">
+
+		<Source name="StatisticalOutlierRemoval2.out_cloud_xyzrgb">
 			<sink>Window.in_cloud_xyzrgb2</sink>
 		</Source>
-		<Source name="Generator.out_cloud_last_xyzsift">
+		
+		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
+			<sink>Macher.in_cloud_first_xyzsift</sink>		
+		</Source>
+
+		<Source name="FeatureCloudConverter2.out_cloud_xyzsift">
+			<sink>Macher.in_cloud_sec_xyzsift</sink>		
+		</Source>
+
+		<Source name="Macher.out_cloud_first_xyzsift">
 			<sink>Window.in_cloud_xyzsift1</sink>
 		</Source>
-		<Source name="Generator.out_cloud_prev_xyzsift">
+		<Source name="Macher.out_cloud_sec_xyzsift">
 			<sink>Window.in_cloud_xyzsift2</sink>
 		</Source>
-		<Source name="Generator.out_correspondences">
+		<Source name="Macher.out_correspondences">
 			<sink>Window.in_correspondences</sink>
 		</Source> 
-
-  
-
-
 				
 	</DataStreams>
 </Task>
+
 
