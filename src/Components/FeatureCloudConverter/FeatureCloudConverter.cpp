@@ -51,7 +51,7 @@ void FeatureCloudConverter::prepareInterface() {
     registerHandler("process_depth_xyz", &h_process_depth_xyz);
     addDependency("process_depth_xyz", &in_features);
     addDependency("process_depth_xyz", &in_descriptors);
-    addDependency("proces_depth_xyzs", &in_depth_xyz);
+    addDependency("proces_depth_xyz", &in_depth_xyz);
     h_process_depth_xyz_mask.setup(boost::bind(&FeatureCloudConverter::process_depth_xyz_mask, this));
     registerHandler("process_depth_xyz_mask", &h_process_depth_xyz_mask);
     addDependency("process_depth_xyz_mask", &in_mask);
