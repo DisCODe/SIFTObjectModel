@@ -37,7 +37,8 @@
 				<Component name="CloudCutter" type="SIFTObjectModel:CloudCutter" priority="9" bump="0">
 				</Component>
 				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="10" bump="0">
-				</Component>
+                                    <param name="max_distance">150</param>
+                                </Component>
             </Executor>
 
 			<Executor name="Visualization" period="1">
@@ -59,8 +60,8 @@
 			<sink>Converter.in_color</sink>
 		</Source>
 		<Source name="Source.out_depth">	
-			<sink>Converter.in_depth</sink>	
-			<sink>FeatureCloudConverter.in_depth</sink>	
+                        <sink>Converter.in_depth</sink>
+                        <sink>FeatureCloudConverter.in_depth</sink>
 		</Source>
 		<Source name="Source.out_camera_info">
 			<sink>Converter.in_camera_info</sink>	
@@ -99,13 +100,15 @@
 		<Source name="SIFTObjectMatcher.out_cloud_xyzsift">
 			<sink>Window.in_cloud_xyzsift1</sink>
 		</Source>
-		<Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
+                <Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
 			<sink>Window.in_cloud_xyzsift2</sink>
-		</Source>
-		<Source name="SIFTObjectMatcher.out_correspondences">
+                </Source>
+<!--		<Source name="SIFTObjectMatcher.out_correspondences">
 			<sink>Window.in_correspondences</sink>
-		</Source>
-
+                </Source>-->
+                <Source name="SIFTObjectMatcher.out_clustered_correspondences">
+                        <sink>Window.in_clustered_correspondences</sink>
+                </Source>
 		<Source name="Source.out_img">
 			<sink>Window2.in_img0</sink>		
 		</Source>		

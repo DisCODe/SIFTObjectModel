@@ -83,9 +83,6 @@ registerStream("in_clustered_correspondences", &in_clustered_correspondences);
 	addDependency("on_clouds", &in_cloud_xyzrgb1);
     //addDependency("on_clouds", &in_correspondences);
 	addDependency("on_clouds", &in_cloud_xyzrgb2);	
-	h_on_good_correspondences.setup(boost::bind(&CorrespondencesViewer::on_good_correspondences, this));
-	registerHandler("good_correspondences", &h_on_good_correspondences);
-	addDependency("good_correspondences", &in_good_correspondences);
 	// Register spin handler.
 	h_on_spin.setup(boost::bind(&CorrespondencesViewer::on_spin, this));
 	registerHandler("on_spin", &h_on_spin);
@@ -123,7 +120,7 @@ void CorrespondencesViewer::on_clouds() {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb2 = in_cloud_xyzrgb2.read();
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift1 = in_cloud_xyzsift1.read();
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift2 = in_cloud_xyzsift2.read();
-	pcl::CorrespondencesPtr correspondences = in_correspondences.read();
+    //pcl::CorrespondencesPtr correspondences = in_correspondences.read();
 	
 	//*cloud_view_xyzsift = *cloud_xyzsift1;
 	
@@ -186,6 +183,7 @@ void CorrespondencesViewer::on_clouds() {
 	//Display correspondences
 	viewer->removeCorrespondences("correspondences") ;
     if(display_correspondences && !in_correspondences.empty()){
+        pcl::CorrespondencesPtr correspondences = in_correspondences.read();
 		viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift1, cloud_xyzsift2trans, *correspondences, "correspondences") ;
 		viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 
 			((cv::Mat)correspondences_colours).at<uchar>(0, 0),
@@ -217,10 +215,10 @@ void CorrespondencesViewer::on_clouds() {
         for(int i = 0; i< clustered_corrs.size(); i++){
             int r,g,b;
             r = g = b = 0;
-            int ii = i*255/clustered_corrs.size();
+            int ii = 60 + i*(255-60)/clustered_corrs.size();
             int lb = ii & 0xff;
             if (ii > 50)
-                switch (ii>>8) {
+                switch (ii>>6) {
                 case 0:
                     b = 255;
                     g = 255-lb;
@@ -256,43 +254,24 @@ void CorrespondencesViewer::on_clouds() {
                     break;
                 }
 
-
+            cout << "cloud_xyzsift1 " <<cloud_xyzsift1->size() << " cloud_xyzsift2trans " << cloud_xyzsift2trans->size()<< " cluster " << clustered_corrs[i].size() <<endl;
             ostringstream ss;
             ss << i;
             string str = ss.str();
-            viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift1, cloud_xyzsift2trans, clustered_corrs[i], "correspondences"+str) ;
+//            viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift1, cloud_xyzsift2trans, clustered_corrs[i], "correspondences"+str) ;
+            viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift2trans, cloud_xyzsift1, clustered_corrs[i], "correspondences"+str) ;
             viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR,
                 r,
                 g,
                 b,
                 "correspondences"+str) ;
+            cout<<"ii "<< ii <<" "<< (ii>>6) <<" rgb " <<r<<" "<<g<<" "<<b<<endl;
         }
 
     }
 }
 
-void CorrespondencesViewer::on_good_correspondences() {
-	//pcl::CorrespondencesPtr good_correspondences = in_good_correspondences.read();
-	
-	
-	//pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift(new pcl::PointCloud<PointXYZSIFT>) ;
-	////query widok siftcloud1
-	////match model siftcloud2
-	//for(int i = 0; i<good_correspondences->size(); i++){
-		//int q = good_correspondences->at(i).index_query;
-		//int m = good_correspondences->at(i).index_match;
-		//cout<< q << " " << m << " " << cloud_view_xyzsift->at(i).x << " " << cloud_view_xyzsift->at(i).y << " " << cloud_view_xyzsift->at(i).z <<endl;
-		//cloud_xyzsift->push_back(cloud_view_xyzsift->at(i));
-	//}
-	//viewer->removePointCloud("siftcloud") ;
-	//if(display_cloud_xyzsift1){
-		//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz(new pcl::PointCloud<pcl::PointXYZ>); 
-		//pcl::copyPointCloud(*cloud_xyzsift,*cloud_xyz);
-		//viewer->addPointCloud<pcl::PointXYZ>(cloud_xyz, "siftcloud");
-		//viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "siftcloud");
-		//viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "siftcloud");
-	//}	
-}
+
 void CorrespondencesViewer::on_spin() {
 	viewer->spinOnce (100);
 }
