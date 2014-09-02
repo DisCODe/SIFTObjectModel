@@ -181,7 +181,7 @@ void FeatureCloudConverter::process_depth_xyz() {
     Types::Features features = in_features.read();
 
     pcl::PointCloud<PointXYZSIFT>::Ptr cloud (new pcl::PointCloud<PointXYZSIFT>());
-
+    const double max_z = 1.0e4;
 
     for(int i=0; i < features.features.size(); i++){
 
@@ -190,7 +190,7 @@ void FeatureCloudConverter::process_depth_xyz() {
         int v = round(features.features[i].pt.y);
 
         cv::Vec3f p = depth_xyz.at<cv::Vec3f>(v, u);
-
+        if(fabs(p[2] - max_z) < FLT_EPSILON || fabs(p[2]) > max_z) continue;
 
         point.x = p[0];
         point.y = p[1];
@@ -216,7 +216,7 @@ void FeatureCloudConverter::process_depth_xyz_mask() {
     Types::Features features = in_features.read();
     cv::Mat mask = in_mask.read();
     pcl::PointCloud<PointXYZSIFT>::Ptr cloud (new pcl::PointCloud<PointXYZSIFT>());
-
+    const double max_z = 1.0e4;
 
     for(int i=0; i < features.features.size(); i++){
 
@@ -227,7 +227,7 @@ void FeatureCloudConverter::process_depth_xyz_mask() {
                 continue;
         }
         cv::Vec3f p = depth_xyz.at<cv::Vec3f>(v, u);
-
+        if(fabs(p[2] - max_z) < FLT_EPSILON || fabs(p[2]) > max_z) continue;
 
         point.x = p[0];
         point.y = p[1];
