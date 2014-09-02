@@ -102,7 +102,7 @@ bool CorrespondenceMatcher::onStart() {
 
 void CorrespondenceMatcher::mach()
 {
-    CLOG(LINFO) << "CorrespondenceMatcher::mach";
+    CLOG(LDEBUG) << "CorrespondenceMatcher::match";
 
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_first = in_cloud_first_xyzsift.read();
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sec = in_cloud_sec_xyzsift.read();
@@ -115,20 +115,21 @@ void CorrespondenceMatcher::mach()
 	pcl::removeNaNFromPointCloud(*cloud_first, *cloud_first, indices);
 	cloud_sec->is_dense = false;
 	pcl::removeNaNFromPointCloud(*cloud_sec, *cloud_sec, indices);
-	
+
 
 	pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
 	MergeUtils::computeCorrespondences(cloud_first, cloud_sec, correspondences);
 	pcl::CorrespondencesPtr inliers(new pcl::Correspondences()) ;
 	Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_first, cloud_sec, correspondences, *inliers, properties);
-	
+
+	CLOG(LINFO) << "  correspondences3: " << inliers->size() << " out of " << correspondences->size();
 //	pcl::transformPointCloud(*cloud_sec, *cloud_sec, current_trans);
-	
+
 	out_correspondences.write(inliers);
 	out_cloud_first_xyzsift.write(cloud_first);
 	out_cloud_sec_xyzsift.write(cloud_sec);
-	
-	CLOG(LINFO) << "return ";
+
+	CLOG(LDEBUG) << "return ";
 	return;
 }
 

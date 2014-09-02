@@ -23,44 +23,47 @@
 					<param name="">2</param>
 				</Component>
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/kinect/1</param>
 					<param name="sequence.pattern">.*\_rgb.png</param>
 					<param name="mode.loop">0</param>
 					<param name="mode.auto_trigger">0</param>		
 				</Component>
 	                       <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="4" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/kinect/1</param>
                                         <param name="sequence.pattern">.*\_xyz\.yml</param>
                                         <param name="mode.loop">1</param>
                                         <param name="mode.auto_trigger">0</param>
                                 </Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="5" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/kinect/1</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>
 					<param name="mode.auto_trigger">0</param>
 				</Component>
 				<Component name="SequenceRGB2" type="CvBasic:Sequence" priority="6" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/kinect/1</param>
 					<param name="sequence.pattern">.*\_rgb.png</param>
 					<param name="mode.loop">0</param>
 					<param name="mode.auto_trigger">0</param>
 				</Component>
 	                       <Component name="SequenceXYZ2" type="CvBasic:Sequence" priority="7" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/kinect/1</param>
                                         <param name="sequence.pattern">.*\_xyz\.yml</param>
                                         <param name="mode.loop">1</param>
                                         <param name="mode.auto_trigger">0</param>
                                 </Component>
 				<Component name="SequenceMask2" type="CvBasic:Sequence" priority="8" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/1</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/kinect/1</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>
 					<param name="mode.auto_trigger">0</param>
 				</Component>
 
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="9" bum="0">
-					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
+						<param name="width">1063</param>
+						<param name="height">972</param>
+						<param name="camera_matrix">1 0 0 ; 0 1 0 ; 0 0 1</param>
+						<param name="dist_coeffs">0 0 0 0 0 0 0 0</param>
 				</Component>
 
 				<Component name="SIFT" type="CvBasic:CvSIFT" priority="10" bump="0">
@@ -96,7 +99,7 @@
 		</Subtask>	
 	
 	</Subtasks>
-	
+
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
 		<Source name="Trigger.out_trigger">
@@ -104,16 +107,16 @@
 			<sink>SequenceXYZ.in_trigger</sink>
 			<sink>SequenceMask.in_trigger</sink>
 		</Source>
-		
+
 		<Source name="Trigger2.out_trigger">
 			<sink>SequenceRGB2.in_trigger</sink>
 			<sink>SequenceXYZ2.in_trigger</sink>
 			<sink>SequenceMask2.in_trigger</sink>
 		</Source>
-		
+
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
-			<sink>Converter.in_color</sink>
+			<sink>Converter.in_rgb_stereo</sink>
 		</Source>
 		<Source name="SequenceXYZ.out_img">	
 			<sink>Converter.in_depth_xyz</sink>	
@@ -123,10 +126,10 @@
 			<sink>Converter.in_mask</sink>
 			<sink>FeatureCloudConverter.in_mask</sink>
 		</Source>
-		
+
 		<Source name="SequenceRGB2.out_img">
 			<sink>SIFT2.in_img</sink>
-			<sink>Converter2.in_color</sink>
+			<sink>Converter2.in_rgb_stereo</sink>
 		</Source>
 		<Source name="SequenceXYZ2.out_img">	
 			<sink>Converter2.in_depth_xyz</sink>	
@@ -136,14 +139,14 @@
 			<sink>Converter2.in_mask</sink>	
 			<sink>FeatureCloudConverter2.in_mask</sink>		
 		</Source>
-		
+
 		<Source name="CameraInfo.out_camera_info">
 			<sink>Converter.in_camera_info</sink>	
 			<sink>FeatureCloudConverter.in_camera_info</sink>
 			<sink>Converter2.in_camera_info</sink>	
 			<sink>FeatureCloudConverter2.in_camera_info</sink>
 		</Source>
-		
+
 		<Source name="SIFT.out_descriptors">
 			<sink>FeatureCloudConverter.in_descriptors</sink>	
 		</Source>

@@ -89,21 +89,6 @@ protected:
 	/// Output data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 
-	/// Output data stream containing last point cloud.
-	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_last_xyzrgb;
-
-	/// Output data stream containing last feature cloud (SIFTs).
-	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_last_xyzsift;
-
-	/// Output data stream containing previous point cloud.
-	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_prev_xyzrgb;
-
-	/// Output data stream containing previous feature cloud (SIFTs).
-	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_prev_xyzsift;
-
-	/// Output data stream containing corespondences beetwen previous and last cloud
-	Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;
-
 	// Mean number of features per view.
 	Base::DataStreamOut<int> out_mean_viewpoint_features_number;
 

@@ -22,37 +22,37 @@
 					<param name="">2</param>
 				</Component>
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/USA/food_box_8R</param>
 					<param name="sequence.pattern">.*\_color.png</param>
 					<param name="mode.loop">0</param>
 					<param name="mode.auto_trigger">0</param>		
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="4" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/USA/food_box_8R</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 					<param name="mode.loop">0</param>	
 					<param name="mode.auto_trigger">0</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="5" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/USA/food_box_8R</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>	
 					<param name="mode.auto_trigger">0</param>	
 				</Component>
 				<Component name="SequenceRGB2" type="CvBasic:Sequence" priority="6" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/USA/food_box_8R</param>
 					<param name="sequence.pattern">.*\_color.png</param>
 					<param name="mode.loop">0</param>
 					<param name="mode.auto_trigger">0</param>		
 				</Component>
 				<Component name="SequenceDepth2" type="CvBasic:Sequence" priority="7" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/USA/food_box_8R</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 					<param name="mode.loop">0</param>	
 					<param name="mode.auto_trigger">0</param>	
 				</Component>
 				<Component name="SequenceMask2" type="CvBasic:Sequence" priority="8" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>
+					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/USA/food_box_8R</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 					<param name="mode.loop">0</param>	
 					<param name="mode.auto_trigger">0</param>	
