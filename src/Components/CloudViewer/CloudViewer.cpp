@@ -214,7 +214,6 @@ void CloudViewer::on_clouds_xyzrgb() {
 	std::vector<int> indices2;
 	cloud2->is_dense = false; 
 	pcl::removeNaNFromPointCloud(*cloud2, *cloud2, indices2);
-	
 
 	viewer->removePointCloud("viewcloud",v1) ;
 	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb (cloud);

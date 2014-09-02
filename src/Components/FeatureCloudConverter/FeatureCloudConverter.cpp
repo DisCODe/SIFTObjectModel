@@ -216,8 +216,7 @@ void FeatureCloudConverter::process_depth_xyz_mask() {
     Types::Features features = in_features.read();
     cv::Mat mask = in_mask.read();
     pcl::PointCloud<PointXYZSIFT>::Ptr cloud (new pcl::PointCloud<PointXYZSIFT>());
-
-
+	
     for(int i=0; i < features.features.size(); i++){
 
         PointXYZSIFT point;
@@ -233,13 +232,11 @@ void FeatureCloudConverter::process_depth_xyz_mask() {
         point.y = p[1];
         point.z = p[2];
 
-
         for(int j=0; j<descriptors.cols;j++){
             point.descriptor[j] = descriptors.row(i).at<float>(j);
         }
 
         point.multiplicity = 1;
-
         cloud->push_back(point);
     }
 
