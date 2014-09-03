@@ -99,8 +99,10 @@ protected:
 	
 	Base::Property<float> threshold;
 	Base::Property<float> inlier_threshold;
-    Base::Property<float> max_distance;
+    //Base::Property<float> max_distance;
+    Base::Property<float> cg_size;
     Base::Property<float> cg_thresh;
+    Base::Property<bool> use_hough3d;
 
 };
 
