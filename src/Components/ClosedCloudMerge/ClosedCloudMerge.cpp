@@ -234,6 +234,7 @@ void ClosedCloudMerge::addViewToModel()
 		if (correspondences3->size() > corrTreshold) {
 			lum_sift.setCorrespondences(counter-1, i, correspondences3);
 			added++;
+
 		//	for(int j = 0; j< correspondences3->size();j++){
 		//		if (correspondences3->at(j).index_query >=lum_sift.getPointCloud(counter - 1)->size() || correspondences3->at(j).index_match >=lum_sift.getPointCloud(i)->size()){
 		//			continue;

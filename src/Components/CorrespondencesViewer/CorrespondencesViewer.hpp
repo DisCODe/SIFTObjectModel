@@ -86,17 +86,15 @@ protected:
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb2;
 	Base::DataStreamIn<pcl::CorrespondencesPtr> in_correspondences;
 	Base::DataStreamIn<pcl::CorrespondencesPtr> in_good_correspondences;
-
+    Base::DataStreamIn<std::vector<pcl::Correspondences> > in_clustered_correspondences;
 // Output data streams
 
 	// Handlers
-	Base::EventHandler2 h_on_clouds;
-	Base::EventHandler2 h_on_good_correspondences;
+    Base::EventHandler2 h_on_clouds;
 	Base::EventHandler2 h_on_spin;
 	
 	// Handlers
-	void on_clouds();
-	void on_good_correspondences();
+    void on_clouds();
 	void on_spin();
 	
 	
@@ -120,6 +118,8 @@ protected:
 	Base::Property<float> tx;
 	Base::Property<float> ty;
 	Base::Property<float> tz;
+
+    int clusters;
 	
 };
 

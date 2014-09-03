@@ -18,6 +18,7 @@
 				<Component name="Trigger" type="CvBasic:Trigger" priority="1" bump="0">
 					<param name="">1</param>
 				</Component>
+<<<<<<< HEAD
 				<Component name="Trigger2" type="CvBasic:Trigger" priority="2" bump="0">
 					<param name="">2</param>
 				</Component>
@@ -54,6 +55,29 @@
 				<Component name="SequenceMask2" type="CvBasic:Sequence" priority="8" bump="0">
 					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/USA/food_box_8R</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
+=======
+				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
+<!--                                        <param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>-->
+                                        <param name="sequence.directory">/home/mlaszkow/Pobrane/savanah/</param>
+                                        <param name="sequence.pattern">col.*.png</param>
+<!--                                        <param name="sequence.pattern">.*\_color.png</param>-->
+					<param name="mode.loop">0</param>
+					<param name="mode.auto_trigger">0</param>		
+				</Component>
+				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="3" bump="0">
+<!--                                        <param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>-->
+                                        <param name="sequence.directory">/home/mlaszkow/Pobrane/savanah/</param>
+                                        <param name="sequence.pattern">dep.*.png</param>
+<!--                                        <param name="sequence.pattern">.*\_depth.png</param>-->
+					<param name="mode.loop">0</param>	
+					<param name="mode.auto_trigger">0</param>	
+				</Component>
+				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
+<!--                                        <param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_8R</param>-->
+                                        <param name="sequence.directory">/home/mlaszkow/Pobrane/savanah/</param>
+                                        <param name="sequence.pattern">mas.*.png</param>
+<!--                                        <param name="sequence.pattern">.*\_mask.png</param>-->
+>>>>>>> michal/master
 					<param name="mode.loop">0</param>	
 					<param name="mode.auto_trigger">0</param>	
 				</Component>
@@ -92,6 +116,8 @@
 			<Executor name="Visualization" period="0.1">
 				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
 				</Component>
+                                <Component name="Window2" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
+                                </Component>
 			</Executor>
 		</Subtask>	
 	
@@ -182,15 +208,36 @@
 			<sink>macher.in_cloud_sec_xyzsift</sink>		
 		</Source>
 
+<<<<<<< HEAD
 		<Source name="macher.out_cloud_first_xyzsift">
+=======
+		<Source name="Generator.out_cloud_last_xyzrgb">
+			<sink>Window.in_cloud_xyzrgb1</sink>
+                        <sink>Window2.in_cloud_xyzrgb1</sink>
+		</Source>
+		<Source name="Generator.out_cloud_prev_xyzrgb">
+			<sink>Window.in_cloud_xyzrgb2</sink>
+                        <sink>Window2.in_cloud_xyzrgb2</sink>
+		</Source>
+		<Source name="Generator.out_cloud_last_xyzsift">
+>>>>>>> michal/master
 			<sink>Window.in_cloud_xyzsift1</sink>
+                        <sink>Window2.in_cloud_xyzsift1</sink>
 		</Source>
 		<Source name="macher.out_cloud_sec_xyzsift">
 			<sink>Window.in_cloud_xyzsift2</sink>
+                        <sink>Window2.in_cloud_xyzsift2</sink>
 		</Source>
 		<Source name="macher.out_correspondences">
 			<sink>Window.in_correspondences</sink>
 		</Source> 
+<<<<<<< HEAD
+=======
+                <Source name="Generator.out_good_correspondences">
+                        <sink>Window2.in_correspondences</sink>
+                </Source>
+
+>>>>>>> michal/master
 				
 	</DataStreams>
 </Task>

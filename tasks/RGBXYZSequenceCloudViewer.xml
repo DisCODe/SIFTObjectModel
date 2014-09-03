@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Dawid Kaczmarek</name>
+			<link></link>
+		</Author>
+	
+		<Description>
+			<brief>Disparity viewer</brief>
+			<full>Displays a sequence of  stereo-images (RGB and depth XYZ).</full>
+		</Description>
+	</Reference>
+
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Processing">
+			<Executor name="Processing" period="0.5">
+				<Component name="NextImageTrigger" type="CvBasic:Trigger" priority="1" bump="0">
+				</Component>
+				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
+                                        <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
+					<param name="sequence.pattern">.*\_rgb\.png</param>
+					<param name="mode.loop">1</param>
+					<param name="mode.auto_trigger">0</param>						
+				</Component>
+				<Component name="SequenceXYZ" type="CvBasic:Sequence" priority="3" bump="0">
+                                        <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
+					<param name="sequence.pattern">.*\_xyz\.yml</param>
+					<param name="mode.loop">1</param>
+					<param name="mode.auto_trigger">0</param>						
+				</Component>
+                                <Component name="DepthConverter" type="PCL:DepthConverter" priority="4" bump="0">
+                                </Component>
+                                <Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
+                                </Component>
+                                <Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
+                                </Component>
+                                <Component name="Writer" type="SIFTObjectModel:PCDWriter" priority="9" bump="0">
+                                </Component>
+			</Executor>
+		</Subtask>	
+
+		<Subtask name="Display">
+			<Executor name="Display" period="0.1">
+                                <Component name="Window" type="SIFTObjectModel:CloudViewer" priority="1" bump="0">
+                                    <param name="coordinate_system">false</param>
+<!--                                    <param name="background_r">255</param>
+                                    <param name="background_g">255</param>
+                                    <param name="background_b">255</param>-->
+				</Component>
+			</Executor>
+		</Subtask>	
+
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+		<Source name="NextImageTrigger.out_trigger">
+			<sink>SequenceRGB.in_trigger</sink>
+			<sink>SequenceXYZ.in_trigger</sink>
+		</Source>
+                <Source name="SequenceRGB.out_img">
+                        <sink>SIFT.in_img</sink>
+                        <sink>DepthConverter.in_color</sink>
+                </Source>
+                <Source name="SequenceXYZ.out_img">
+                        <sink>DepthConverter.in_depth_xyz</sink>
+                        <sink>FeatureCloudConverter.in_depth_xyz</sink>
+                </Source>
+                <Source name="SIFT.out_descriptors">
+                        <sink>FeatureCloudConverter.in_descriptors</sink>
+                </Source>
+                <Source name="SIFT.out_features">
+                        <sink>FeatureCloudConverter.in_features</sink>
+                </Source>
+                <Source name="DepthConverter.out_cloud_xyzrgb">
+                        <sink>Window.in_cloud_xyzrgb</sink>
+		</Source>
+                <Source name="FeatureCloudConverter.out_cloud_xyzsift">
+                        <sink>Window.in_cloud_xyzsift</sink>
+                        <sink>Writer.in_cloud_xyzsift</sink>
+                </Source>
+	</DataStreams>
+</Task>
+
