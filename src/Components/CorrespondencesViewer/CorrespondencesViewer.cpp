@@ -254,18 +254,15 @@ void CorrespondencesViewer::on_clouds() {
                     break;
                 }
 
-            cout << "cloud_xyzsift1 " <<cloud_xyzsift1->size() << " cloud_xyzsift2trans " << cloud_xyzsift2trans->size()<< " cluster " << clustered_corrs[i].size() <<endl;
             ostringstream ss;
             ss << i;
             string str = ss.str();
-//            viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift1, cloud_xyzsift2trans, clustered_corrs[i], "correspondences"+str) ;
             viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift2trans, cloud_xyzsift1, clustered_corrs[i], "correspondences"+str) ;
             viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR,
                 r,
                 g,
                 b,
                 "correspondences"+str) ;
-            cout<<"ii "<< ii <<" "<< (ii>>6) <<" rgb " <<r<<" "<<g<<" "<<b<<endl;
         }
 
     }
