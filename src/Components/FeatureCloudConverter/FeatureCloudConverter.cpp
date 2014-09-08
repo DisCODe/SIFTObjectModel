@@ -215,21 +215,22 @@ void FeatureCloudConverter::process_depth_xyz_mask() {
     cv::Mat descriptors = in_descriptors.read();
     Types::Features features = in_features.read();
     cv::Mat mask = in_mask.read();
+    mask.convertTo(mask, CV_32F);
     pcl::PointCloud<PointXYZSIFT>::Ptr cloud (new pcl::PointCloud<PointXYZSIFT>());
     const double max_z = 1.0e4;
 
     for(int i=0; i < features.features.size(); i++){
-		
-        
         PointXYZSIFT point;
         int u = round(features.features[i].pt.x);
         int v = round(features.features[i].pt.y);
         if (mask.at<float>(v, u)==0) {
                 continue;
         }
+        
         cv::Vec3f p = depth_xyz.at<cv::Vec3f>(v, u);
         if(fabs(p[2] - max_z) < FLT_EPSILON || fabs(p[2]) > max_z) continue;
 
+       
         point.x = p[0];
         point.y = p[1];
         point.z = p[2];
