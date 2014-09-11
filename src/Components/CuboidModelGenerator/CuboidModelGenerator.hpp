@@ -13,8 +13,18 @@
 #include "Property.hpp"
 #include "EventHandler2.hpp"
 
-#include <opencv2/opencv.hpp>
 #include "Types/Features.hpp"
+
+#include <opencv2/opencv.hpp>
+
+#if CV_MAJOR_VERSION == 2
+#if CV_MINOR_VERSION > 3
+#include <opencv2/nonfree/features2d.hpp>
+#endif
+#elif CV_MAJOR_VERSION == 3
+#include <opencv2/nonfree/features2d.hpp>
+#endif
+
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -24,6 +34,8 @@
 
 namespace Processors {
 namespace CuboidModelGenerator {
+
+using namespace cv;
 
 /*!
  * \class CuboidModelGenerator
