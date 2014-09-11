@@ -85,13 +85,6 @@ void ClosedCloudMerge::prepareInterface() {
 	registerStream("out_cloud_xyzrgb_normals", &out_cloud_xyzrgb_normals);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 
-	registerStream("out_cloud_last_xyzrgb", &out_cloud_last_xyzrgb);
-	registerStream("out_cloud_last_xyzsift", &out_cloud_last_xyzsift);
-	registerStream("out_cloud_prev_xyzrgb", &out_cloud_prev_xyzrgb);
-	registerStream("out_cloud_prev_xyzsift", &out_cloud_prev_xyzsift);
-	registerStream("out_correspondences", &out_correspondences);
-    registerStream("out_good_correspondences", &out_good_correspondences);
-
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
 
     h_addViewToModel.setup(boost::bind(&ClosedCloudMerge::addViewToModel, this));
@@ -184,19 +177,6 @@ void ClosedCloudMerge::addViewToModel()
 		out_cloud_xyzrgb_normals.write(cloud_normal_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
 
-		out_cloud_prev_xyzrgb.write(cloud_merged);
-		out_cloud_last_xyzrgb.write(cloud_merged);
-
-		out_cloud_prev_xyzsift.write(cloud_sift_merged);
-		out_cloud_last_xyzsift.write(cloud_sift_merged);
-
-		pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
-		MergeUtils::computeCorrespondences(cloud_sift, cloud_sift_merged, correspondences);
-		pcl::CorrespondencesPtr inliers(new pcl::Correspondences()) ;
-        out_correspondences.write(correspondences);
-		Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, *inliers, properties);
-        out_good_correspondences.write(inliers);
-
 		// Push SOM - depricated.
 //		out_instance.write(produce());
 		CLOG(LINFO) << "return ";
@@ -241,12 +221,6 @@ void ClosedCloudMerge::addViewToModel()
 	*rgbn_views[counter -1] = *cloud;
 	*rgb_views[counter -1] = *cloudrgb;
 
-	out_cloud_prev_xyzrgb.write(rgb_views[counter-2]);
-	out_cloud_last_xyzrgb.write(cloudrgb);
-
-	out_cloud_prev_xyzsift.write(lum_sift.getPointCloud(counter-2));
-	out_cloud_last_xyzsift.write(cloud_sift);
-
 
 	int added = 0;
 	for (int i = counter - 2 ; i >= 0; i--)
@@ -260,10 +234,7 @@ void ClosedCloudMerge::addViewToModel()
 		if (correspondences3->size() > corrTreshold) {
 			lum_sift.setCorrespondences(counter-1, i, correspondences3);
 			added++;
-            if  (i == counter - 2){
-                out_correspondences.write(correspondences2);
-                out_good_correspondences.write(correspondences3);
-            }
+
 		//	for(int j = 0; j< correspondences3->size();j++){
 		//		if (correspondences3->at(j).index_query >=lum_sift.getPointCloud(counter - 1)->size() || correspondences3->at(j).index_match >=lum_sift.getPointCloud(i)->size()){
 		//			continue;

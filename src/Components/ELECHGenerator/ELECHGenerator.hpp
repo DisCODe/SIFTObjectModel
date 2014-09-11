@@ -120,7 +120,7 @@ protected:
 	int total_viewpoint_features_number;
 
 	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> rgb_views;
-	pcl::registration::LUM<PointXYZSIFT> lum_sift;
+	std::vector<pcl::PointCloud<PointXYZSIFT>::Ptr> sift_views;
 	pcl::registration::ELCH<pcl::PointXYZRGB> elch_rgb;
 	pcl::registration::ELCH<PointXYZSIFT> elch_sift;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
@@ -129,8 +129,8 @@ protected:
 	Eigen::Matrix4f global_trans;
 
     Base::Property<double> ICP_transformation_epsilon;
-    Base::Property<float> Loop_max_correspondence_distance;
-    Base::Property<int> Loop_ICP_max_iterations;
+    Base::Property<float> Elch_max_correspondence_distance;
+    Base::Property<int> Elch_ICP_max_iterations;
 
     ///RanSAC Properties
     Base::Property<float> RanSAC_inliers_threshold;
@@ -143,19 +143,6 @@ protected:
     Base::Property<int> ICP_max_iterations;
     Base::Property<float> Elch_rejection_threshold;
 
-
-    ///RanSAC Properties
-//    Base::Property<float> RanSAC_inliers_threshold;
-//    Base::Property<float> RanSAC_max_iterations;
-
-
-/*	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_prev ;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_next ;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_to_merge;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_to_merge;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_prev;
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_next;
-*/
 };
 /*
  * Register processor component.

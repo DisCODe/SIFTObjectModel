@@ -8,9 +8,9 @@ FILE(GLOB files *.cpp)
 FIND_PACKAGE( OpenCV REQUIRED )
 
 # Create an executable file from sources:
-ADD_LIBRARY(ELECHGenerator SHARED ${files})
+ADD_LIBRARY(CorrespondenceMatcher SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(ELECHGenerator MergeUtils ${OpenCV_LIBS} ${DisCODe_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} )
+TARGET_LINK_LIBRARIES(CorrespondenceMatcher MergeUtils ${OpenCV_LIBS} ${DisCODe_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} )
 
-INSTALL_COMPONENT(ELECHGenerator)
+INSTALL_COMPONENT(CorrespondenceMatcher)

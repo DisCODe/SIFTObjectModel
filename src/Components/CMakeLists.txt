@@ -42,3 +42,6 @@ ADD_COMPONENT(PCDWriter)
 ADD_COMPONENT(CuboidModelGenerator)
 
 ADD_COMPONENT(CloudViewer)
+
+ADD_COMPONENT(CorrespondenceMatcher)
+
