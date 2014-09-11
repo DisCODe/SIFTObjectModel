@@ -17,7 +17,7 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
-					<param name="filenames">/home/mkamionk/DisCODe/RGB-D/Model/LUMfood_box_8R.json</param>
+					<param name="filenames">/home/tkornuta/Objects/LUMfood_box_8R.json</param>
 				</Component>
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
 					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3</param>
@@ -49,10 +49,6 @@
 
 				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
 				</Component>
-<!--				<Component name="Window2" type="PCL:CloudViewer" priority="1" bump="0">
-					<param name="coordinate_system">0</param>
-					<param name="two_viewports">1</param>
-				</Component>   -->
             </Executor>
 		</Subtask>	
 	
