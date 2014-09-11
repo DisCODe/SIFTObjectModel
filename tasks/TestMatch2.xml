@@ -17,23 +17,24 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
-                                        <param name="filenames">/home/mlaszkow/jsonmodels/FB12.json</param>
+                                        <param name="filenames">/home/discode/cuboids/models/loyd_kinect.json</param>
 				</Component>
-				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/mlaszkow/obiekty/food_box_12/</param>
-					<param name="sequence.pattern">.*\_color.png</param>				
-				</Component>
-				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/mlaszkow/obiekty/food_box_12/</param>
-					<param name="sequence.pattern">.*\_depth.png</param>	
-				</Component>
-				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
-					<param name="sequence.directory">/home/mlaszkow/obiekty/food_box_12/</param>
-					<param name="sequence.pattern">.*\_mask.png</param>
-				</Component>
-				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="5" bump="0">
-					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
-				</Component>
+                                <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="2" bump="0">
+                                </Component>
+                                <Component name="SequenceRGB" type="CvBasic:Sequence" priority="3" bump="0">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
+                                    <param name="sequence.pattern">.*\_rgb\.png</param>
+                                    <param name="mode.loop">1</param>
+                                    <param name="mode.sort">1</param>
+                                    <param name="mode.auto_trigger">0</param>
+                                </Component>
+                                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="4" bump="0">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
+                                    <param name="sequence.pattern">.*\_xyz\.yml</param>
+                                    <param name="mode.loop">1</param>
+                                    <param name="mode.sort">1</param>
+                                    <param name="mode.auto_trigger">0</param>
+                                </Component>
 				<Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
 				</Component>
 				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
@@ -42,11 +43,14 @@
 				</Component>
 				
 				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
+                                    <param name="cg_size">0.01</param>
+                                    <param name="cg_tresh">9</param>
 				</Component>
             </Executor>
 
 			<Executor name="Visualization" period="1">
 				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
+
 				</Component>
             </Executor>
 		</Subtask>	
@@ -55,21 +59,17 @@
 	
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
+                <Source name="NextImageTrigger.out_trigger">
+                        <sink>SequenceRGB.in_trigger</sink>
+                        <sink>SequenceXYZ.in_trigger</sink>
+                </Source>
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
-			<sink>Converter.in_color</sink>
+                        <sink>Converter.in_rgb_stereo</sink>
 		</Source>
-		<Source name="SequenceDepth.out_img">	
-			<sink>Converter.in_depth</sink>	
-			<sink>FeatureCloudConverter.in_depth</sink>	
-		</Source>
-		<Source name="SequenceMask.out_img">
-			<sink>Converter.in_mask</sink>	
-			<sink>FeatureCloudConverter.in_mask</sink>		
-		</Source>
-		<Source name="CameraInfo.out_camera_info">
-			<sink>Converter.in_camera_info</sink>	
-			<sink>FeatureCloudConverter.in_camera_info</sink>
+                <Source name="SequenceXYZ.out_img">
+                        <sink>Converter.in_depth_xyz</sink>
+                        <sink>FeatureCloudConverter.in_depth_xyz</sink>
 		</Source>
 		<Source name="SIFT.out_descriptors">
 			<sink>FeatureCloudConverter.in_descriptors</sink>	
@@ -100,10 +100,10 @@
 		<Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
 			<sink>Window.in_cloud_xyzsift2</sink>
 		</Source>
-<!--		<Source name="SIFTObjectMatcher.out_correspondences">
+<!--                <Source name="SIFTObjectMatcher.out_correspondences">
 			<sink>Window.in_correspondences</sink>
-		</Source>
-		<Source name="SIFTObjectMatcher.out_good_correspondences">
+                </Source>-->
+<!--		<Source name="SIFTObjectMatcher.out_good_correspondences">
 			<sink>Window.in_good_correspondences</sink>
                 </Source>-->
                 <Source name="SIFTObjectMatcher.out_clustered_correspondences">
