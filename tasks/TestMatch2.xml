@@ -43,8 +43,8 @@
 				</Component>
 				
 				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
-                                    <param name="cg_size">0.01</param>
-                                    <param name="cg_tresh">9</param>
+                                    <param name="cg_size">0.01f</param>
+                                    <param name="cg_thresh">9.0f</param>
 				</Component>
             </Executor>
 
