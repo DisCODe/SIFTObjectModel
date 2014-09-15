@@ -4,8 +4,8 @@
  * \author Micha Laszkowski
  */
 
-#ifndef PASSTHROUGH_HPP_
-#define PASSTHROUGH_HPP_
+#ifndef PASSTHROUGH2_HPP_
+#define PASSTHROUGH2_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -15,9 +15,14 @@
 
 #include <pcl/point_types.h>
 #include <pcl/filters/passthrough.h>
+#include <pcl/filters/impl/passthrough.hpp>
+
 
 #include <Types/PointXYZSIFT.hpp>
 #include <Types/SIFTObjectModel.hpp>
+
+#include <pcl/pcl_base.h>
+
 
 namespace Processors {
 namespace PassThrough {
@@ -107,6 +112,9 @@ protected:
     void filter_xyzsift();
     void filter_som();
 
+
+    void applyFilter (pcl::PointCloud<PointXYZSIFT>::Ptr input, pcl::PointCloud<PointXYZSIFT> &output, std::string filter_field_name, float min, float max, bool negative);
+    void applyFilterIndices (std::vector<int> &indices, pcl::PointCloud<PointXYZSIFT>::Ptr input, std::string filter_field_name, float min, float max, bool negative);
 };
 
 } //: namespace PassThrough
@@ -117,4 +125,4 @@ protected:
  */
 REGISTER_COMPONENT("PassThrough", Processors::PassThrough::PassThrough)
 
-#endif /* PASSTHROUGH_HPP_ */
+#endif /* PASSTHROUGH2_HPP_ */

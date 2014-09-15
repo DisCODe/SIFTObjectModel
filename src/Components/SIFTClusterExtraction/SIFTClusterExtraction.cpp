@@ -70,7 +70,7 @@ bool SIFTClusterExtraction::onStart() {
 void SIFTClusterExtraction::extract() {
   LOG(LTRACE) <<"SIFTClusterExtraction::extract()";
   
-  
+/*
   pcl::PointCloud<PointXYZSIFT>::Ptr cloud = in_cloud_xyzsift.read();
   // Creating the KdTree object for the search method of the extraction
   pcl::search::KdTree<PointXYZSIFT>::Ptr tree (new pcl::search::KdTree<PointXYZSIFT>);
@@ -108,7 +108,7 @@ void SIFTClusterExtraction::extract() {
 		clusters_xyz.push_back(cloud_xyz);
 	}
 	out_clusters_xyz.write(clusters_xyz);
-
+*/
 }
 
 } //: namespace SIFTClusterExtraction
