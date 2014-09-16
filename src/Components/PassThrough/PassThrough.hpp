@@ -15,13 +15,10 @@
 
 #include <pcl/point_types.h>
 #include <pcl/filters/passthrough.h>
-#include <pcl/filters/impl/passthrough.hpp>
 
 
 #include <Types/PointXYZSIFT.hpp>
 #include <Types/SIFTObjectModel.hpp>
-
-#include <pcl/pcl_base.h>
 
 
 namespace Processors {
@@ -76,18 +73,17 @@ protected:
 
 
 // Input data streams
-
-        Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZ>::Ptr> in_cloud_xyz;
-        Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
-        Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
-        Base::DataStreamIn<SIFTObjectModel*> in_som;
+    Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZ>::Ptr> in_cloud_xyz;
+    Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
+    Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
+    Base::DataStreamIn<SIFTObjectModel*> in_som;
 
 // Output data streams
+    Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZ>::Ptr> out_cloud_xyz;
+    Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
+    Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
+    Base::DataStreamOut<SIFTObjectModel*> out_som;
 
-        Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZ>::Ptr> out_cloud_xyz;
-        Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
-        Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
-        Base::DataStreamOut<SIFTObjectModel*> out_som;
 	// Handlers
     Base::EventHandler2 h_filter_xyz;
     Base::EventHandler2 h_filter_xyzrgb;
@@ -111,7 +107,6 @@ protected:
     void filter_xyzrgb();
     void filter_xyzsift();
     void filter_som();
-
 
     void applyFilter (pcl::PointCloud<PointXYZSIFT>::Ptr input, pcl::PointCloud<PointXYZSIFT> &output, std::string filter_field_name, float min, float max, bool negative);
     void applyFilterIndices (std::vector<int> &indices, pcl::PointCloud<PointXYZSIFT>::Ptr input, std::string filter_field_name, float min, float max, bool negative);

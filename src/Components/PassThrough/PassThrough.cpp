@@ -13,9 +13,6 @@
 #include <boost/bind.hpp>
 
 
-//PCL_INSTANTIATE(PCLBase, PointXYZSIFT);
-//PCL_INSTANTIATE(PassThrough, PointXYZSIFT);
-
 namespace Processors {
 namespace PassThrough {
 
@@ -135,64 +132,39 @@ void PassThrough::filter_xyzsift() {
         applyFilter(cloud, *cloud, "x", xa, xb, negative_x);
         applyFilter(cloud, *cloud, "y", ya, yb, negative_y);
         applyFilter(cloud, *cloud, "z", za, zb, negative_z);
-    //    pcl::PassThrough<PointXYZSIFT> pass;
-    //    pass.setInputCloud (cloud);
-    //    pass.setFilterFieldName ("x");
-    //    pass.setFilterLimits (xa, xb);
-    //    pass.setFilterLimitsNegative (negative_x);
-    //    pass.filter (*cloud);
-    //    pass.setFilterFieldName ("y");
-    //    pass.setFilterLimits (ya, yb);
-    //    pass.setFilterLimitsNegative (negative_y);
-    //    pass.filter (*cloud);
-    //    pass.setFilterFieldName ("z");
-    //    pass.setFilterLimits (za, zb);
-    //    pass.setFilterLimitsNegative (negative_z);
-    //    pass.filter (*cloud);
         out_cloud_xyzsift.write(cloud);
 }
 
 void PassThrough::filter_som() {
     LOG(LTRACE) <<"PassThrough::filter_som()";
-    //    SIFTObjectModel* som = in_som.read();
-    //    pcl::PassThrough<pcl::PointXYZRGB> pass;
-    //    pcl::PassThrough<PointXYZSIFT> pass_sift;
+        SIFTObjectModel* som = in_som.read();
+        pcl::PassThrough<pcl::PointXYZRGB> pass;
 
-    //    pass.setInputCloud (som->cloud_xyzrgb);
-    //    pass.setFilterFieldName ("x");
-    //    pass.setFilterLimits (xa, xb);
-    //    pass.setFilterLimitsNegative (negative_x);
-    //    pass.filter (*(som->cloud_xyzrgb));
-    //    pass.setFilterFieldName ("y");
-    //    pass.setFilterLimits (ya, yb);
-    //    pass.setFilterLimitsNegative (negative_y);
-    //    pass.filter (*(som->cloud_xyzrgb));
-    //    pass.setFilterFieldName ("z");
-    //    pass.setFilterLimits (za, zb);
-    //    pass.setFilterLimitsNegative (negative_z);
-    //    pass.filter (*(som->cloud_xyzrgb));
+        pass.setInputCloud (som->cloud_xyzrgb);
+        pass.setFilterFieldName ("x");
+        pass.setFilterLimits (xa, xb);
+        pass.setFilterLimitsNegative (negative_x);
+        pass.filter (*(som->cloud_xyzrgb));
+        pass.setFilterFieldName ("y");
+        pass.setFilterLimits (ya, yb);
+        pass.setFilterLimitsNegative (negative_y);
+        pass.filter (*(som->cloud_xyzrgb));
+        pass.setFilterFieldName ("z");
+        pass.setFilterLimits (za, zb);
+        pass.setFilterLimitsNegative (negative_z);
+        pass.filter (*(som->cloud_xyzrgb));
 
-    //    pass_sift.setInputCloud (som->cloud_xyzsift);
-    //    pass_sift.setFilterFieldName ("x");
-    //    pass_sift.setFilterLimits (xa, xb);
-    //    pass_sift.setFilterLimitsNegative (negative_x);
-    //    pass_sift.filter (*(som->cloud_xyzsift));
-    //    pass_sift.setFilterFieldName ("y");
-    //    pass_sift.setFilterLimits (ya, yb);
-    //    pass_sift.setFilterLimitsNegative (negative_y);
-    //    pass_sift.filter (*(som->cloud_xyzsift));
-    //    pass_sift.setFilterFieldName ("z");
-    //    pass_sift.setFilterLimits (za, zb);
-    //    pass_sift.setFilterLimitsNegative (negative_z);
-    //    pass_sift.filter (*(som->cloud_xyzsift));
+        applyFilter(som->cloud_xyzsift, *(som->cloud_xyzsift), "x", xa, xb, negative_x);
+        applyFilter(som->cloud_xyzsift, *(som->cloud_xyzsift), "y", ya, yb, negative_y);
+        applyFilter(som->cloud_xyzsift, *(som->cloud_xyzsift), "z", za, zb, negative_z);
 
-    //    out_som.write(som);
+        out_som.write(som);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void PassThrough::applyFilter (pcl::PointCloud<PointXYZSIFT>::Ptr input, pcl::PointCloud<PointXYZSIFT> &output, std::string filter_field_name, float min, float max, bool negative)
 {
+    CLOG(LTRACE) << "PassThrough::applyFilter() " << filter_field_name;
     output.header = input->header;
     output.sensor_origin_ = input->sensor_origin_;
     output.sensor_orientation_ = input->sensor_orientation_;
@@ -201,27 +173,22 @@ void PassThrough::applyFilter (pcl::PointCloud<PointXYZSIFT>::Ptr input, pcl::Po
 
     output.is_dense = true;
     applyFilterIndices (indices, input, filter_field_name, min, max, negative);
-    cout<< "indices size "<< indices.size() <<endl;
+    CLOG(LTRACE)<< "Number of indices: "<< indices.size() <<endl;
     copyPointCloud (*input, indices, output);
 
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void PassThrough::applyFilterIndices (std::vector<int> &indices, pcl::PointCloud<PointXYZSIFT>::Ptr input, std::string filter_field_name, float min, float max, bool negative)
 {
-    //using pcl::PCLBase<PointXYZSIFT>::indices_;
-
+    CLOG(LTRACE) << "PassThrough::applyFilterIndices() " << filter_field_name;
     pcl::IndicesPtr indices_(new vector<int>);
-    pcl::IndicesPtr removed_indices_(new vector<int>);
-    //indices_->resize(input->size());
     for(int i = 0; i < input->size(); i++){
         indices_->push_back(i);
     }
 
     // The arrays to be used
     indices.resize (indices_->size ());
-    removed_indices_->resize (indices_->size ());
-    int oii = 0, rii = 0; // oii = output indices iterator, rii = removed indices iterator
+    int oii = 0; // oii = output indices iterator, rii = removed indices iterator
     // Has a field name been specified?
 
     if (filter_field_name.empty ())
@@ -246,10 +213,8 @@ void PassThrough::applyFilterIndices (std::vector<int> &indices, pcl::PointCloud
         int distance_idx = pcl::getFieldIndex (*input, filter_field_name, fields);
         if (distance_idx == -1)
         {
-            //PCL_WARN ("[pcl::%s::applyFilter] Unable to find field name in point type.\n", getClassName ().c_str ());
-            LOG(LWARNING) << "[pcl::?::applyFilter] Unable to find field name in point type."; //TODO
+            CLOG(LWARNING) << "PassThrough::applyFilterIndices Unable to find field name in point type.";
             indices.clear ();
-            removed_indices_->clear ();
             return;
         }
         // Filter for non-finite entries and the specified field limits
@@ -287,9 +252,6 @@ void PassThrough::applyFilterIndices (std::vector<int> &indices, pcl::PointCloud
     }
     // Resize the output arrays
     indices.resize (oii);
-    removed_indices_->resize (rii);
-    cout<< "indices_ size "<< indices_->size() <<endl;
-    cout<< "removed_indices_ size "<< removed_indices_->size() <<endl;
 }
 
 } //: namespace PassThrough
