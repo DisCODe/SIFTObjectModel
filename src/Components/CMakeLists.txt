@@ -47,3 +47,5 @@ ADD_COMPONENT(CloudViewer)
 ADD_COMPONENT(CloudTransformer)
 
 ADD_COMPONENT(PassThrough)
+
+ADD_COMPONENT(CylinderModelGenerator)
