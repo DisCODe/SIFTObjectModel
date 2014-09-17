@@ -15,6 +15,13 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+#if (CV_MAJOR_VERSION == 2)
+#if (CV_MINOR_VERSION > 3)
+#include <opencv2/nonfree/features2d.hpp>
+#endif
+#endif
+
+
 using boost::property_tree::ptree;
 using boost::property_tree::read_json;
 using boost::property_tree::write_json;
@@ -26,7 +33,7 @@ CuboidModelGenerator::CuboidModelGenerator(const std::string & name) :
 		Base::Component(name) , 
         dataJSONname("dataJSONname", std::string("./")) {
     registerProperty(dataJSONname);
-
+    generateModel_flag = false;
 }
 
 CuboidModelGenerator::~CuboidModelGenerator() {
@@ -38,13 +45,18 @@ void CuboidModelGenerator::prepareInterface() {
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 	registerStream("out_model", &out_model);
     registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
-	// Register handlers
-	h_generate.setup(boost::bind(&CuboidModelGenerator::generate, this));
-	registerHandler("generate", &h_generate);
 
+    // Register handlers
+    h_generateModel.setup(boost::bind(&CuboidModelGenerator::generateModelPressed, this));
+    registerHandler("generateModel", &h_generateModel);
+
+    h_returnModel.setup(boost::bind(&CuboidModelGenerator::returnModel, this));
+    registerHandler("returnModel", &h_returnModel);
+    addDependency("returnModel", NULL);
 }
 
 bool CuboidModelGenerator::onInit() {
+    CLOG(LTRACE) << "CuboidModelGenerator::onInit";
     cloud_xyzrgb = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
     cloud_xyzsift = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
 	return true;
@@ -63,7 +75,7 @@ bool CuboidModelGenerator::onStart() {
 }
 
 void CuboidModelGenerator::sift(cv::Mat input, cv::Mat &descriptors, Types::Features &features) {
-    LOG(LTRACE) << "CuboidModelGenerator::sift()\n";
+    CLOG(LTRACE) << "CuboidModelGenerator::sift";
     try {
         //-- Step 1: Detect the keypoints.
         cv::SiftFeatureDetector detector;
@@ -76,7 +88,7 @@ void CuboidModelGenerator::sift(cv::Mat input, cv::Mat &descriptors, Types::Feat
 
         features = Types::Features(keypoints);
     } catch (...) {
-        LOG(LERROR) << "CuboidModelGenerator::sift() failed\n";
+        CLOG(LERROR) << "CuboidModelGenerator::sift() failed\n";
     }
 }
 
@@ -119,11 +131,40 @@ void CuboidModelGenerator::loadData(){
 
 }
 
-void CuboidModelGenerator::generate() {
-    CLOG(LTRACE) << "CuboidModelGenerator::generate";
+
+void CuboidModelGenerator::returnModel() {
+    CLOG(LTRACE) << "CuboidModelGenerator::returnModel()";
+    // Generate model if required.
+    if (generateModel_flag) {
+        generateModel();
+        generateModel_flag = false;
+    }
+
+    // Write to output clouds and SOM.
+    out_cloud_xyzrgb.write(cloud_xyzrgb);
+    out_cloud_xyzsift.write(cloud_xyzsift);
+    out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
+
+    SIFTObjectModel* model;
+    model = dynamic_cast<SIFTObjectModel*>(produce());
+    out_model.write(model);
+}
+
+
+void CuboidModelGenerator::generateModelPressed() {
+    CLOG(LTRACE) << "CuboidModelGenerator::generateModelPressed";
+    generateModel_flag = true;
+}
+
+
+void CuboidModelGenerator::generateModel() {
+    CLOG(LTRACE) << "CuboidModelGenerator::generateModel";
     loadData();
 
-    //pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb(new pcl::PointCloud<pcl::PointXYZRGB>());
+    // Clear clouds.
+    cloud_xyzrgb->clear();
+    cloud_xyzsift->clear();
+
     int x,y,z;
     //front
     y=0;//stałe
@@ -240,11 +281,9 @@ void CuboidModelGenerator::generate() {
         }
     }
 
-    out_cloud_xyzrgb.write(cloud_xyzrgb);
 
 
     //SIFT
-    //pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift (new pcl::PointCloud<PointXYZSIFT>());
     int f = 0;
     cv::Mat descriptors;
     Types::Features features;
@@ -256,7 +295,7 @@ void CuboidModelGenerator::generate() {
         PointXYZSIFT point;
         int u = round(features.features[i].pt.x);
         int v = round(features.features[i].pt.y);
-//TODO float?
+
         int xx = 0 + (u-0)*(a-1-0)/(front.cols-1-0);
         int zz = 0 + (v-0)*(c-1-0)/(front.rows-1-0);
 
@@ -378,13 +417,8 @@ void CuboidModelGenerator::generate() {
         cloud_xyzsift->push_back(point);
     }
 
-    out_cloud_xyzsift.write(cloud_xyzsift);
-
     mean_viewpoint_features_number = f/6;
-    out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
-    SIFTObjectModel* model;
-    model = dynamic_cast<SIFTObjectModel*>(produce());
-    out_model.write(model);
+
 }
 
 

@@ -83,25 +83,45 @@ protected:
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 	Base::DataStreamOut<AbstractObject*> out_model;
     Base::DataStreamOut<int> out_mean_viewpoint_features_number;
-	// Handlers
-	Base::EventHandler2 h_generate;
 
-	// Properties
+    // Handlers
+    /// Generates model on the basis of cuboid model and textures loaded from files.
+    Base::EventHandler2 h_generateModel;
+
+    /// Handler returning model.
+    Base::EventHandler2 h_returnModel;
+
+    /// JSON file containing geometric properties of the cuboid and list of files with textures.
 	Base::Property<std::string> dataJSONname;
 
 
-	
-	// Handlers
-	void generate();
+    /// Function responsible for generation of SOM cuboid model.
+    void generateModel();
 
+    /// Function setting the generateModel flag.
+    void generateModelPressed();
 
+    /// Function responsible for cyclic return of SOM cuboid model.
+    void returnModel();
+
+    /// Image with left side texture.
     cv::Mat left;
+    /// Image with right side texture.
     cv::Mat right;
+    /// Image with top side texture.
     cv::Mat top;
+    /// Image with bottom side texture.
     cv::Mat bottom;
+    /// Image with front side texture.
     cv::Mat front;
+    /// Image with back side texture.
     cv::Mat back;
+
+    /// Sizes of the cuboid.
     int a,b,c;
+
+    /// Flag indicating that the user pressed the generateModelButton
+    bool generateModel_flag;
 
 };
 

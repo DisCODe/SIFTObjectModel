@@ -122,6 +122,9 @@ protected:
 	pcl::visualization::PCLVisualizer * viewer;
 	pcl::visualization::PCLVisualizer * viewer2;
 	int v1,v2;
+
+    /// Handler for showing/hiding coordinate system.
+    void onCSShowClick(const bool & new_show_cs_);
 	
 };
 

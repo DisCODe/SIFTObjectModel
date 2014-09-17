@@ -85,19 +85,16 @@ protected:
     Base::DataStreamOut<SIFTObjectModel*> out_som;
 
 	// Handlers
-	Base::EventHandler2 h_fransform_xyz;
-	Base::EventHandler2 h_transform_xyzrgb;
-	Base::EventHandler2 h_transform_xyzsift;
-    Base::EventHandler2 h_transform_som;
+    Base::EventHandler2 h_transform_clouds;
+    void transform_clouds();
 
 	// Properties
 
-	
-	// Handlers
-	void fransform_xyz();
-	void transform_xyzrgb();
-	void transform_xyzsift();
-    void transform_som();
+    //   Helper functions, specialized for every cloud type.
+    void transform_xyz(Types::HomogMatrix hm_);
+    void transform_xyzrgb(Types::HomogMatrix hm_);
+    void transform_xyzsift(Types::HomogMatrix hm_);
+    void transform_som(Types::HomogMatrix hm_);
 
 };
 
