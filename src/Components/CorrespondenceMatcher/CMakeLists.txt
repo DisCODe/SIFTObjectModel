@@ -8,11 +8,9 @@ FILE(GLOB files *.cpp)
 FIND_PACKAGE( OpenCV REQUIRED )
 
 # Create an executable file from sources:
-ADD_LIBRARY(DrawCSystem SHARED ${files})
+ADD_LIBRARY(CorrespondenceMatcher SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(DrawCSystem ${DisCODe_LIBRARIES} 
-	${OpenCV_LIBS}
-	)
+TARGET_LINK_LIBRARIES(CorrespondenceMatcher MergeUtils ${OpenCV_LIBS} ${DisCODe_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} )
 
-INSTALL_COMPONENT(DrawCSystem)
+INSTALL_COMPONENT(CorrespondenceMatcher)
