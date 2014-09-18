@@ -116,12 +116,27 @@ protected:
     cv::Mat front;
     /// Image with back side texture.
     cv::Mat back;
+    /// Image with left side mask.
+    cv::Mat left_mask;
+    /// Image with right side mask.
+    cv::Mat right_mask;
+    /// Image with top side mask.
+    cv::Mat top_mask;
+    /// Image with bottom side mask.
+    cv::Mat bottom_mask;
+    /// Image with front side mask.
+    cv::Mat front_mask;
+    /// Image with back side mask.
+    cv::Mat back_mask;
 
     /// Sizes of the cuboid.
     int a,b,c;
 
     /// Flag indicating that the user pressed the generateModelButton
     bool generateModel_flag;
+
+    bool generate_top, generate_bottom, generate_left, generate_right, generate_front, generate_back;
+    bool mask_top, mask_bottom, mask_left, mask_right, mask_front, mask_back;
 
 };
 

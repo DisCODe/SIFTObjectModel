@@ -76,7 +76,7 @@ bool CylinderModelGenerator::onStart() {
 }
 
 void CylinderModelGenerator::sift(cv::Mat input, cv::Mat &descriptors, Types::Features &features) {
-    CLOG(LTRACE) << "CuboidModelGenerator::sift";
+    CLOG(LTRACE) << "CylinderModelGenerator::sift";
     try {
         //-- Step 1: Detect the keypoints.
         cv::SiftFeatureDetector detector;
@@ -89,7 +89,7 @@ void CylinderModelGenerator::sift(cv::Mat input, cv::Mat &descriptors, Types::Fe
 
         features = Types::Features(keypoints);
     } catch (...) {
-        CLOG(LERROR) << "CuboidModelGenerator::sift() failed\n";
+        CLOG(LERROR) << "CylinderModelGenerator::sift() failed\n";
     }
 }
 
