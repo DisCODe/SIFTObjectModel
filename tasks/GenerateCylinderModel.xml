@@ -28,6 +28,9 @@
                         <Executor name="Visualization" period="1">d
                                 <Component name="WindowPCL" type="SIFTObjectModel:CloudViewer" priority="1" bump="0">
 <!--                                    <param name="coordinate_system">false</param>-->
+                                        <param name="background_r">255</param>
+                                        <param name="background_g">255</param>
+                                        <param name="background_b">255</param>
 				</Component>
 			</Executor>
 		</Subtask>	

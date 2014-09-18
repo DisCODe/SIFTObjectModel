@@ -106,6 +106,13 @@ protected:
     /// Image with side texture.
     cv::Mat side;
 
+    /// Image with top side mask.
+    cv::Mat top_mask;
+    /// Image with bottom side mask.
+    cv::Mat bottom_mask;
+    /// Image with side mask.
+    cv::Mat side_mask;
+
     /// Flag indicating that the user pressed the generateModelButton
     bool generateModel_flag;
 
@@ -114,6 +121,9 @@ protected:
 
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb;
     pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift;
+
+    bool generate_top, generate_bottom, generate_side;
+    bool mask_top, mask_bottom, mask_side;
 
 };
 

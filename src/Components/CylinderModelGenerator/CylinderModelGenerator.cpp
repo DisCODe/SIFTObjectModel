@@ -57,6 +57,7 @@ void CylinderModelGenerator::prepareInterface() {
 
 bool CylinderModelGenerator::onInit() {
     CLOG(LTRACE) << "CylinderModelGenerator::onInit";
+    generate_top = generate_bottom = generate_side = mask_top = mask_bottom = mask_side = false;
     cloud_xyzrgb = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
     cloud_xyzsift = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
 	return true;
@@ -99,15 +100,21 @@ void CylinderModelGenerator::loadData(){
     std::string top_name;
     std::string bottom_name;
     std::string side_name;
+    std::string top_mask_name;
+    std::string bottom_mask_name;
+    std::string side_mask_name;
     try{
         cout<<dataJSONname<<endl;
         // Open JSON file and load it to ptree.
         read_json(dataJSONname, ptree_file);
         // Read JSON properties.
-        model_name = ptree_file.get<std::string>("name");
-        side_name = ptree_file.get<std::string>("side");
-        top_name = ptree_file.get<std::string>("top");
-        bottom_name = ptree_file.get<std::string>("bottom");
+        model_name = ptree_file.get("name","");
+        side_name = ptree_file.get("side","");
+        top_name = ptree_file.get("top","");
+        bottom_name = ptree_file.get("bottom","");
+        side_mask_name = ptree_file.get("side_mask","");
+        top_mask_name = ptree_file.get("top_mask","");
+        bottom_mask_name = ptree_file.get("bottom_mask","");
 
         h = ptree_file.get<int>("h");
         r = ptree_file.get<int>("r");
@@ -117,10 +124,30 @@ void CylinderModelGenerator::loadData(){
         LOG(LERROR) << "CylinderModelGenerator: file "<< dataJSONname <<" not found or invalid\n";
         return;
     }//: catch
-
-    top = cv::imread(top_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
-    bottom = cv::imread(bottom_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
-    side = cv::imread(side_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+    if(top_name!=""){
+        top = cv::imread(top_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+        generate_top = true;
+    }
+    if(bottom_name!=""){
+        bottom = cv::imread(bottom_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+        generate_bottom = true;
+    }
+    if(side_name!=""){
+        side = cv::imread(side_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+        generate_side = true;
+    }
+    if(top_mask_name!=""){
+        top_mask = cv::imread(top_mask_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+        mask_top = true;
+    }
+    if(bottom_mask_name!=""){
+        bottom_mask = cv::imread(bottom_mask_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+        mask_bottom = true;
+    }
+    if(side_mask_name!=""){
+        side_mask = cv::imread(side_mask_name, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+        mask_side = true;
+    }
 
 }
 
@@ -141,145 +168,172 @@ void CylinderModelGenerator::generateModel() {
 
 
     //side
-    for (float i=0; i<h; i+=step){
-        for(float j=0; j<w; j+=step){
-            // Get image coordinates.
-            pcl::PointXYZRGB point;
-            int v = 0 + (j-0)*(side.cols-1-0)/(w-1-0);
-            int u = 0 + (i-0)*(side.rows-1-0)/(h-1-0);
-            cv::Vec3b bgr = side.at<cv::Vec3b>(u, v);
-            // Set point colour.
-            point.r = bgr[2];
-            point.g = bgr[1];
-            point.b = bgr[0];
-            // Compute cylindric parameters.
-            float z = i;
-            float fi = -j*360/(w-1);
-            // Set cartesian coordinates of the cylinder side.
-            point.x = float(r) * cos(fi * M_PI /180.0) /1000;
-            point.y = float(r) * sin(fi * M_PI /180.0) /1000;
-            point.z = float(z)/1000;
-            // Add point to cloud.
-            cloud_xyzrgb->push_back(point);
+    if(generate_side){
+        for (float i=0; i<h; i+=step){
+            for(float j=0; j<w; j+=step){
+                // Get image coordinates.
+                pcl::PointXYZRGB point;
+                int v = 0 + (j-0)*(side.cols-1-0)/(w-1-0);
+                int u = 0 + (i-0)*(side.rows-1-0)/(h-1-0);
+                if (mask_side && side_mask.at<float>(v, u)==0) {
+                        continue;
+                }
+                cv::Vec3b bgr = side.at<cv::Vec3b>(u, v);
+                // Set point colour.
+                point.r = bgr[2];
+                point.g = bgr[1];
+                point.b = bgr[0];
+                // Compute cylindric parameters.
+                float z = i;
+                float fi = -j*360/(w-1);
+                // Set cartesian coordinates of the cylinder side.
+                point.x = float(r) * cos(fi * M_PI /180.0) /1000;
+                point.y = float(r) * sin(fi * M_PI /180.0) /1000;
+                point.z = float(z)/1000;
+                // Add point to cloud.
+                cloud_xyzrgb->push_back(point);
+            }
         }
     }
-
     //top
-    for (float i=0; i<2*r; i+=step){
-        for(float j=0; j<2*r; j+=step){
-            if(sqrt(abs(i-r)*abs(i-r)+abs(j-r)*abs(j-r)) > r)
-                continue;
-            // Get image coordinates.
-            pcl::PointXYZRGB point;
-            int v = 0 + (j-0)*(top.cols-1-0)/(2*r-1-0);
-            int u = 0 + (i-0)*(top.rows-1-0)/(2*r-1-0);
-            cv::Vec3b bgr = top.at<cv::Vec3b>(u, v);
-            // Set point colour.
-            point.r = bgr[2];
-            point.g = bgr[1];
-            point.b = bgr[0];
-            // Set cartesian coordinates of the cylinder top.
-            point.x = (i-float(r))/1000;
-            point.y = (j-float(r))/1000;
-            point.z = float(h)/1000;
-            // Add point to cloud.
-            cloud_xyzrgb->push_back(point);
+    if(generate_top){
+        for (float i=0; i<2*r; i+=step){
+            for(float j=0; j<2*r; j+=step){
+                if(sqrt(abs(i-r)*abs(i-r)+abs(j-r)*abs(j-r)) > r)
+                    continue;
+                // Get image coordinates.
+                pcl::PointXYZRGB point;
+                int v = 0 + (j-0)*(top.cols-1-0)/(2*r-1-0);
+                int u = 0 + (i-0)*(top.rows-1-0)/(2*r-1-0);
+                if (mask_top && top_mask.at<float>(v, u)==0) {
+                        continue;
+                }
+                cv::Vec3b bgr = top.at<cv::Vec3b>(u, v);
+                // Set point colour.
+                point.r = bgr[2];
+                point.g = bgr[1];
+                point.b = bgr[0];
+                // Set cartesian coordinates of the cylinder top.
+                point.x = (i-float(r))/1000;
+                point.y = (j-float(r))/1000;
+                point.z = float(h)/1000;
+                // Add point to cloud.
+                cloud_xyzrgb->push_back(point);
+            }
         }
     }
-
     //bottom
-    for (float i=0; i<2*r; i+=step){
-        for(float j=0; j<2*r; j+=step){
-            if(sqrt(abs(i-r)*abs(i-r)+abs(j-r)*abs(j-r)) > r)
-                continue;
-            // Get image coordinates.
-            pcl::PointXYZRGB point;
-            int v = 0 + (j-0)*(bottom.cols-1-0)/(2*r-1-0);
-            int u = 0 + (i-0)*(bottom.rows-1-0)/(2*r-1-0);
-            cv::Vec3b bgr = bottom.at<cv::Vec3b>(u, v);
-            // Set point colour.
-            point.r = bgr[2];
-            point.g = bgr[1];
-            point.b = bgr[0];
-            // Set cartesian coordinates of the cylinder top.
-            point.x = (float(r)-i)/1000;
-            point.y = (j-float(r))/1000;
-            point.z = 0/1000;
-            // Add point to cloud.
-            cloud_xyzrgb->push_back(point);
+    if(generate_bottom){
+        for (float i=0; i<2*r; i+=step){
+            for(float j=0; j<2*r; j+=step){
+                if(sqrt(abs(i-r)*abs(i-r)+abs(j-r)*abs(j-r)) > r)
+                    continue;
+                // Get image coordinates.
+                pcl::PointXYZRGB point;
+                int v = 0 + (j-0)*(bottom.cols-1-0)/(2*r-1-0);
+                int u = 0 + (i-0)*(bottom.rows-1-0)/(2*r-1-0);
+                if (mask_bottom && bottom_mask.at<float>(v, u)==0) {
+                        continue;
+                }
+                cv::Vec3b bgr = bottom.at<cv::Vec3b>(u, v);
+                // Set point colour.
+                point.r = bgr[2];
+                point.g = bgr[1];
+                point.b = bgr[0];
+                // Set cartesian coordinates of the cylinder top.
+                point.x = (float(r)-i)/1000;
+                point.y = (j-float(r))/1000;
+                point.z = 0/1000;
+                // Add point to cloud.
+                cloud_xyzrgb->push_back(point);
+            }
         }
     }
 
     //SIFT
-    int f = 0;
     cv::Mat descriptors;
     Types::Features features;
     //side
-    sift(side,descriptors,features);
-    CLOG(LTRACE)<<"SIFT side " << features.features.size() <<endl;
+    if(generate_side){
+        sift(side,descriptors,features);
+        CLOG(LTRACE)<<"SIFT side " << features.features.size() <<endl;
 
-    for(int i=0; i < features.features.size(); i++){
-        PointXYZSIFT point;
-        // Get image coordinates.
-        float u = features.features[i].pt.x;
-        float v = features.features[i].pt.y;
-        // Compute cylindric parameters.
-        float z = v*h/side.rows;
-        float fi = -(u*w/side.cols)*360/(w-1);
-        // Set cartesian coordinates of the cylinder side.
-        point.x = float(r) * cos(fi * M_PI /180.0) /1000;
-        point.y = float(r) * sin(fi * M_PI /180.0) /1000;
-        point.z = float(z)/1000;
-        //Set SIFT descriptor
-        for(int j=0; j<descriptors.cols;j++){
-            point.descriptor[j] = descriptors.row(i).at<float>(j);
+        for(int i=0; i < features.features.size(); i++){
+            PointXYZSIFT point;
+            // Get image coordinates.
+            float u = features.features[i].pt.x;
+            float v = features.features[i].pt.y;
+            if (mask_side && side_mask.at<float>(int(v), int(u))==0) {
+                    continue;
+            }
+            // Compute cylindric parameters.
+            float z = v*h/side.rows;
+            float fi = -(u*w/side.cols)*360/(w-1);
+            // Set cartesian coordinates of the cylinder side.
+            point.x = float(r) * cos(fi * M_PI /180.0) /1000;
+            point.y = float(r) * sin(fi * M_PI /180.0) /1000;
+            point.z = float(z)/1000;
+            //Set SIFT descriptor
+            for(int j=0; j<descriptors.cols;j++){
+                point.descriptor[j] = descriptors.row(i).at<float>(j);
+            }
+            point.multiplicity = 1;
+            cloud_xyzsift->push_back(point);
         }
-        point.multiplicity = 1;
-        cloud_xyzsift->push_back(point);
     }
 
     //top
-    sift(top,descriptors,features);
-    CLOG(LTRACE)<<"SIFT top " << features.features.size() <<endl;
-    for(int i=0; i < features.features.size(); i++){
-        PointXYZSIFT point;
-        // Get image coordinates.
-        float u = features.features[i].pt.x;
-        float v = features.features[i].pt.y;
-        if(sqrt(abs((u*2*r/top.cols)-r)*abs((u*2*r/top.cols)-r)+abs((v*2*r/top.rows)-r)*abs((v*2*r/top.rows)-r)) > r)
-            continue;
-        // Set cartesian coordinates of the cylinder side.
-        point.y = ((u*2*r/top.cols)-float(r)) /1000;
-        point.x = ((v*2*r/top.rows)-float(r)) /1000;
-        point.z = float(h)/1000;
-        //Set SIFT descriptor
-        for(int j=0; j<descriptors.cols;j++){
-            point.descriptor[j] = descriptors.row(i).at<float>(j);
+    if(generate_top){
+        sift(top,descriptors,features);
+        CLOG(LTRACE)<<"SIFT top " << features.features.size() <<endl;
+        for(int i=0; i < features.features.size(); i++){
+            PointXYZSIFT point;
+            // Get image coordinates.
+            float u = features.features[i].pt.x;
+            float v = features.features[i].pt.y;
+            if (mask_top && top_mask.at<float>(int(v), int(u))==0) {
+                    continue;
+            }
+            if(sqrt(abs((u*2*r/top.cols)-r)*abs((u*2*r/top.cols)-r)+abs((v*2*r/top.rows)-r)*abs((v*2*r/top.rows)-r)) > r)
+                continue;
+            // Set cartesian coordinates of the cylinder side.
+            point.y = ((u*2*r/top.cols)-float(r)) /1000;
+            point.x = ((v*2*r/top.rows)-float(r)) /1000;
+            point.z = float(h)/1000;
+            //Set SIFT descriptor
+            for(int j=0; j<descriptors.cols;j++){
+                point.descriptor[j] = descriptors.row(i).at<float>(j);
+            }
+            point.multiplicity = 1;
+            cloud_xyzsift->push_back(point);
         }
-        point.multiplicity = 1;
-        cloud_xyzsift->push_back(point);
     }
 
     //bottom
-    sift(bottom,descriptors,features);
-    CLOG(LTRACE)<<"SIFT bottom " << features.features.size() <<endl;
-    for(int i=0; i < features.features.size(); i++){
-        PointXYZSIFT point;
-        // Get image coordinates.
-        float u = features.features[i].pt.x;
-        float v = features.features[i].pt.y;
-        if(sqrt(abs((u*2*r/bottom.cols)-r)*abs((u*2*r/bottom.cols)-r)+abs((v*2*r/bottom.rows)-r)*abs((v*2*r/bottom.rows)-r)) > r)
-            continue;
-        // Set cartesian coordinates of the cylinder side.
-        point.y = ((u*2*r/bottom.cols)-float(r)) /1000;
-        point.x = (float(r)-(v*2*r/bottom.rows)) /1000;
-        point.z = 0/1000;
-        //Set SIFT descriptor
-        for(int j=0; j<descriptors.cols;j++){
-            point.descriptor[j] = descriptors.row(i).at<float>(j);
+    if(generate_bottom){
+        sift(bottom,descriptors,features);
+        CLOG(LTRACE)<<"SIFT bottom " << features.features.size() <<endl;
+        for(int i=0; i < features.features.size(); i++){
+            PointXYZSIFT point;
+            // Get image coordinates.
+            float u = features.features[i].pt.x;
+            float v = features.features[i].pt.y;
+            if (mask_bottom && bottom_mask.at<float>(int(v), int(u))==0) {
+                    continue;
+            }
+            if(sqrt(abs((u*2*r/bottom.cols)-r)*abs((u*2*r/bottom.cols)-r)+abs((v*2*r/bottom.rows)-r)*abs((v*2*r/bottom.rows)-r)) > r)
+                continue;
+            // Set cartesian coordinates of the cylinder side.
+            point.y = ((u*2*r/bottom.cols)-float(r)) /1000;
+            point.x = (float(r)-(v*2*r/bottom.rows)) /1000;
+            point.z = 0/1000;
+            //Set SIFT descriptor
+            for(int j=0; j<descriptors.cols;j++){
+                point.descriptor[j] = descriptors.row(i).at<float>(j);
+            }
+            point.multiplicity = 1;
+            cloud_xyzsift->push_back(point);
         }
-        point.multiplicity = 1;
-        cloud_xyzsift->push_back(point);
     }
 }
 
