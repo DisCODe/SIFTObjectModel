@@ -87,6 +87,8 @@ protected:
     Base::Property<std::string> dataJSONname;
 
     Base::Property<float> step;
+
+    Base::Property<bool> generate_on_init;
 	
 	// Handlers
     /// Function responsible for generation of SOM cuboid model.

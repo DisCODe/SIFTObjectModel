@@ -30,9 +30,11 @@ namespace CuboidModelGenerator {
 
 CuboidModelGenerator::CuboidModelGenerator(const std::string & name) :
 		Base::Component(name) , 
-        dataJSONname("dataJSONname", std::string("./")) {
+        dataJSONname("dataJSONname", std::string("./")),
+        generate_on_init("generate_on_init", true) {
     registerProperty(dataJSONname);
-    generateModel_flag = false;
+    registerProperty(generate_on_init);
+    generateModel_flag = generate_on_init;
 }
 
 CuboidModelGenerator::~CuboidModelGenerator() {
@@ -56,7 +58,6 @@ void CuboidModelGenerator::prepareInterface() {
 
 bool CuboidModelGenerator::onInit() {
     CLOG(LTRACE) << "CuboidModelGenerator::onInit";
-
     generate_top = generate_bottom = generate_left = generate_right = generate_front = generate_back =
         mask_top = mask_bottom = mask_left = mask_right = mask_front = mask_back = false;
     cloud_xyzrgb = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());

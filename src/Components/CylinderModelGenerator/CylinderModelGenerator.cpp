@@ -32,9 +32,12 @@ namespace CylinderModelGenerator {
 CylinderModelGenerator::CylinderModelGenerator(const std::string & name) :
 		Base::Component(name) , 
         dataJSONname("dataJSONname", std::string("./")),
-        step("step", 1.0){
+        step("step", 1.0),
+        generate_on_init("generate_on_init", true){
 	registerProperty(dataJSONname);
     registerProperty(step);
+    registerProperty(generate_on_init);
+    generateModel_flag = generate_on_init;
 
 }
 

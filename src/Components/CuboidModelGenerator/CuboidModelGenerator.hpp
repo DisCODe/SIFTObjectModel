@@ -106,6 +106,7 @@ protected:
     /// JSON file containing geometric properties of the cuboid and list of files with textures.
 	Base::Property<std::string> dataJSONname;
 
+    Base::Property<bool> generate_on_init;
 
     /// Function responsible for generation of SOM cuboid model.
     void generateModel();
