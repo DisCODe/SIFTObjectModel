@@ -16,16 +16,16 @@
 	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
-                                <Component name="Generator" type="SIFTObjectModel:CuboidModelGenerator" priority="1" bump="0">
-                                        <param name="dataJSONname">/home/discode/cuboids/dataset/loyd_kinect/loyd.json</param>
+                                <Component name="Generator" type="SIFTObjectModel:CylinderModelGenerator" priority="1" bump="10">
+                                        <param name="dataJSONname">/home/discode/cylinders/dataset/test/test.json</param>
 				</Component>
-                                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="2" bump="10">
-                                        <param name="SOM">loyd_kinect</param>
-                                        <param name="directory">/home/discode/cuboids/models/</param>
+                                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="2" bump="0">
+                                        <param name="SOM">test_cylinder</param>
+                                        <param name="directory">/home/discode/cylinders/models/</param>
                                 </Component>
 			</Executor>
 
-			<Executor name="Visualization" period="1">
+                        <Executor name="Visualization" period="1">d
                                 <Component name="WindowPCL" type="SIFTObjectModel:CloudViewer" priority="1" bump="0">
 <!--                                    <param name="coordinate_system">false</param>-->
 				</Component>
@@ -44,9 +44,10 @@
                         <sink>Writer.in_cloud_xyzsift</sink>
                         <sink>WindowPCL.in_cloud_xyzsift</sink>
                 </Source>
+                <!--
                 <Source name="Generator.out_mean_viewpoint_features_number">
                         <sink>Writer.in_mean_viewpoint_features_number</sink>
-                </Source>
+                </Source>-->
 	</DataStreams>
 </Task>
 

@@ -8,9 +8,9 @@ FILE(GLOB files *.cpp)
 
 
 # Create an executable file from sources:
-ADD_LIBRARY(SIFTClusterExtraction SHARED ${files})
+ADD_LIBRARY(CloudTransformer SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(SIFTClusterExtraction ${DisCODe_LIBRARIES} ${PCL_LIBRARIES} ${PCL_SEGMENTATION_LIBRARIES} ${PCL_REGISTRATION_LIBRARIES} ${PCL_RECOGNITION_LIBRARIES})
+TARGET_LINK_LIBRARIES(CloudTransformer ${DisCODe_LIBRARIES} )
 
-INSTALL_COMPONENT(SIFTClusterExtraction)
+INSTALL_COMPONENT(CloudTransformer)

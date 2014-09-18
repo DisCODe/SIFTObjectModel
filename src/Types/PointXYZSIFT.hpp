@@ -8,6 +8,13 @@
 
 #include <pcl/point_representation.h>
 
+#include <pcl/filters/passthrough.h>
+#include <pcl/filters/impl/passthrough.hpp>
+
+#include "pcl/impl/instantiate.hpp"
+
+#include <boost/preprocessor.hpp>
+
 //#include "pcl/filters/impl/extract_indices.hpp"
 //#include "pcl/filters/impl/voxel_grid.hpp"
 //#include "pcl/features/impl/normal_3d.hpp"
@@ -20,7 +27,6 @@
 
 //#include <pcl/search/impl/search.hpp>
 //namespace Types {
-
 
 struct PointXYZSIFT
 {
@@ -63,7 +69,6 @@ class DefaultPointRepresentation<PointXYZSIFT> : public PointRepresentation<Poin
       }
   };	
 }
-
 
 
 

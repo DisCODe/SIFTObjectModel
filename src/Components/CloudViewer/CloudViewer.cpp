@@ -20,7 +20,7 @@ namespace CloudViewer {
 CloudViewer::CloudViewer(const std::string & name) :
 		Base::Component(name),
     prop_window_name("window_name", std::string("3D PC Viewer")),
-    prop_coordinate_system("coordinate_system", true),
+    prop_coordinate_system("coordinate_system", boost::bind(&CloudViewer::onCSShowClick, this, _2), true),
     prop_two_viewports("two_viewports", false),
     prop_background_r("background_r", 0),
     prop_background_g("background_g", 0),
@@ -48,6 +48,26 @@ CloudViewer::CloudViewer(const std::string & name) :
   registerProperty(prop_point_b);
   registerProperty(prop_point_size);
   
+}
+
+void CloudViewer::onCSShowClick(const bool & new_show_cs_){
+    CLOG(LDEBUG) << "CloudViewer::onCSShowClick show="<<new_show_cs_;
+    if(new_show_cs_) {
+#if PCL_VERSION_COMPARE(>=,1,7,1)
+        viewer->addCoordinateSystem (1.0, "ClustersViewer", 0);
+#else
+        viewer->addCoordinateSystem (1.0);
+#endif
+    }
+    else {
+#if PCL_VERSION_COMPARE(>=,1,7,1)
+        viewer->removeCoordinateSystem ("ClustersViewer");
+#else
+        viewer->removeCoordinateSystem (1.0);
+#endif
+    }
+
+    prop_coordinate_system = new_show_cs_;
 }
 
 CloudViewer::~CloudViewer() {
@@ -102,7 +122,7 @@ void CloudViewer::prepareInterface() {
 bool CloudViewer::onInit() {
 
 	if(prop_two_viewports){
-        LOG(LTRACE) << "CloudViewer::onInit, prop_two_viewports==true\n";
+        CLOG(LTRACE) << "CloudViewer::onInit, prop_two_viewports==true";
 		viewer = new pcl::visualization::PCLVisualizer (prop_window_name);
 		v1 = 0;
 		v2 = 1;
@@ -113,7 +133,7 @@ bool CloudViewer::onInit() {
 		viewer->setBackgroundColor (0.3, 0.3, 0.3, v2);			
 	}
 	else{
-        LOG(LTRACE) << "CloudViewer::onInit, prop_two_viewports==false\n";
+        CLOG(LTRACE) << "CloudViewer::onInit, prop_two_viewports==false";
 		viewer = new pcl::visualization::PCLVisualizer (prop_window_name);
 		viewer->setBackgroundColor(prop_background_r,prop_background_g, prop_background_b);
 
@@ -123,7 +143,7 @@ bool CloudViewer::onInit() {
 	// Add coordinate system -- different function call depending on the PCL version(!)
 	if(prop_coordinate_system) {
 #if PCL_VERSION_COMPARE(>=,1,7,1)
-		viewer->addCoordinateSystem (1.0, "CloudViewer", 0);
+		viewer->addCoordinateSystem (1.0, "ClustersViewer", 0);
 #else
 		viewer->addCoordinateSystem (1.0);
 #endif
@@ -147,15 +167,15 @@ bool CloudViewer::onStart() {
 }
 
 void CloudViewer::on_cloud_xyz() {
-	LOG(LTRACE) << "CloudViewer::on_cloud_xyz\n";
+    CLOG(LTRACE) << "CloudViewer::on_cloud_xyz\n";
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = in_cloud_xyz.read();
 	viewer->updatePointCloud<pcl::PointXYZ> (cloud, "sample cloud");
 }
 
 void CloudViewer::on_clouds_xyz() {
 	if(!prop_two_viewports)
-		LOG(LDEBUG) << "Set property two_viewports = 1\n";
-	LOG(LTRACE) << "CloudViewer::on_clouds_xyz\n";
+        CLOG(LDEBUG) << "Set property two_viewports = 1\n";
+    CLOG(LTRACE) << "CloudViewer::on_clouds_xyz\n";
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = in_cloud_xyz.read();
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2 = in_cloud_xyz2.read();
 
@@ -167,7 +187,7 @@ void CloudViewer::on_clouds_xyz() {
 }
 
 void CloudViewer::on_cloud_xyzrgb() {
-	LOG(LTRACE) << "CloudViewer::on_cloud_xyzrgb\n";
+    CLOG(LTRACE) << "CloudViewer::on_cloud_xyzrgb\n";
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud = in_cloud_xyzrgb.read();
 	
 	// Filter the NaN points.
@@ -181,7 +201,7 @@ void CloudViewer::on_cloud_xyzrgb() {
 }
 
 void CloudViewer::on_cloud_xyzsift() {
-    LOG(LTRACE) << "CloudViewer::on_cloud_xyzsift\n";
+    CLOG(LTRACE) << "CloudViewer::on_cloud_xyzsift\n";
     pcl::PointCloud<PointXYZSIFT>::Ptr cloud = in_cloud_xyzsift.read();
 
     // Filter the NaN points.
@@ -214,6 +234,7 @@ void CloudViewer::on_clouds_xyzrgb() {
 	std::vector<int> indices2;
 	cloud2->is_dense = false; 
 	pcl::removeNaNFromPointCloud(*cloud2, *cloud2, indices2);
+	
 
 	viewer->removePointCloud("viewcloud",v1) ;
 	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb (cloud);

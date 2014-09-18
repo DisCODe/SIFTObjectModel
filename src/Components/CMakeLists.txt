@@ -36,6 +36,7 @@ ADD_COMPONENT(SIFTNOMWriter)
 
 ADD_COMPONENT(SIFTNOMReader)
 
+ADD_COMPONENT(DrawCSystem)
 
 ADD_COMPONENT(PCDWriter)
 
@@ -45,3 +46,8 @@ ADD_COMPONENT(CloudViewer)
 
 ADD_COMPONENT(CorrespondenceMatcher)
 
+ADD_COMPONENT(CloudTransformer)
+
+ADD_COMPONENT(PassThrough)
+
+ADD_COMPONENT(CylinderModelGenerator)

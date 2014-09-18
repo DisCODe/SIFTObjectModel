@@ -17,18 +17,18 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
-					<param name="filenames">/home/tkornuta/Objects/LUMfood_box_8R.json</param>
+					<param name="filenames">/home/mlaszkow/jsonmodels/CB1.json</param>
 				</Component>
 				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3</param>
+					<param name="sequence.directory">/home/tkornuta/Objects/cereal_box_1_co5</param>
 					<param name="sequence.pattern">.*\_color.png</param>				
 				</Component>
 				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="3" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3</param>
+					<param name="sequence.directory">/home/tkornuta/Objects/cereal_box_1_co5</param>
 					<param name="sequence.pattern">.*\_depth.png</param>	
 				</Component>
 				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
-					<param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/food_box_3</param>
+					<param name="sequence.directory">/home/tkornuta/Objects/cereal_box_1_co5</param>
 					<param name="sequence.pattern">.*\_mask.png</param>
 				</Component>
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="5" bump="0">
@@ -38,15 +38,29 @@
 				</Component>
 				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
 				</Component>
-				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
+
+				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="8" bump="0">
+					<param name="LeafSize.x">0.005</param>
+					<param name="LeafSize.y">0.005</param>
+					<param name="LeafSize.z">0.005</param>
+				</Component>
+
+
+				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="9" bump="0">
 				</Component>
 				
-				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
+				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="10" bump="0">
 				</Component>
             </Executor>
 
 			<Executor name="Visualization" period="1">
-
+<!--
+				<Component name="WindowPCL" type="PCL:XYZCloudViewer" priority="1" bump="0">
+					<param name="title">RGB(white), SIFT(red)</param>
+					<param name="count">2</param>
+					<param name="clouds_colours"> 255 255 255;255 0 0</param>
+				</Component>
+-->
 				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
 				</Component>
             </Executor>
@@ -64,12 +78,10 @@
 			<sink>Converter.in_depth</sink>	
 			<sink>FeatureCloudConverter.in_depth</sink>	
 		</Source>
-<!--
 		<Source name="SequenceMask.out_img">
-			<sink>Converter.in_mask</sink>	
-			<sink>FeatureCloudConverter.in_mask</sink>		
+<!--			<sink>Converter.in_mask</sink>	
+			<sink>FeatureCloudConverter.in_mask</sink>		-->
 		</Source>
--->
 		<Source name="CameraInfo.out_camera_info">
 			<sink>Converter.in_camera_info</sink>	
 			<sink>FeatureCloudConverter.in_camera_info</sink>
@@ -81,11 +93,23 @@
 			<sink>FeatureCloudConverter.in_features</sink>	
 		</Source>		
 		<Source name="Converter.out_cloud_xyzrgb">
-			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
-
+			<sink>VoxelGrid.in_cloud_xyzrgb</sink>
+<!--
+			<sink>WindowPCL.in_cloud_xyz0</sink>			
+-->
 		</Source>
+
+		<Source name="VoxelGrid.out_cloud_xyzrgb">
+			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
+		</Source>	
+
+
+
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
 			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>	
+<!--
+			<sink>WindowPCL.in_cloud_xyz1</sink>
+-->
 		</Source>
 
 		<Source name="SOMJSONReader.out_models">
