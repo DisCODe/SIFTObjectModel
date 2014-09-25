@@ -1,0 +1,99 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Michał Laszkowski</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+                        <brief>Generates Cuboid Model, transform and cut it</brief>
+                        <full></full>
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+			<Executor name="Processing"  period="1">
+                                <Component name="Generator" type="SIFTObjectModel:CuboidModelGenerator" priority="1" bump="0">
+                                        <param name="dataJSONname">/home/discode/cuboids/dataset/loyd_kinect/loyd.json</param>
+				</Component>
+                                <Component name="HMP1" type="CvCoreTypes:HomogenousMatrixProvider" priority="2" bump="0">
+                                    <param name="offset.x">0</param>
+                                    <param name="offset.y">0</param>
+                                    <param name="offset.z">0</param>
+                                    <param name="offset.roll">0</param>
+                                    <param name="offset.pitch">0</param>
+                                    <param name="offset.yaw">0</param>
+                                </Component>
+                                <Component name="CloudTransformer1" type="SIFTObjectModel:CloudTransformer" priority="3" bump="0">
+                                </Component>
+                                <Component name="PassThrough" type="SIFTObjectModel:PassThrough" priority="4" bump="0">
+                                    <param name="x.a">0</param>
+                                    <param name="x.b">0</param>
+                                    <param name="y.a">0</param>
+                                    <param name="y.b">0</param>
+                                    <param name="z.a">0</param>
+                                    <param name="z.b">0</param>
+                                    <param name="negative_x">0</param>
+                                    <param name="negative_y">0</param>
+                                    <param name="negative_z">0</param>
+                                </Component>
+                                <Component name="HMP2" type="CvCoreTypes:HomogenousMatrixProvider" priority="5" bump="0">
+                                    <param name="offset.x">0</param>
+                                    <param name="offset.y">0</param>
+                                    <param name="offset.z">0</param>
+                                    <param name="offset.roll">0</param>
+                                    <param name="offset.pitch">0</param>
+                                    <param name="offset.yaw">0</param>
+                                </Component>
+                                <Component name="CloudTransformer2" type="SIFTObjectModel:CloudTransformer" priority="6" bump="0">
+                                </Component>
+			</Executor>
+
+                        <Executor name="Visualization" period="0.5">
+                                <Component name="WindowPCL" type="SIFTObjectModel:CloudViewer" priority="1" bump="0">
+                                    <param name="coordinate_system">1</param>
+				</Component>
+			</Executor>
+		</Subtask>	
+	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+                <Source name="Generator.out_cloud_xyzrgb">
+                    <sink>CloudTransformer1.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="Generator.out_cloud_xyzsift">
+                        <sink>CloudTransformer1.in_cloud_xyzsift</sink>
+                </Source>
+                <Source name="HMP1.out_homogMatrix">
+                        <sink>CloudTransformer1.in_hm</sink>
+                </Source>
+                <Source name="CloudTransformer1.out_cloud_xyzrgb">
+                        <sink>PassThrough.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="CloudTransformer1.out_cloud_xyzsift">
+                        <sink>PassThrough.in_cloud_xyzsift</sink>
+                </Source>
+                <Source name="PassThrough.out_cloud_xyzrgb">
+                        <sink>CloudTransformer2.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="PassThrough.out_cloud_xyzsift">
+                        <sink>CloudTransformer2.in_cloud_xyzsift</sink>
+                </Source>
+                <Source name="HMP2.out_homogMatrix">
+                        <sink>CloudTransformer2.in_hm</sink>
+                </Source>
+                <Source name="CloudTransformer2.out_cloud_xyzrgb">
+                        <sink>WindowPCL.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="CloudTransformer2.out_cloud_xyzsift">
+                        <sink>WindowPCL.in_cloud_xyzsift</sink>
+                </Source>
+	</DataStreams>
+</Task>
+
+

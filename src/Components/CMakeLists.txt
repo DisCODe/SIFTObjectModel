@@ -6,8 +6,6 @@ ADD_COMPONENT(SOMJSONWriter)
 
 ADD_COMPONENT(SIFTObjectMatcher)
 
-ADD_COMPONENT(SOMGenerator)
-
 ADD_COMPONENT(SIFTAdder)
 
 ADD_COMPONENT(FeatureCloudConverter)
@@ -18,7 +16,7 @@ ADD_COMPONENT(Downsampling)
 
 ADD_COMPONENT(PC2Octree)
 
-ADD_COMPONENT(LUMGenerator)
+ADD_COMPONENT(ELECHGenerator)
 
 ADD_COMPONENT(Visualization)
 
@@ -31,3 +29,23 @@ ADD_COMPONENT(SIFTClusterExtraction)
 ADD_COMPONENT(PCDReader)
 
 ADD_COMPONENT(ClosedCloudMerge)
+
+ADD_COMPONENT(OpenCloudMerge)
+
+ADD_COMPONENT(SIFTNOMWriter)
+
+ADD_COMPONENT(SIFTNOMReader)
+
+ADD_COMPONENT(PCDWriter)
+
+ADD_COMPONENT(CuboidModelGenerator)
+
+ADD_COMPONENT(CloudViewer)
+
+ADD_COMPONENT(CorrespondenceMatcher)
+
+ADD_COMPONENT(CloudTransformer)
+
+ADD_COMPONENT(PassThrough)
+
+ADD_COMPONENT(CylinderModelGenerator)

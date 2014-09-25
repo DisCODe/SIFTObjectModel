@@ -1,0 +1,153 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Michał Laszkowski</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>Generates SOM and stores it in PCD file</brief>
+			<full>Loads a sequence of object views and joins them into SIFT object model (SOM)</full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+			<Executor name="Processing"  period="1">
+				<Component name="Trigger" type="CvBasic:Trigger" priority="1" bump="0">
+					<param name="">1</param>
+				</Component>
+				<Component name="SequenceRGB" type="CvBasic:Sequence" priority="2" bump="0">
+					<param name="sequence.directory">/home/mlepicka/Objects/food_box_8/rgbd-dataset/food_box/food_box_8/</param>
+					<param name="sequence.pattern">.*\_color.png</param>
+					<param name="mode.loop">0</param>
+					<param name="mode.triggered">1</param>				
+				</Component>
+				<Component name="SequenceDepth" type="CvBasic:Sequence" priority="3" bump="0">
+					<param name="sequence.directory">/home/mlepicka/Objects/food_box_8/rgbd-dataset/food_box/food_box_8/</param>
+					<param name="sequence.pattern">.*\_depth.png</param>	
+					<param name="mode.loop">0</param>
+					<param name="mode.triggered">1</param>		
+				</Component>
+				<Component name="SequenceMask" type="CvBasic:Sequence" priority="4" bump="0">
+					<param name="sequence.directory">/home/mlepicka/Objects/food_box_8/rgbd-dataset/food_box/food_box_8/</param>
+					<param name="sequence.pattern">.*\_mask.png</param>
+					<param name="mode.loop">0</param>
+					<param name="mode.triggered">1</param>		
+				</Component>
+				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="5" bump="0">
+					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
+				</Component>
+				<Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
+				</Component>
+				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
+				</Component>
+				<Component name="StatisticalOutlierRemoval" type="PCL:StatisticalOutlierRemoval" priority="8" bump="0">
+					<param name="MeanK">15</param>
+					<param name="StddevMulThresh">0.10</param>
+				</Component>
+				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="9" bump="0">
+				</Component>
+				<!--<Component name="Normals" type="SIFTObjectModel:NormalEstimation" priority="10">
+					<param name="radius">0.02</param>
+					
+				</Component>-->
+                                <Component name="Generator" type="SIFTObjectModel:OpenCloudMerge" priority="11" bump="1">
+					<param name="ICP.Correspondence_distance">0.1</param>
+					<param name="ICP.Iterations">5000</param>
+					<param name="ICP.Points">0</param>
+					<param name="ICP.Normals">0</param>
+				</Component>
+				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="12" bump="0">
+					<param name="LeafSize.x">0.005</param>
+					<param name="LeafSize.y">0.005</param>
+					<param name="LeafSize.z">0.005</param>
+				</Component>
+		                <Component name="WriterRGB" type="SIFTObjectModel:SOMJSONWriter" priority="13" bump="2">
+					<param name="SOM">kakao_test</param>
+					<param name="directory">/home/discode/14.06.13objects/kakao_model_bez_ICP</param>
+			        </Component>
+
+			</Executor>
+
+			<Executor name="Visualization" period="0.1">
+				<Component name="Visualizer" type="SIFTObjectModel:Visualization" priority="1" bump="0">
+					<param name="filenames">/home/mlepicka/modele/savanah_v2_cala_chmura_xyzrgb.pcd</param>
+				</Component>
+			</Executor>
+		</Subtask>	
+	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+		<Source name="Trigger.out_trigger">
+			<sink>SequenceRGB.in_trigger</sink>
+			<sink>SequenceDepth.in_trigger</sink>
+			<sink>SequenceMask.in_trigger</sink>
+		</Source>
+		<Source name="SequenceRGB.out_img">
+			<sink>SIFT.in_img</sink>
+			<sink>Converter.in_color</sink>
+		</Source>
+		<Source name="SequenceDepth.out_img">	
+			<sink>Converter.in_depth</sink>	
+			<sink>FeatureCloudConverter.in_depth</sink>	
+		</Source>
+		<Source name="SequenceMask.out_img">
+			<sink>Converter.in_mask</sink>	
+			<sink>FeatureCloudConverter.in_mask</sink>		
+		</Source>
+		<Source name="CameraInfo.out_camera_info">
+			<sink>Converter.in_camera_info</sink>	
+			<sink>FeatureCloudConverter.in_camera_info</sink>
+		</Source>
+		<Source name="SIFT.out_descriptors">
+			<sink>FeatureCloudConverter.in_descriptors</sink>	
+		</Source>
+		<Source name="SIFT.out_features">
+			<sink>FeatureCloudConverter.in_features</sink>	
+		</Source>	
+		<Source name="Converter.out_cloud_xyzrgb">
+			<sink>StatisticalOutlierRemoval.in_cloud_xyzrgb</sink>
+		</Source>
+
+		<Source name="StatisticalOutlierRemoval.out_cloud_xyzrgb">
+			<!--<sink>Normals.in_cloud_xyzrgb</sink>-->
+			<sink>Generator.in_cloud_xyzrgb</sink>
+		</Source>
+
+		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
+			<sink>Generator.in_cloud_xyzsift</sink>		
+		</Source>
+
+		<!---<Source name="Normals.out_cloud_xyzrgb_normals">
+			<sink>Generator.in_cloud_xyzrgb_normals</sink>
+		</Source>-->
+		<Source name="Generator.out_cloud_xyzrgb">
+			<sink>VoxelGrid.in_cloud_xyzrgb</sink>
+			<!---<sink>Writer.in_cloud_xyzrgb</sink>-->
+		</Source>
+		<Source name="VoxelGrid.out_cloud_xyzrgb">
+			<sink>Visualizer.in_cloud_xyzrgb</sink>
+		</Source>	
+
+<!---
+		<Source name="Generator.out_cloud_xyzsift">
+			<sink>Writer.in_cloud_xyzsift</sink>
+			<sink>WriterRGB.in_cloud_xyzsift</sink>	
+		</Source>
+
+		<Source name="Generator.out_mean_viewpoint_features_number">
+			<sink>Writer.in_mean_viewpoint_features_number</sink>
+			<sink>Writer.in_mean_viewpoint_features_number</sink>
+		</Source>
+			-->	
+	</DataStreams>
+</Task>
+
+
+
+

@@ -76,6 +76,7 @@ protected:
 	bool onStop();
 
 	pcl::visualization::PCLVisualizer * viewer;
+	//pcl::PointCloud<PointXYZSIFT>::Ptr cloud_view_xyzsift;
 
 // Input data streams
 
@@ -84,15 +85,16 @@ protected:
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb1;
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb2;
 	Base::DataStreamIn<pcl::CorrespondencesPtr> in_correspondences;
-
+	Base::DataStreamIn<pcl::CorrespondencesPtr> in_good_correspondences;
+    Base::DataStreamIn<std::vector<pcl::Correspondences> > in_clustered_correspondences;
 // Output data streams
 
 	// Handlers
-	Base::EventHandler2 h_on_clouds;
+    Base::EventHandler2 h_on_clouds;
 	Base::EventHandler2 h_on_spin;
 	
 	// Handlers
-	void on_clouds();
+    void on_clouds();
 	void on_spin();
 	
 	
@@ -109,6 +111,15 @@ protected:
 	Base::Property<bool> display_cloud_xyzsift1;
 	Base::Property<bool> display_cloud_xyzsift2;
 	Base::Property<bool> display_correspondences;
+	Base::Property<bool> display_good_correspondences;
+	
+	Base::Property<bool> prop_coordinate_system;
+	
+	Base::Property<float> tx;
+	Base::Property<float> ty;
+	Base::Property<float> tz;
+
+    int clusters;
 	
 };
 

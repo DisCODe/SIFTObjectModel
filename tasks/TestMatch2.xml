@@ -1,0 +1,118 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Michal Laszkowski</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>PCL:TestMatch</brief>
+			<full></full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+			<Executor name="Processing"  period="1">
+				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
+                                        <param name="filenames">/home/discode/cuboids/models/loyd_kinect.json</param>
+				</Component>
+                                <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="2" bump="0">
+                                </Component>
+                                <Component name="SequenceRGB" type="CvBasic:Sequence" priority="3" bump="0">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
+                                    <param name="sequence.pattern">.*\_rgb\.png</param>
+                                    <param name="mode.loop">1</param>
+                                    <param name="mode.sort">1</param>
+                                    <param name="mode.auto_trigger">0</param>
+                                </Component>
+                                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="4" bump="0">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
+                                    <param name="sequence.pattern">.*\_xyz\.yml</param>
+                                    <param name="mode.loop">1</param>
+                                    <param name="mode.sort">1</param>
+                                    <param name="mode.auto_trigger">0</param>
+                                </Component>
+				<Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
+				</Component>
+				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
+				</Component>
+				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
+				</Component>
+				
+				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
+                                    <param name="cg_size">0.01f</param>
+                                    <param name="cg_thresh">9.0f</param>
+				</Component>
+            </Executor>
+
+			<Executor name="Visualization" period="1">
+				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
+
+				</Component>
+            </Executor>
+		</Subtask>	
+	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+                <Source name="NextImageTrigger.out_trigger">
+                        <sink>SequenceRGB.in_trigger</sink>
+                        <sink>SequenceXYZ.in_trigger</sink>
+                </Source>
+		<Source name="SequenceRGB.out_img">
+			<sink>SIFT.in_img</sink>
+                        <sink>Converter.in_rgb_stereo</sink>
+		</Source>
+                <Source name="SequenceXYZ.out_img">
+                        <sink>Converter.in_depth_xyz</sink>
+                        <sink>FeatureCloudConverter.in_depth_xyz</sink>
+		</Source>
+		<Source name="SIFT.out_descriptors">
+			<sink>FeatureCloudConverter.in_descriptors</sink>	
+		</Source>
+		<Source name="SIFT.out_features">
+			<sink>FeatureCloudConverter.in_features</sink>	
+		</Source>		
+		<Source name="Converter.out_cloud_xyzrgb">
+			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>		
+		</Source>
+		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
+			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>	
+		</Source>
+
+		<Source name="SOMJSONReader.out_models">
+			<sink>SIFTObjectMatcher.in_models</sink>
+		</Source>
+
+		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
+			<sink>Window.in_cloud_xyzrgb1</sink>
+		</Source>
+		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
+			<sink>Window.in_cloud_xyzrgb2</sink>
+		</Source>
+		<Source name="SIFTObjectMatcher.out_cloud_xyzsift">
+			<sink>Window.in_cloud_xyzsift1</sink>
+		</Source>
+		<Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
+			<sink>Window.in_cloud_xyzsift2</sink>
+		</Source>
+<!--                <Source name="SIFTObjectMatcher.out_correspondences">
+			<sink>Window.in_correspondences</sink>
+                </Source>-->
+<!--		<Source name="SIFTObjectMatcher.out_good_correspondences">
+			<sink>Window.in_good_correspondences</sink>
+                </Source>-->
+                <Source name="SIFTObjectMatcher.out_clustered_correspondences">
+                        <sink>Window.in_clustered_correspondences</sink>
+                </Source>
+			
+	</DataStreams>
+</Task>
+
+
+
+

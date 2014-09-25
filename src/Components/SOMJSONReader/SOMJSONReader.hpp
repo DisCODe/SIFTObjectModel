@@ -70,7 +70,7 @@ protected:
 	Base::DataStreamOut<std::vector<AbstractObject*> > out_models;
 
 
-	// Handlers
+	// Handlerswas
 	Base::EventHandler2 h_loadModels;
 
 	/// List of the files containing models to be read.

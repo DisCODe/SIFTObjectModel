@@ -38,10 +38,18 @@
 				</Component>
 				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
 				</Component>
-				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
+
+				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="8" bump="0">
+					<param name="LeafSize.x">0.005</param>
+					<param name="LeafSize.y">0.005</param>
+					<param name="LeafSize.z">0.005</param>
+				</Component>
+
+
+				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="9" bump="0">
 				</Component>
 				
-				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
+				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="10" bump="0">
 				</Component>
             </Executor>
 
@@ -71,8 +79,8 @@
 			<sink>FeatureCloudConverter.in_depth</sink>	
 		</Source>
 		<Source name="SequenceMask.out_img">
-			<sink>Converter.in_mask</sink>	
-			<sink>FeatureCloudConverter.in_mask</sink>		
+<!--			<sink>Converter.in_mask</sink>	
+			<sink>FeatureCloudConverter.in_mask</sink>		-->
 		</Source>
 		<Source name="CameraInfo.out_camera_info">
 			<sink>Converter.in_camera_info</sink>	
@@ -85,11 +93,18 @@
 			<sink>FeatureCloudConverter.in_features</sink>	
 		</Source>		
 		<Source name="Converter.out_cloud_xyzrgb">
-			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
+			<sink>VoxelGrid.in_cloud_xyzrgb</sink>
 <!--
 			<sink>WindowPCL.in_cloud_xyz0</sink>			
 -->
 		</Source>
+
+		<Source name="VoxelGrid.out_cloud_xyzrgb">
+			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
+		</Source>	
+
+
+
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
 			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>	
 <!--

@@ -78,28 +78,24 @@ protected:
 
 
 	/// Input data stream containing SIFT Object Model
-	Base::DataStreamIn<SIFTObjectModel*> in_som;
+	Base::DataStreamIn<SIFTObjectModel*, Base::DataStreamBuffer::Newest> in_som;
 
 	/// Input data stream containing object model point cloud.
-	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
-
-	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> in_cloud_xyzrgb_normals;
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr, Base::DataStreamBuffer::Newest> in_cloud_xyzrgb;
 
 
 	/// Input data stream containing object model feature cloud (SIFTs).
-	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
+	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr, Base::DataStreamBuffer::Newest> in_cloud_xyzsift;
 
 	// Input stream containing mean number of features per view. 
-	Base::DataStreamIn<int> in_mean_viewpoint_features_number;
+	Base::DataStreamIn<int, Base::DataStreamBuffer::Newest> in_mean_viewpoint_features_number;
 
 
 	// Handlers
 	Base::EventHandler2 h_Write;
-	Base::EventHandler2 h_Write_normals;
 	
 	// Handlers
 	void Write();
-	void Write_normals();
 
 	/// Name of the model - used for generation of names of JSON ("major" file) and PCDs ("minor" files containing clouds).
 	Base::Property<std::string> SOMname;

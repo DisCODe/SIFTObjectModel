@@ -84,7 +84,8 @@ protected:
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift_model;
 	Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;
-
+    Base::DataStreamOut<pcl::CorrespondencesPtr> out_good_correspondences;
+    Base::DataStreamOut<std::vector<pcl::Correspondences> > out_clustered_correspondences;
 	// Handlers
 	Base::EventHandler2 h_readModels;
 	Base::EventHandler2 h_match;
@@ -98,6 +99,10 @@ protected:
 	
 	Base::Property<float> threshold;
 	Base::Property<float> inlier_threshold;
+    //Base::Property<float> max_distance;
+    Base::Property<float> cg_size;
+    Base::Property<float> cg_thresh;
+    Base::Property<bool> use_hough3d;
 
 };
 

@@ -16,8 +16,6 @@
 #include <Types/SIFTObjectModel.hpp>
 #include <Types/SIFTObjectModelFactory.hpp>
 
-#include <Types/MergeUtils.hpp>
-
 #include <pcl/registration/correspondence_estimation.h>
 #include "pcl/registration/correspondence_rejection_sample_consensus.h"
 
@@ -113,8 +111,8 @@ protected:
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
 
-//	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> rgb_views;
-	std::vector<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> rgb_views;
+	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> rgb_views;
+	std::vector<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> rgbn_views;
     pcl::registration::LUM<PointXYZSIFT> lum_sift;
 
 
@@ -130,7 +128,7 @@ public:
     Base::Property<float> RanSAC_inliers_threshold;
     Base::Property<float> RanSAC_max_iterations;
 
-    Base::Property<int> threshold, maxIterations;
+    Base::Property<int> viewNumber, maxIterations, corrTreshold;
 };
 
 REGISTER_COMPONENT("ClosedCloudMerge", Processors::ClosedCloudMerge::ClosedCloudMerge)
