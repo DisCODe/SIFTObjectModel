@@ -49,3 +49,5 @@ ADD_COMPONENT(CloudTransformer)
 ADD_COMPONENT(PassThrough)
 
 ADD_COMPONENT(CylinderModelGenerator)
+
+ADD_COMPONENT(SingleSOMJsonReader)
