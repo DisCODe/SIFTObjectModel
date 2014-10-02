@@ -4,8 +4,8 @@
  * \author Michal Laszkowski
  */
 
-#ifndef CUBOIDMODELGENERATOR_HPP_
-#define CUBOIDMODELGENERATOR_HPP_
+#ifndef CYLINDERMODELGENERATOR_HPP_
+#define CYLINDERMODELGENERATOR_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -13,47 +13,32 @@
 #include "Property.hpp"
 #include "EventHandler2.hpp"
 
-#include "Types/Features.hpp"
-
 #include <opencv2/opencv.hpp>
-
-#if CV_MAJOR_VERSION == 2
-#if CV_MINOR_VERSION > 3
-#include <opencv2/nonfree/features2d.hpp>
-#endif
-#elif CV_MAJOR_VERSION == 3
-#include <opencv2/nonfree/features2d.hpp>
-#endif
-
-
+#include "Types/Features.hpp"
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <Types/PointXYZSIFT.hpp>
-#include <Types/SIFTObjectModel.hpp>
-#include <Types/SIFTObjectModelFactory.hpp>
 
 namespace Processors {
-namespace CuboidModelGenerator {
-
-using namespace cv;
+namespace CylinderModelGenerator {
 
 /*!
- * \class CuboidModelGenerator
- * \brief CuboidModelGenerator processor class.
+ * \class CylinderModelGenerator
+ * \brief CylinderModelGenerator processor class.
  *
  * 
  */
-class CuboidModelGenerator: public Base::Component, SIFTObjectModelFactory {
+class CylinderModelGenerator: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	CuboidModelGenerator(const std::string & name = "CuboidModelGenerator");
+	CylinderModelGenerator(const std::string & name = "CylinderModelGenerator");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~CuboidModelGenerator();
+	virtual ~CylinderModelGenerator();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -87,26 +72,22 @@ protected:
     void loadData();
     void sift(cv::Mat input, cv::Mat &descriptors, Types::Features &features);
 
-
 	// Input data streams
 
 	// Output data streams
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
-	Base::DataStreamOut<AbstractObject*> out_model;
-    Base::DataStreamOut<int> out_mean_viewpoint_features_number;
 
-    // Handlers
-    /// Generates model on the basis of cuboid model and textures loaded from files.
-    Base::EventHandler2 h_generateModel;
+	// Handlers
+	Base::EventHandler2 h_generateModel;
+	Base::EventHandler2 h_returnModel;
 
-    /// Handler returning model.
-    Base::EventHandler2 h_returnModel;
-
+	// Properties
     /// JSON file containing geometric properties of the cuboid and list of files with textures.
-	Base::Property<std::string> dataJSONname;
+    Base::Property<std::string> dataJSONname;
 
-
+	
+	// Handlers
     /// Function responsible for generation of SOM cuboid model.
     void generateModel();
 
@@ -116,33 +97,31 @@ protected:
     /// Function responsible for cyclic return of SOM cuboid model.
     void returnModel();
 
-    /// Image with left side texture.
-    cv::Mat left;
-    /// Image with right side texture.
-    cv::Mat right;
+
     /// Image with top side texture.
     cv::Mat top;
     /// Image with bottom side texture.
     cv::Mat bottom;
-    /// Image with front side texture.
-    cv::Mat front;
-    /// Image with back side texture.
-    cv::Mat back;
-
-    /// Sizes of the cuboid.
-    int a,b,c;
+    /// Image with side texture.
+    cv::Mat side;
 
     /// Flag indicating that the user pressed the generateModelButton
     bool generateModel_flag;
 
+    /// Sizes of the cuboid.
+    int h,r;
+
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb;
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift;
+
 };
 
-} //: namespace CuboidModelGenerator
+} //: namespace CylinderModelGenerator
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CuboidModelGenerator", Processors::CuboidModelGenerator::CuboidModelGenerator)
+REGISTER_COMPONENT("CylinderModelGenerator", Processors::CylinderModelGenerator::CylinderModelGenerator)
 
-#endif /* CUBOIDMODELGENERATOR_HPP_ */
+#endif /* CYLINDERMODELGENERATOR_HPP_ */

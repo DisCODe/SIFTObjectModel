@@ -1,0 +1,63 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Michał Laszkowski</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+                        <brief>Generates Cuboid Model, transform and cut it</brief>
+                        <full></full>
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+			<Executor name="Processing"  period="1">
+                                <Component name="Generator" type="SIFTObjectModel:CuboidModelGenerator" priority="1" bump="0">
+                                        <param name="dataJSONname">/home/discode/cuboids/dataset/loyd_kinect/loyd.json</param>
+				</Component>
+                                <Component name="PassThrough" type="SIFTObjectModel:PassThrough" priority="2" bump="0">
+                                    <param name="x.a">0</param>
+                                    <param name="x.b">0</param>
+                                    <param name="y.a">0</param>
+                                    <param name="y.b">0</param>
+                                    <param name="z.a">0</param>
+                                    <param name="z.b">0</param>
+                                    <param name="negative_x">0</param>
+                                    <param name="negative_y">0</param>
+                                    <param name="negative_z">0</param>
+                                </Component>
+			</Executor>
+
+			<Executor name="Visualization" period="1">
+                                <Component name="WindowPCL" type="SIFTObjectModel:CloudViewer" priority="1" bump="10">
+<!--                                    <param name="coordinate_system">false</param>-->
+				</Component>
+			</Executor>
+		</Subtask>	
+	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+                <Source name="Generator.out_cloud_xyzrgb">
+                        <sink>PassThrough.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="Generator.out_cloud_xyzsift">
+                        <sink>PassThrough.in_cloud_xyzsift</sink>
+                </Source>
+                <Source name="PassThrough.out_cloud_xyzrgb">
+                        <sink>WindowPCL.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="PassThrough.out_cloud_xyzsift">
+                        <sink>WindowPCL.in_cloud_xyzsift</sink>
+                </Source>
+	</DataStreams>
+</Task>
+
+
+
+

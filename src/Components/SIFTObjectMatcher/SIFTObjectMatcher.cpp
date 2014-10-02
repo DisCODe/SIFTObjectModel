@@ -68,12 +68,16 @@ SIFTObjectMatcher::SIFTObjectMatcher(const std::string & name) :
 		Base::Component(name),
 		threshold("threshold", 0.75f),
         inlier_threshold("inlier_threshold", 0.001f),
-        max_distance("max_distance", 150),
-        cg_thresh("cg_thresh", 5.0f){
+        //max_distance("max_distance", 150),
+        cg_size("cg_size", 0.01f),
+        cg_thresh("cg_thresh", 5.0f),
+        use_hough3d("use_hough3d", false){
 			registerProperty(threshold);
 			registerProperty(inlier_threshold);
-            registerProperty(max_distance);
+            //registerProperty(max_distance);
+            registerProperty(cg_size);
             registerProperty(cg_thresh);
+            registerProperty(use_hough3d);
 }
 
 SIFTObjectMatcher::~SIFTObjectMatcher() {
@@ -141,10 +145,9 @@ void SIFTObjectMatcher::readModels() {
 void SIFTObjectMatcher::match() {
 	CLOG(LTRACE) << "SIFTObjectMatcher::match()"<<endl;
 	if(models.empty()){
-		cout<<"No models available" <<endl;
+        CLOG(LWARNING)<<"No models available" <<endl;
 		return;
 	}
-			
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift = in_cloud_xyzsift.read();
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb = in_cloud_xyzrgb.read();	
 	
@@ -156,14 +159,11 @@ void SIFTObjectMatcher::match() {
 		CLOG(LTRACE) << "liczba cech instancji : " <<
 			cloud_xyzsift->size()<<endl; 
 
-
         pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
-        pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst ;
+        //pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst ;
 
-        //SIFTFeatureRepresentation point_representation ;
-        //correst.setPointRepresentation (point_representation.makeShared()); //NEVER do like this, makeShared will return DefaultFeatureRepresentation<PointDefault>!
         SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation()) ;
-        correst.setPointRepresentation(point_representation) ;
+        //correst.setPointRepresentation(point_representation) ;
         for (int i = 0 ; i<models.size(); i++){
 
             pcl::KdTreeFLANN<PointXYZSIFT> match_search;
@@ -180,14 +180,15 @@ void SIFTObjectMatcher::match() {
                 continue;
               }
               int found_neighs = match_search.nearestKSearch (cloud_xyzsift->at (j), 1, neigh_indices, neigh_sqr_dists);
-              if(found_neighs == 1 && neigh_sqr_dists[0] < max_distance) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
+              if(found_neighs == 1)// && neigh_sqr_dists[0] < max_distance) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
               {
                 pcl::Correspondence corr (neigh_indices[0], static_cast<int> (j), neigh_sqr_dists[0]);
 //                pcl::Correspondence corr2 (static_cast<int> (j), neigh_indices[0], neigh_sqr_dists[0]);
                 correspondences->push_back (corr);
               }
             }
-            std::cout << "Correspondences found: " << correspondences->size () << std::endl;
+
+            CLOG(LINFO) << "Correspondences found: " << correspondences->size () << std::endl;
 //            correst.setInputSource(cloud_xyzsift) ;
 //            correst.setInputTarget(models[i]->cloud_xyzsift) ;
 //            correst.determineReciprocalCorrespondences(*correspondences, max_distance) ;
@@ -225,22 +226,16 @@ void SIFTObjectMatcher::match() {
 
         //Algorithm params
         float rf_rad_ (0.015f);
-        float cg_size_ (inlier_threshold);//(0.01f);
-        float cg_thresh_ (cg_thresh);
+
         std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations;
         std::vector<pcl::Correspondences> clustered_corrs;
-//        clustered_corrs.resize(10000);
-//        rototranslations.resize(10000);
 
-        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz_model (new pcl::PointCloud<pcl::PointXYZ>);
-        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz_instance (new pcl::PointCloud<pcl::PointXYZ>);
-        pcl::copyPointCloud(*(models[i]->cloud_xyzsift),*cloud_xyz_model);
-        pcl::copyPointCloud(*cloud_xyzsift,*cloud_xyz_instance);
         //  Clustering
-        if(false){
+        if(use_hough3d){//nie działa :(
+            CLOG(LTRACE) << "Using Hough3DGrouping";
             pcl::Hough3DGrouping<PointXYZSIFT, PointXYZSIFT, pcl::ReferenceFrame, pcl::ReferenceFrame> clusterer;
-            clusterer.setHoughBinSize (cg_size_);
-            clusterer.setHoughThreshold (cg_thresh_);
+            clusterer.setHoughBinSize (cg_size);
+            clusterer.setHoughThreshold (cg_thresh);
             clusterer.setUseInterpolation (true);
             clusterer.setUseDistanceWeight (false);
 
@@ -251,61 +246,57 @@ void SIFTObjectMatcher::match() {
             //clusterer.setSceneRf (scene_rf);
             clusterer.setModelSceneCorrespondences (correspondences);
 
-            clusterer.cluster (clustered_corrs);//tu sie wywala
-    //      clusterer.recognize (rototranslations, clustered_corrs);//tu sie wywala
+    //        clusterer.cluster (clustered_corrs);//tu sie wywala
+            clusterer.recognize (rototranslations, clustered_corrs);//tu sie wywala
 
-            std::cout << "Model instances found: " << rototranslations.size () << std::endl;
-            for (size_t i = 0; i < rototranslations.size (); ++i)
+            CLOG(LINFO) << "Model instances found: " << rototranslations.size ();
+            for (size_t j = 0; j < rototranslations.size (); ++j)
             {
-                Eigen::Matrix3f rotation = rototranslations[i].block<3,3>(0, 0);
-                Eigen::Vector3f translation = rototranslations[i].block<3,1>(0, 3);
+                Eigen::Matrix3f rotation = rototranslations[j].block<3,3>(0, 0);
+                Eigen::Vector3f translation = rototranslations[j].block<3,1>(0, 3);
                 if(rotation != Eigen::Matrix3f::Identity()){
-                    std::cout << "\n    Instance " << i + 1 << ":" << std::endl;
-                    std::cout << "        Correspondences belonging to this instance: " << clustered_corrs[i].size () << std::endl;
-
-                  // Print the rotation matrix and translation vector
-                    printf ("\n");
-                    printf ("            | %6.3f %6.3f %6.3f | \n", rotation (0,0), rotation (0,1), rotation (0,2));
-                    printf ("        R = | %6.3f %6.3f %6.3f | \n", rotation (1,0), rotation (1,1), rotation (1,2));
-                    printf ("            | %6.3f %6.3f %6.3f | \n", rotation (2,0), rotation (2,1), rotation (2,2));
-                    printf ("\n");
-                    printf ("        t = < %0.3f, %0.3f, %0.3f >\n", translation (0), translation (1), translation (2));
+                    CLOG(LINFO) << "\n    Instance " << j + 1 << ":";
+                    CLOG(LINFO) << "        Correspondences belonging to this instance: " << clustered_corrs[j].size () ;
+                    // Print the rotation matrix and translation vector
+                    CLOG(LINFO) << "            | "<< rotation (0,0)<<" "<< rotation (0,1)<< " "<<rotation (0,2)<<" | ";
+                    CLOG(LINFO) << "        R = | "<< rotation (1,0)<<" "<< rotation (1,1)<< " "<<rotation (1,2)<<" | ";
+                    CLOG(LINFO) << "            | "<< rotation (2,0)<<" "<< rotation (2,1)<< " "<<rotation (2,2)<<" | ";
+                    CLOG(LINFO) << "        t = < "<< translation (0)<<" "<< translation (1)<< " "<< translation (2)<<" > ";
                 }
             }
         }
-///////////////////////////
         else{
-        // Using GeometricConsistency0
+            CLOG(LTRACE) << "Using GeometricConsistencyGrouping";
+        // Using GeometricConsistency
             pcl::GeometricConsistencyGrouping<PointXYZSIFT, PointXYZSIFT> gc_clusterer;
-            gc_clusterer.setGCSize (cg_size_);
-            gc_clusterer.setGCThreshold (cg_thresh_);
-            cout<< "model " << cloud_xyz_model->size() <<" scena "<<cloud_xyz_instance->size()<<" corrs "<<correspondences->size()<<endl;
-            gc_clusterer.setInputCloud (models[i]->cloud_xyzsift);//cloud_xyz_model);
-            gc_clusterer.setSceneCloud (cloud_xyzsift);//cloud_xyz_instance);
+            gc_clusterer.setGCSize (cg_size);
+            gc_clusterer.setGCThreshold (cg_thresh);
+//            cout<< "model " << cloud_xyz_model->size() <<" scena "<<cloud_xyz_instance->size()<<" corrs "<<correspondences->size()<<endl;
+            gc_clusterer.setInputCloud (models[i]->cloud_xyzsift);
+            gc_clusterer.setSceneCloud (cloud_xyzsift);
             gc_clusterer.setModelSceneCorrespondences (correspondences);
 
             //gc_clusterer.cluster (clustered_corrs);
             gc_clusterer.recognize (rototranslations, clustered_corrs);
-            cout<<"clustered_corrs "<< clustered_corrs.size()<<endl;
-            for(int j=0; j<clustered_corrs.size(); j++){
-                for(int k =0; k<clustered_corrs[j].size();k++){
-                    cout<<clustered_corrs[j][k].index_query<<"-"<<clustered_corrs[j][k].index_match<<", ";
-                }
-                cout<<endl<<"-----------"<<endl;
-            }
+            CLOG(LINFO) << "Model instances found: " << rototranslations.size () << std::endl;
+//            cout<<"clustered_corrs "<< clustered_corrs.size()<<endl;
+//            for(int j=0; j<clustered_corrs.size(); j++){
+//                for(int k =0; k<clustered_corrs[j].size();k++){
+//                    cout<<clustered_corrs[j][k].index_query<<"-"<<clustered_corrs[j][k].index_match<<", ";
+//                }
+//                cout<<endl<<"-----------"<<endl;
+//            }
                 for (size_t k = 0; k < rototranslations.size (); ++k){
                       Eigen::Matrix3f rotation = rototranslations[k].block<3,3>(0, 0);
                       Eigen::Vector3f translation = rototranslations[k].block<3,1>(0, 3);
                       if(rotation != Eigen::Matrix3f::Identity()){
-                          std::cout << "\n    Instance " << k + 1 << ":" << std::endl;
-                          std::cout << "        Correspondences belonging to this instance: " << clustered_corrs[k].size () << std::endl;
+                          CLOG(LINFO) << "\n    Instance " << k + 1 << ":";
+                          CLOG(LINFO) << "        Correspondences belonging to this instance: " << clustered_corrs[k].size () ;
                           //Print the rotation matrix and translation vector
-                          printf ("\n");
-                          printf ("            | %6.3f %6.3f %6.3f | \n", rotation (0,0), rotation (0,1), rotation (0,2));
-                          printf ("        R = | %6.3f %6.3f %6.3f | \n", rotation (1,0), rotation (1,1), rotation (1,2));
-                          printf ("            | %6.3f %6.3f %6.3f | \n", rotation (2,0), rotation (2,1), rotation (2,2));
-                          printf ("\n");
-                          printf ("        t = < %0.3f, %0.3f, %0.3f >\n", translation (0), translation (1), translation (2));
+                          CLOG(LINFO) << "            | "<< rotation (0,0)<<" "<< rotation (0,1)<< " "<<rotation (0,2)<<" | ";
+                          CLOG(LINFO) << "        R = | "<< rotation (1,0)<<" "<< rotation (1,1)<< " "<<rotation (1,2)<<" | ";
+                          CLOG(LINFO) << "            | "<< rotation (2,0)<<" "<< rotation (2,1)<< " "<<rotation (2,2)<<" | ";
+                          CLOG(LINFO) << "        t = < "<< translation (0)<<" "<< translation (1)<< " "<< translation (2)<<" > ";
                       }
                 }
             }

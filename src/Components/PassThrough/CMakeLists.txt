@@ -5,14 +5,12 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 FILE(GLOB files *.cpp)
 
 # Find required packages
-FIND_PACKAGE( OpenCV REQUIRED )
+FIND_PACKAGE( PCL 1.7.0 REQUIRED )
 
 # Create an executable file from sources:
-ADD_LIBRARY(DrawCSystem SHARED ${files})
+ADD_LIBRARY(PassThrough SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(DrawCSystem ${DisCODe_LIBRARIES} 
-	${OpenCV_LIBS}
-	)
+TARGET_LINK_LIBRARIES(PassThrough ${DisCODe_LIBRARIES} ${PCL_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} ${PCL_FILTERS_LIBRARIES})
 
-INSTALL_COMPONENT(DrawCSystem)
+INSTALL_COMPONENT(PassThrough)

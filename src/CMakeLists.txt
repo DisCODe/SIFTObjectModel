@@ -7,12 +7,12 @@ include_directories(.)
 # ##############################################################################
 
 # Find Boost, at least ver. 1.41
-FIND_PACKAGE(Boost 1.41.0 REQUIRED)
+FIND_PACKAGE(Boost 1.41.0 REQUIRED COMPONENTS system thread filesystem date_time)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 # Find another necessary libraries
 
-FIND_PACKAGE(PCL 1.3 REQUIRED COMPONENTS io visualization)
+FIND_PACKAGE(PCL 1.7.1 REQUIRED COMPONENTS io visualization)
 include_directories(${PCL_INCLUDE_DIRS})
 MESSAGE("PCL include: ${PCL_INCLUDE_DIRS}")
 link_directories(${PCL_LIBRARY_DIRS})
@@ -21,9 +21,15 @@ add_definitions(${PCL_DEFINITIONS})
 # Find another DCLs our one depends on
 # Use macro: DISCODE_FIND_DCL(<DCL_NAME>)
 
+DISCODE_FIND_DCL(PCLCoreTypes)
 DISCODE_FIND_DCL(CvCoreTypes)
+
 DISCODE_FIND_DCL(CvBasic)
-DISCODE_FIND_DCL(PCL)
+#DISCODE_FIND_DCL(PCL)
+
+
+SET(DisCODe_LIBRARIES ${DisCODe_LIBRARIES} ${Boost_LIBRARIES})
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,defs") 
 
 # ##############################################################################
 # Add source directories
