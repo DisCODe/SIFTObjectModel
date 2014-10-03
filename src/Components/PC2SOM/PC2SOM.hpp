@@ -4,8 +4,8 @@
  * \author Michal Laszkowski
  */
 
-#ifndef PCDWRITER_HPP_
-#define PCDWRITER_HPP_
+#ifndef PC2SOM_HPP_
+#define PC2SOM_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -13,31 +13,29 @@
 #include "Property.hpp"
 #include "EventHandler2.hpp"
 
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#include <pcl/io/pcd_io.h>
-#include <Types/PointXYZSIFT.hpp>
+#include <Types/SIFTObjectModelFactory.hpp>
+
 
 namespace Processors {
-namespace PCDWriter {
+namespace PC2SOM {
 
 /*!
- * \class PCDWriter
- * \brief PCDWriter processor class.
+ * \class PC2SOM
+ * \brief PC2SOM processor class.
  *
  * 
  */
-class PCDWriter: public Base::Component {
+class PC2SOM: public Base::Component, SIFTObjectModelFactory {
 public:
 	/*!
 	 * Constructor.
 	 */
-	PCDWriter(const std::string & name = "PCDWriter");
+	PC2SOM(const std::string & name = "PC2SOM");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~PCDWriter();
+	virtual ~PC2SOM();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -70,28 +68,30 @@ protected:
 
 
 	// Input data streams
-	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
+    Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr, Base::DataStreamBuffer::Newest> in_cloud_xyzrgb;
+    Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr, Base::DataStreamBuffer::Newest> in_cloud_xyzsift;
+    Base::DataStreamIn<int, Base::DataStreamBuffer::Newest> in_mean_viewpoint_features_number;
 
 	// Output data streams
+	Base::DataStreamOut<AbstractObject*> out_model;
 
 	// Handlers
-	Base::EventHandler2 h_Write;
+	Base::EventHandler2 h_createSOM;
 
 	// Properties
-	Base::Property<std::string> filename;
-
+    Base::Property<std::string> SOMname;
 	
 	// Handlers
-	void Write();
+	void createSOM();
 
 };
 
-} //: namespace PCDWriter
+} //: namespace PC2SOM
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("PCDWriter", Processors::PCDWriter::PCDWriter)
+REGISTER_COMPONENT("PC2SOM", Processors::PC2SOM::PC2SOM)
 
-#endif /* PCDWRITER_HPP_ */
+#endif /* PC2SOM_HPP_ */

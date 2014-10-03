@@ -26,8 +26,6 @@ ADD_COMPONENT(CorrespondencesViewer)
 
 ADD_COMPONENT(SIFTClusterExtraction)
 
-ADD_COMPONENT(PCDReader)
-
 ADD_COMPONENT(ClosedCloudMerge)
 
 ADD_COMPONENT(OpenCloudMerge)
@@ -36,16 +34,8 @@ ADD_COMPONENT(SIFTNOMWriter)
 
 ADD_COMPONENT(SIFTNOMReader)
 
-ADD_COMPONENT(PCDWriter)
-
-ADD_COMPONENT(CuboidModelGenerator)
-
 ADD_COMPONENT(CloudViewer)
 
 ADD_COMPONENT(CorrespondenceMatcher)
 
-ADD_COMPONENT(CloudTransformer)
-
-ADD_COMPONENT(PassThrough)
-
-ADD_COMPONENT(CylinderModelGenerator)
+ADD_COMPONENT(PC2SOM)
