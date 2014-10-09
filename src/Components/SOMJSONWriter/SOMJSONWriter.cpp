@@ -163,6 +163,9 @@ void SOMJSONWriter::Write() {
         int mean_viewpoint_features_number = in_mean_viewpoint_features_number.read();
         ptree_file.put("mean_viewpoint_features_number", mean_viewpoint_features_number);
     }
+    else{
+        ptree_file.put("mean_viewpoint_features_number", -1);
+    }
 
 /*
 if(in_cloud_xyzrgb.empty()&&in_cloud_xyzsift.empty()&&in_mean_viewpoint_features_number.empty()){
