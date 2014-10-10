@@ -49,8 +49,8 @@
 				</Component>
                 <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="10" bump="1">
 					<param name="View.Number">9</param>
-					<param name="Interations.Max">20</param>
-					<param name="Correspondenc.Treshold">10</param>
+					<param name="Interations.Max">100</param>
+					<param name="Correspondenc.Treshold">7</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
 					<param name="LeafSize.x">0.005</param>
