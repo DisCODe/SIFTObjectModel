@@ -95,6 +95,8 @@ void SIFTObjectMatcher::prepareInterface() {
     registerStream("out_correspondences", &out_correspondences);
     registerStream("out_good_correspondences", &out_good_correspondences);
     registerStream("out_clustered_correspondences", &out_clustered_correspondences);
+    registerStream("out_rototranslations", &out_rototranslations);
+
 
 	// Register handlers
 	h_readModels.setup(boost::bind(&SIFTObjectMatcher::readModels, this));
@@ -271,7 +273,6 @@ void SIFTObjectMatcher::match() {
             pcl::GeometricConsistencyGrouping<PointXYZSIFT, PointXYZSIFT> gc_clusterer;
             gc_clusterer.setGCSize (cg_size);
             gc_clusterer.setGCThreshold (cg_thresh);
-//            cout<< "model " << cloud_xyz_model->size() <<" scena "<<cloud_xyz_instance->size()<<" corrs "<<correspondences->size()<<endl;
             gc_clusterer.setInputCloud (models[i]->cloud_xyzsift);
             gc_clusterer.setSceneCloud (cloud_xyzsift);
             gc_clusterer.setModelSceneCorrespondences (correspondences);
@@ -302,6 +303,7 @@ void SIFTObjectMatcher::match() {
             }
 
             out_clustered_correspondences.write(clustered_corrs);
+            out_rototranslations.write(rototranslations);
         }
 }
 
