@@ -33,7 +33,9 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 		prop_coordinate_system("coordinate_system", false),
 		tx("tx", 0.3f),
 		ty("ty", 0.0f),
-		tz("tz", 0.0f){
+        tz("tz", 0.0f),
+        display_one_cluster("display_one_cluster", false),
+        display_cluster("display_cluster", 0){
 			registerProperty(prop_window_name);
 			registerProperty(cloud_xyzsift1_point_size);
 			registerProperty(cloud_xyzsift2_point_size);
@@ -49,6 +51,8 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 			registerProperty(tx);
 			registerProperty(ty);
 			registerProperty(tz);
+            registerProperty(display_one_cluster);
+            registerProperty(display_cluster);
 			
 			  // Set red as default.
 			((cv::Mat)clouds_colours).at<uchar>(0,0) = 255;
@@ -217,59 +221,71 @@ void CorrespondencesViewer::on_clouds() {
     if(display_correspondences && !in_clustered_correspondences.empty()){
         std::vector<pcl::Correspondences> clustered_corrs = in_clustered_correspondences.read();
         clusters = clustered_corrs.size();
-        for(int i = 0; i< clustered_corrs.size(); i++){
-            int r,g,b;
-            r = g = b = 0;
-            int ii = 60 + i*(255-60)/clustered_corrs.size();
-            int lb = ii & 0xff;
-            if (ii > 50)
-                switch (ii>>6) {
-                case 0:
-                    b = 255;
-                    g = 255-lb;
-                    r = 255-lb;
-                    break;
-                case 1:
-                    b = 255;
-                    g = lb;
-                    r = 0;
-                    break;
-                case 2:
-                    b = 255-lb;
-                    g = 255;
-                    r = 0;
-                    break;
-                case 3:
-                    b = 0;
-                    g = 255;
-                    r = lb;
-                    break;
-                case 4:
-                    b = 0;
-                    g = 255-lb;
-                    r = 255;
-                    break;
-                case 5:
-                    b = 0;
-                    g = 0;
-                    r = 255-lb;
-                    break;
-                default:
-                    r = g = b = 0;
-                    break;
-                }
-
-            ostringstream ss;
-            ss << i;
-            string str = ss.str();
-            viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift2trans, cloud_xyzsift1, clustered_corrs[i], "correspondences"+str) ;
-            viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR,
-                r,
-                g,
-                b,
-                "correspondences"+str) ;
+        if(display_one_cluster){
+            int display_cluster_ = display_cluster;
+            if(display_cluster >= clusters)
+                display_cluster_ = 0;
+                viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift2trans, cloud_xyzsift1, clustered_corrs[display_cluster_], "correspondences0") ;
+                viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR,
+                    ((cv::Mat)correspondences_colours).at<uchar>(0, 0),
+                    ((cv::Mat)correspondences_colours).at<uchar>(0, 1),
+                    ((cv::Mat)correspondences_colours).at<uchar>(0, 2),
+                    "correspondences0") ;
         }
+        else{
+            for(int i = 0; i< clustered_corrs.size(); i++){
+                int r,g,b;
+                r = g = b = 0;
+                int ii = 60 + i*(255-60)/clustered_corrs.size();
+                int lb = ii & 0xff;
+                if (ii > 50)
+                    switch (ii>>6) {
+                    case 0:
+                        b = 255;
+                        g = 255-lb;
+                        r = 255-lb;
+                        break;
+                    case 1:
+                        b = 255;
+                        g = lb;
+                        r = 0;
+                        break;
+                    case 2:
+                        b = 255-lb;
+                        g = 255;
+                        r = 0;
+                        break;
+                    case 3:
+                        b = 0;
+                        g = 255;
+                        r = lb;
+                        break;
+                    case 4:
+                        b = 0;
+                        g = 255-lb;
+                        r = 255;
+                        break;
+                    case 5:
+                        b = 0;
+                        g = 0;
+                        r = 255-lb;
+                        break;
+                    default:
+                        r = g = b = 0;
+                        break;
+                    }
 
+                ostringstream ss;
+                ss << i;
+                string str = ss.str();
+                viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift2trans, cloud_xyzsift1, clustered_corrs[i], "correspondences"+str) ;
+                viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR,
+                    r,
+                    g,
+                    b,
+                    "correspondences"+str) ;
+            }
+        }
     }
 }
 

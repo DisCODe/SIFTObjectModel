@@ -105,6 +105,8 @@ protected:
     Base::Property<float> cg_thresh;
     Base::Property<bool> use_hough3d;
 
+    Base::Property<int> model_out;
+
 };
 
 } //: namespace SIFTObjectMatcher
