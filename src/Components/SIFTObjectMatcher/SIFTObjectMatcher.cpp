@@ -71,13 +71,15 @@ SIFTObjectMatcher::SIFTObjectMatcher(const std::string & name) :
         //max_distance("max_distance", 150),
         cg_size("cg_size", 0.01f),
         cg_thresh("cg_thresh", 5.0f),
-        use_hough3d("use_hough3d", false){
+        use_hough3d("use_hough3d", false),
+        model_out("model_out", 0){
 			registerProperty(threshold);
 			registerProperty(inlier_threshold);
             //registerProperty(max_distance);
             registerProperty(cg_size);
             registerProperty(cg_thresh);
             registerProperty(use_hough3d);
+            registerProperty(model_out);
 }
 
 SIFTObjectMatcher::~SIFTObjectMatcher() {
@@ -95,6 +97,8 @@ void SIFTObjectMatcher::prepareInterface() {
     registerStream("out_correspondences", &out_correspondences);
     registerStream("out_good_correspondences", &out_good_correspondences);
     registerStream("out_clustered_correspondences", &out_clustered_correspondences);
+    registerStream("out_rototranslations", &out_rototranslations);
+
 
 	// Register handlers
 	h_readModels.setup(boost::bind(&SIFTObjectMatcher::readModels, this));
@@ -139,7 +143,7 @@ void SIFTObjectMatcher::readModels() {
 		else
             CLOG(LTRACE) << "niepoprawny model" << endl;
 	}
-    CLOG(LTRACE) << models.size() << " modeli" << endl;
+    CLOG(LTRACE) << models.size() << " models" << endl;
 }
 
 void SIFTObjectMatcher::match() {
@@ -159,12 +163,18 @@ void SIFTObjectMatcher::match() {
 		CLOG(LTRACE) << "liczba cech instancji : " <<
 			cloud_xyzsift->size()<<endl; 
 
-        pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
+        int model_out_ = model_out;
+        if(model_out >= models.size())
+            model_out_ = 0;
+
+
         //pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst ;
 
         SIFTFeatureRepresentation::Ptr point_representation(new SIFTFeatureRepresentation()) ;
         //correst.setPointRepresentation(point_representation) ;
         for (int i = 0 ; i<models.size(); i++){
+
+            pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
 
             pcl::KdTreeFLANN<PointXYZSIFT> match_search;
             match_search.setPointRepresentation(point_representation);
@@ -216,12 +226,14 @@ void SIFTObjectMatcher::match() {
 //                    std::cout <<"Rozpoznano model "<< models[i]->name<<endl;
 //            }
 //        /////////////////////////////
-        out_cloud_xyzrgb.write(cloud_xyzrgb);
-        out_cloud_xyzrgb_model.write(models[i]->cloud_xyzrgb);
-        out_cloud_xyzsift.write(cloud_xyzsift);
-        out_cloud_xyzsift_model.write(models[i]->cloud_xyzsift);
-        out_correspondences.write(correspondences);//wszystkie dopasowania
+            if(i==model_out_){
+                out_cloud_xyzrgb.write(cloud_xyzrgb);
+                out_cloud_xyzrgb_model.write(models[i]->cloud_xyzrgb);
+                out_cloud_xyzsift.write(cloud_xyzsift);
+                out_cloud_xyzsift_model.write(models[i]->cloud_xyzsift);
+                out_correspondences.write(correspondences);//wszystkie dopasowania
 //        out_good_correspondences.write(inliers);
+            }
 
 
         //Algorithm params
@@ -271,7 +283,6 @@ void SIFTObjectMatcher::match() {
             pcl::GeometricConsistencyGrouping<PointXYZSIFT, PointXYZSIFT> gc_clusterer;
             gc_clusterer.setGCSize (cg_size);
             gc_clusterer.setGCThreshold (cg_thresh);
-//            cout<< "model " << cloud_xyz_model->size() <<" scena "<<cloud_xyz_instance->size()<<" corrs "<<correspondences->size()<<endl;
             gc_clusterer.setInputCloud (models[i]->cloud_xyzsift);
             gc_clusterer.setSceneCloud (cloud_xyzsift);
             gc_clusterer.setModelSceneCorrespondences (correspondences);
@@ -300,8 +311,10 @@ void SIFTObjectMatcher::match() {
                       }
                 }
             }
-
-            out_clustered_correspondences.write(clustered_corrs);
+            if(i==model_out_){
+                out_clustered_correspondences.write(clustered_corrs);
+                out_rototranslations.write(rototranslations);
+            }
         }
 }
 

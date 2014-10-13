@@ -34,14 +34,8 @@ ADD_COMPONENT(SIFTNOMWriter)
 
 ADD_COMPONENT(SIFTNOMReader)
 
-ADD_COMPONENT(CuboidModelGenerator)
-
 ADD_COMPONENT(CloudViewer)
 
 ADD_COMPONENT(CorrespondenceMatcher)
 
-ADD_COMPONENT(CloudTransformer)
-
-ADD_COMPONENT(PassThrough)
-
-ADD_COMPONENT(CylinderModelGenerator)
+ADD_COMPONENT(PC2SOM)

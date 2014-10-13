@@ -119,6 +119,9 @@ protected:
 	Base::Property<float> ty;
 	Base::Property<float> tz;
 
+    Base::Property<bool> display_one_cluster;
+    Base::Property<int> display_cluster;
+
     int clusters;
 	
 };

@@ -86,6 +86,7 @@ protected:
 	Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;
     Base::DataStreamOut<pcl::CorrespondencesPtr> out_good_correspondences;
     Base::DataStreamOut<std::vector<pcl::Correspondences> > out_clustered_correspondences;
+    Base::DataStreamOut<std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > > out_rototranslations;
 	// Handlers
 	Base::EventHandler2 h_readModels;
 	Base::EventHandler2 h_match;
@@ -103,6 +104,8 @@ protected:
     Base::Property<float> cg_size;
     Base::Property<float> cg_thresh;
     Base::Property<bool> use_hough3d;
+
+    Base::Property<int> model_out;
 
 };
 
