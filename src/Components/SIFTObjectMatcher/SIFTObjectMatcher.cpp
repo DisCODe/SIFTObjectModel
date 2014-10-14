@@ -164,8 +164,10 @@ void SIFTObjectMatcher::match() {
 			cloud_xyzsift->size()<<endl; 
 
         int model_out_ = model_out;
-        if(model_out >= models.size())
+        if(model_out >= models.size()){
+            CLOG(LTRACE) << "Less than "<< model_out+1 << " models! Model 0 will be written";
             model_out_ = 0;
+        }
 
 
         //pcl::registration::CorrespondenceEstimation<PointXYZSIFT, PointXYZSIFT> correst ;
@@ -226,14 +228,14 @@ void SIFTObjectMatcher::match() {
 //                    std::cout <<"Rozpoznano model "<< models[i]->name<<endl;
 //            }
 //        /////////////////////////////
-            if(i==model_out_){
-                out_cloud_xyzrgb.write(cloud_xyzrgb);
-                out_cloud_xyzrgb_model.write(models[i]->cloud_xyzrgb);
-                out_cloud_xyzsift.write(cloud_xyzsift);
-                out_cloud_xyzsift_model.write(models[i]->cloud_xyzsift);
-                out_correspondences.write(correspondences);//wszystkie dopasowania
-//        out_good_correspondences.write(inliers);
-            }
+//            if(i==model_out_){
+//                out_cloud_xyzrgb.write(cloud_xyzrgb);
+//                out_cloud_xyzrgb_model.write(models[i]->cloud_xyzrgb);
+//                out_cloud_xyzsift.write(cloud_xyzsift);
+//                out_cloud_xyzsift_model.write(models[i]->cloud_xyzsift);
+//                out_correspondences.write(correspondences);//wszystkie dopasowania
+// //        out_good_correspondences.write(inliers);
+//            }
 
 
         //Algorithm params
@@ -311,7 +313,14 @@ void SIFTObjectMatcher::match() {
                       }
                 }
             }
+            //Write only choosen model
             if(i==model_out_){
+                out_cloud_xyzrgb.write(cloud_xyzrgb);
+                out_cloud_xyzrgb_model.write(models[i]->cloud_xyzrgb);
+                out_cloud_xyzsift.write(cloud_xyzsift);
+                out_cloud_xyzsift_model.write(models[i]->cloud_xyzsift);
+                out_correspondences.write(correspondences);//wszystkie dopasowania
+                //        out_good_correspondences.write(inliers);
                 out_clustered_correspondences.write(clustered_corrs);
                 out_rototranslations.write(rototranslations);
             }
