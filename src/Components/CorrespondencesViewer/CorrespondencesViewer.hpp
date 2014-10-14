@@ -117,6 +117,7 @@ protected:
 	Base::Property<bool> display_cloud_xyzsift2;
 	Base::Property<bool> display_correspondences;
 	Base::Property<bool> display_good_correspondences;
+    Base::Property<bool> display_bounding_box;
 	
 	Base::Property<bool> prop_coordinate_system;
 	

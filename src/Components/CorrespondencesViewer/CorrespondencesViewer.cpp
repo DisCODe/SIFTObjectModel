@@ -14,6 +14,8 @@
 //#include <pcl/visualization/point_cloud_color_handlers.h>
 #include <pcl/registration/correspondence_estimation.h>
 #include <pcl/filters/filter.h>
+#include <pcl/common/common.h>
+
 namespace Processors {
 namespace CorrespondencesViewer {
 
@@ -31,6 +33,7 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
         display_correspondences("display_correspondences", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), true),
 		display_good_correspondences("display_good_correspondences", true),
         prop_coordinate_system("coordinate_system", boost::bind(&CorrespondencesViewer::onCSShowClick, this, _2), true),
+        display_bounding_box("display_bounding_box", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), false),
 		tx("tx", 0.3f),
 		ty("ty", 0.0f),
         tz("tz", 0.0f),
@@ -47,6 +50,7 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 			registerProperty(display_cloud_xyzsift2);
 			registerProperty(display_correspondences);
 			registerProperty(display_good_correspondences);
+            registerProperty(display_bounding_box);
 			registerProperty(prop_coordinate_system);
 			registerProperty(tx);
 			registerProperty(ty);
@@ -101,6 +105,7 @@ void CorrespondencesViewer::displayCorrespondences(){
         viewer->removeCorrespondences(std::string("correspondences")+str) ;
     }
     clusters = clustered_corrs.size();
+    viewer->removeAllShapes();
 
     //If no clustered corrs display corrs from in_correspondences and in_good_correspondences
     if(clusters == 0){
@@ -129,7 +134,7 @@ void CorrespondencesViewer::displayCorrespondences(){
 
     //Display clustered corrs
     else if(display_correspondences){
-        CLOG(LTRACE) << "CorrespondencesViewer display clusters";
+        CLOG(LTRACE) << "CorrespondencesViewer Display clusters";
         viewer->removeCorrespondences("correspondences");
         viewer->removeCorrespondences("good_correspondences");
         //Display only one choosen cluster
@@ -145,6 +150,18 @@ void CorrespondencesViewer::displayCorrespondences(){
                     ((cv::Mat)correspondences_colours).at<uchar>(0, 1),
                     ((cv::Mat)correspondences_colours).at<uchar>(0, 2),
                     "correspondences0") ;
+            //Display Bounding Box
+            if(display_bounding_box){
+                CLOG(LTRACE) << "CorrespondencesViewer Display Bounding Box";
+                vector<int> indices;
+                for(int i = 0; i < clustered_corrs[display_cluster_].size(); i++){
+                    indices.push_back(clustered_corrs[display_cluster_][i].index_match);
+                }
+                Eigen::Vector4f min_pt, max_pt;
+                pcl::getMinMax3D(*cloud_xyzsift1, indices, min_pt, max_pt);
+                viewer->addCube (min_pt[0], max_pt[0], min_pt[1], max_pt[1], min_pt[2], max_pt[2], 255, 255, 255);
+
+            }
         }
         //Display all clusters
         else{
