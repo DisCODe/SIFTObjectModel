@@ -96,6 +96,11 @@ protected:
 	// Handlers
     void on_clouds();
 	void on_spin();
+
+    /// Handler for showing/hiding coordinate system.
+    void onCSShowClick(const bool & new_show_cs_);
+
+    void displayCorrespondences();
 	
 	
 	Base::Property<std::string> prop_window_name;
@@ -112,6 +117,7 @@ protected:
 	Base::Property<bool> display_cloud_xyzsift2;
 	Base::Property<bool> display_correspondences;
 	Base::Property<bool> display_good_correspondences;
+    Base::Property<bool> display_bounding_box;
 	
 	Base::Property<bool> prop_coordinate_system;
 	
@@ -123,6 +129,18 @@ protected:
     Base::Property<int> display_cluster;
 
     int clusters;
+
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb1;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb2;
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift1;
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift2;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb2trans;
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift2trans;
+
+    pcl::CorrespondencesPtr correspondences;
+    pcl::CorrespondencesPtr good_correspondences;
+
+    std::vector<pcl::Correspondences> clustered_corrs;
 	
 };
 

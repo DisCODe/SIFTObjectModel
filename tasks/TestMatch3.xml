@@ -65,15 +65,15 @@
                                     <param name="negative_z">0</param>
                                 </Component>
 
-                                <Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="11" bump="10">
+                                <Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="11" bump="0">
                                     <param name="cg_size">0.01f</param>
                                     <param name="cg_thresh">9.0f</param>
 				</Component>
             </Executor>
 
 			<Executor name="Visualization" period="1">
-				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
-
+                                <Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="10">
+                                    <param name="tx">1.0f</param>
 				</Component>
             </Executor>
 		</Subtask>	
