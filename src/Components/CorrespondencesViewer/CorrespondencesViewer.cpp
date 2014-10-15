@@ -105,6 +105,8 @@ void CorrespondencesViewer::displayCorrespondences(){
         viewer->removeCorrespondences(std::string("correspondences")+str) ;
     }
     clusters = clustered_corrs.size();
+
+    //Remove bounding boxes
     viewer->removeAllShapes();
 
     //If no clustered corrs display corrs from in_correspondences and in_good_correspondences
@@ -216,6 +218,18 @@ void CorrespondencesViewer::displayCorrespondences(){
                     g,
                     b,
                     "correspondences"+str) ;
+                //Display Bounding Box
+                if(display_bounding_box){
+                    CLOG(LTRACE) << "CorrespondencesViewer Display Bounding Box";
+                    vector<int> indices;
+                    for(int j = 0; j < clustered_corrs[i].size(); j++){
+                        indices.push_back(clustered_corrs[i][j].index_match);
+                    }
+                    Eigen::Vector4f min_pt, max_pt;
+                    pcl::getMinMax3D(*cloud_xyzsift1, indices, min_pt, max_pt);
+                    viewer->addCube (min_pt[0], max_pt[0], min_pt[1], max_pt[1], min_pt[2], max_pt[2], r, g, b, "cube"+str);
+
+                }
             }
         }
     }
