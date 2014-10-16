@@ -22,6 +22,8 @@ namespace CorrespondencesViewer {
 CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 		Base::Component(name),
 		prop_window_name("window_name", std::string("Correspondences Viewer")),
+		prop_coordinate_system("coordinate_system",boost::bind(&CorrespondencesViewer::onCSShowClick, this, _2), true),
+		prop_background_color("background_color", boost::bind(&CorrespondencesViewer::onBackgroundColorChange, this, _2), std::string("0,0,0")),
 		cloud_xyzsift1_point_size("cloud_xyzsift1_point_size", 5), 
 		cloud_xyzsift2_point_size("cloud_xyzsift2_point_size", 5),
 		clouds_colours("clouds_colours", cv::Mat(cv::Mat::zeros(2, 3, CV_8UC1))),
@@ -32,42 +34,44 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 		display_cloud_xyzsift2("display_cloud_xyzsift2", true),
         display_correspondences("display_correspondences", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), true),
 		display_good_correspondences("display_good_correspondences", true),
-        prop_coordinate_system("coordinate_system", boost::bind(&CorrespondencesViewer::onCSShowClick, this, _2), true),
         display_bounding_box("display_bounding_box", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), false),
 		tx("tx", 0.3f),
 		ty("ty", 0.0f),
         tz("tz", 0.0f),
         display_one_cluster("display_one_cluster", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), false),
-        display_cluster("display_cluster", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), 0){
-			registerProperty(prop_window_name);
-			registerProperty(cloud_xyzsift1_point_size);
-			registerProperty(cloud_xyzsift2_point_size);
-			registerProperty(clouds_colours);
-			registerProperty(correspondences_colours);
-			registerProperty(display_cloud_xyzrgb1);
-			registerProperty(display_cloud_xyzrgb2);
-			registerProperty(display_cloud_xyzsift1);
-			registerProperty(display_cloud_xyzsift2);
-			registerProperty(display_correspondences);
-			registerProperty(display_good_correspondences);
-            registerProperty(display_bounding_box);
-			registerProperty(prop_coordinate_system);
-			registerProperty(tx);
-			registerProperty(ty);
-			registerProperty(tz);
-            registerProperty(display_one_cluster);
-            registerProperty(display_cluster);
-			
-			  // Set red as default.
-			((cv::Mat)clouds_colours).at<uchar>(0,0) = 255;
-			((cv::Mat)clouds_colours).at<uchar>(0,1) = 0;
-			((cv::Mat)clouds_colours).at<uchar>(0,2) = 0;
-			((cv::Mat)clouds_colours).at<uchar>(1,0) = 255;
-			((cv::Mat)clouds_colours).at<uchar>(1,1) = 0;
-			((cv::Mat)clouds_colours).at<uchar>(1,2) = 0;
-			((cv::Mat)correspondences_colours).at<uchar>(0,0) = 255;
-			((cv::Mat)correspondences_colours).at<uchar>(0,1) = 0;
-			((cv::Mat)correspondences_colours).at<uchar>(0,2) = 0;
+        display_cluster("display_cluster", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), 0)
+{
+	registerProperty(prop_window_name);
+	registerProperty(prop_coordinate_system);
+	registerProperty(prop_background_color);
+
+	registerProperty(cloud_xyzsift1_point_size);
+	registerProperty(cloud_xyzsift2_point_size);
+	registerProperty(clouds_colours);
+	registerProperty(correspondences_colours);
+	registerProperty(display_cloud_xyzrgb1);
+	registerProperty(display_cloud_xyzrgb2);
+	registerProperty(display_cloud_xyzsift1);
+	registerProperty(display_cloud_xyzsift2);
+	registerProperty(display_correspondences);
+	registerProperty(display_good_correspondences);
+	registerProperty(display_bounding_box);
+	registerProperty(tx);
+	registerProperty(ty);
+	registerProperty(tz);
+	registerProperty(display_one_cluster);
+	registerProperty(display_cluster);
+
+	  // Set red as default.
+	((cv::Mat)clouds_colours).at<uchar>(0,0) = 255;
+	((cv::Mat)clouds_colours).at<uchar>(0,1) = 0;
+	((cv::Mat)clouds_colours).at<uchar>(0,2) = 0;
+	((cv::Mat)clouds_colours).at<uchar>(1,0) = 255;
+	((cv::Mat)clouds_colours).at<uchar>(1,1) = 0;
+	((cv::Mat)clouds_colours).at<uchar>(1,2) = 0;
+	((cv::Mat)correspondences_colours).at<uchar>(0,0) = 255;
+	((cv::Mat)correspondences_colours).at<uchar>(0,1) = 0;
+	((cv::Mat)correspondences_colours).at<uchar>(0,2) = 0;
 }
 
 CorrespondencesViewer::~CorrespondencesViewer() {
@@ -75,6 +79,8 @@ CorrespondencesViewer::~CorrespondencesViewer() {
 
 void CorrespondencesViewer::onCSShowClick(const bool & new_show_cs_){
     CLOG(LDEBUG) << "CorrespondencesViewer::onCSShowClick show="<<new_show_cs_;
+    if (!viewer)
+    	return;
     if(new_show_cs_) {
 #if PCL_VERSION_COMPARE(>=,1,7,1)
         viewer->addCoordinateSystem (1.0, "CloudViewer", 0);
@@ -95,6 +101,30 @@ void CorrespondencesViewer::onCSShowClick(const bool & new_show_cs_){
     prop_coordinate_system = new_show_cs_;
 }
 
+void CorrespondencesViewer::onBackgroundColorChange(std::string color_) {
+	CLOG(LDEBUG) << "CorrespondencesViewer::onBackgroundColorChange color=" << color_;
+	try {
+		// Parse string.
+		vector<std::string> strs;
+		boost::split(strs, color_, boost::is_any_of(","));
+		if (strs.size() != 3)
+			throw std::exception();
+
+		// Try to cast to double and divide by 255.
+		double r = boost::lexical_cast<double>(strs[0]) /255;
+		double g = boost::lexical_cast<double>(strs[1]) /255;
+		double b = boost::lexical_cast<double>(strs[2]) /255;
+
+		CLOG(LINFO) << "CorrespondencesViewer::onBackgroundColorChange r=" << r << " g=" << g << " b=" << b;
+		// Change background color.
+		if (viewer)
+			viewer->setBackgroundColor(r, g, b);
+	} catch (...) {
+		CLOG(LWARNING)
+				<< "CorrespondencesViewer::onBackgroundColorChange failed - invalid color format. Accepted format: r,g,b";
+	}
+
+}
 void CorrespondencesViewer::displayCorrespondences(){
     CLOG(LTRACE) << "CorrespondencesViewer::displayCorrespondences";
     //Display clustered correspondences
@@ -168,46 +198,14 @@ void CorrespondencesViewer::displayCorrespondences(){
         //Display all clusters
         else{
             for(int i = 0; i< clustered_corrs.size(); i++){
-                int r,g,b;
-                r = g = b = 0;
-                int ii = 60 + i*(255-60)/clustered_corrs.size();
-                int lb = ii & 0xff;
-                if (ii > 50)
-                    switch (ii>>6) {
-                    case 0:
-                        b = 255;
-                        g = 255-lb;
-                        r = 255-lb;
-                        break;
-                    case 1:
-                        b = 255;
-                        g = lb;
-                        r = 0;
-                        break;
-                    case 2:
-                        b = 255-lb;
-                        g = 255;
-                        r = 0;
-                        break;
-                    case 3:
-                        b = 0;
-                        g = 255;
-                        r = lb;
-                        break;
-                    case 4:
-                        b = 0;
-                        g = 255-lb;
-                        r = 255;
-                        break;
-                    case 5:
-                        b = 0;
-                        g = 0;
-                        r = 255-lb;
-                        break;
-                    default:
-                        r = g = b = 0;
-                        break;
-                    }
+            	// Random colors for given cluster.
+                int c[3], index, r,g,b;
+            	index = rand()%3;
+                c[index+i] = 255;
+                c[(index+1+i)%3] = 0;
+                c[(index+2+i)%3] = 100 + rand()%155;
+                r=c[0];g=c[1];b=c[2];
+                std::cout<<r<<","<<g<<","<<b<<endl;
 
                 ostringstream ss;
                 ss << i;
@@ -273,21 +271,18 @@ bool CorrespondencesViewer::onInit() {
     good_correspondences = pcl::CorrespondencesPtr(new pcl::Correspondences());
 
 	viewer = new pcl::visualization::PCLVisualizer (prop_window_name);
-	viewer->setBackgroundColor (0, 0, 0);
 
-	//viewer->addCoordinateSystem (1.0);
+	// Try to change background color.
+	onBackgroundColorChange(prop_background_color);
+
+	// Display/hide coordinate system.
+	onCSShowClick(prop_coordinate_system);
+
 
 	viewer->initCameraParameters ();
 	//cloud_view_xyzsift = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
     clusters = 0;
 
-    if(prop_coordinate_system) {
-#if PCL_VERSION_COMPARE(>=,1,7,1)
-        viewer->addCoordinateSystem (1.0, "CloudViewer", 0);
-#else
-        viewer->addCoordinateSystem (1.0);
-#endif
-    }
 	return true;
 }
 
