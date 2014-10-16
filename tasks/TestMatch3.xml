@@ -17,10 +17,14 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
-                                        <param name="filenames">/home/discode/models/scena/scena_fragment1.json;/home/discode/models/scena/scena_fragment2.json</param>
+                    <param name="filenames">/home/discode/models/scena/scena_fragment1.json</param>
+                    <!--<param name="filenames">/home/discode/models/scena/scena_fragment1.json;/home/discode/models/scena/scena_fragment2.json</param>-->
+					<!--<param name="filenames">/home/discode/cuboids/models/gigabyte.json</param>-->
 				</Component>
-                                <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="2" bump="0">
-                                </Component>
+
+                <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="2" bump="0">
+                </Component>
+
                                 <Component name="SequenceRGB" type="CvBasic:Sequence" priority="3" bump="0">
                                     <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>

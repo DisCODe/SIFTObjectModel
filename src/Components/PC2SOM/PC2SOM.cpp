@@ -17,7 +17,8 @@ namespace PC2SOM {
 
 PC2SOM::PC2SOM(const std::string & name) :
         Base::Component(name),
-        SOMname("SOMname", std::string(" ")){
+        SOMname("SOMname", std::string(" "))
+{
         registerProperty(SOMname);
 }
 

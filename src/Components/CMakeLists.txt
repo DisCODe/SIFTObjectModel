@@ -39,3 +39,7 @@ ADD_COMPONENT(CloudViewer)
 ADD_COMPONENT(CorrespondenceMatcher)
 
 ADD_COMPONENT(PC2SOM)
+
+ADD_COMPONENT(InstanceGenerator)
+
+ADD_COMPONENT(SOMs2PC)
