@@ -17,7 +17,7 @@ namespace SOMs2PC {
 
 SOMs2PC::SOMs2PC(const std::string & name) :
 		Base::Component(name),
-		prop_model_number("model_number", 0)
+		prop_model_number("model_number", boost::bind(&SOMs2PC::returnSelectedSOMClouds, this), 0)
 {
 	registerProperty(prop_model_number);
 }
