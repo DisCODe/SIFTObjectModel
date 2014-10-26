@@ -96,9 +96,16 @@ protected:
 	// Handlers
     void on_clouds();
 	void on_spin();
+
+	/// Handler for showing/hiding coordinate system.
+	void onCSShowClick(const bool & new_show_cs_);
+
+	/// Handler for changing background color.
+	void onBackgroundColorChange(std::string color_);
+
+    void displayCorrespondences();
 	
 	
-	Base::Property<std::string> prop_window_name;
 	Base::Property<int> cloud_xyzsift1_point_size;
 	Base::Property<int> cloud_xyzsift2_point_size;
 	/// Property for setting the colours of clouds. From default it will be set to 2 rows with 255, 0, 0 (red).
@@ -112,15 +119,39 @@ protected:
 	Base::Property<bool> display_cloud_xyzsift2;
 	Base::Property<bool> display_correspondences;
 	Base::Property<bool> display_good_correspondences;
+    Base::Property<bool> display_bounding_box;
 	
-	Base::Property<bool> prop_coordinate_system;
 	
 	Base::Property<float> tx;
 	Base::Property<float> ty;
 	Base::Property<float> tz;
 
+    Base::Property<bool> display_one_cluster;
+    Base::Property<int> display_cluster;
+
     int clusters;
-	
+
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb1;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb2;
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift1;
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift2;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb2trans;
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift2trans;
+
+    pcl::CorrespondencesPtr correspondences;
+    pcl::CorrespondencesPtr good_correspondences;
+
+    std::vector<pcl::Correspondences> clustered_corrs;
+
+	/// Property: name of the window.
+    Base::Property<std::string> prop_window_name;
+
+	/// Property: display/hide coordinate system.
+    Base::Property<bool> prop_coordinate_system;
+
+	/// Property: background color. As default it is set to 1 row with 0, 0, 0 (black).
+	Base::Property<std::string> prop_background_color;
+
 };
 
 } //: namespace CorrespondencesViewer

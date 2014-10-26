@@ -43,7 +43,7 @@ void SOMJSONReader::prepareInterface() {
 }
 
 bool SOMJSONReader::onInit() {
-	LOG(LTRACE) << "SOMJSONReader::onInit()";
+	CLOG(LTRACE) << "SOMJSONReader::onInit()";
 	// Load models at start.
 	loadModels();
 	return true;
@@ -62,7 +62,7 @@ bool SOMJSONReader::onStart() {
 }
 
 void SOMJSONReader::loadModels() {
-	LOG(LTRACE) << "SOMJSONReader::loadModels()";
+	CLOG(LTRACE) << "SOMJSONReader::loadModels()";
 
 	// List of the returned SOMs.
 	std::vector<AbstractObject*> models;
@@ -91,12 +91,12 @@ void SOMJSONReader::loadModels() {
 
 		}//: try
 		catch(std::exception const& e){
-			LOG(LERROR) << "SOMJSONReader: file "<< namesList[i] <<" not found or invalid\n";
+			CLOG(LERROR) << "SOMJSONReader: file "<< namesList[i] <<" not found or invalid\n";
 			continue;	
 		}//: catch
 
-		LOG(LDEBUG) << "name_cloud_xyzrgb:" << name_cloud_xyzrgb;
-		LOG(LDEBUG) << "name_cloud_xyzsift:" << name_cloud_xyzsift;
+		CLOG(LDEBUG) << "name_cloud_xyzrgb:" << name_cloud_xyzrgb;
+		CLOG(LDEBUG) << "name_cloud_xyzsift:" << name_cloud_xyzsift;
 		
 
 		// Read XYZRGB cloud.
@@ -104,7 +104,7 @@ void SOMJSONReader::loadModels() {
 		// Try to load the file.
 		if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (name_cloud_xyzrgb, *cloud_xyzrgb) == -1) 
 		{
-			LOG(LERROR) << "SOMJSONReader: file "<< name_cloud_xyzrgb <<" not found\n";
+			CLOG(LERROR) << "SOMJSONReader: file "<< name_cloud_xyzrgb <<" not found\n";
 			continue;
 		}//: if
 
@@ -113,7 +113,7 @@ void SOMJSONReader::loadModels() {
 		// Try to load the file.
 		if (pcl::io::loadPCDFile<PointXYZSIFT> (name_cloud_xyzsift, *cloud_xyzsift) == -1) 
 		{
-			LOG(LERROR) << "SOMJSONReader: file "<< name_cloud_xyzsift <<" not found\n";
+			CLOG(LERROR) << "SOMJSONReader: file "<< name_cloud_xyzsift <<" not found\n";
 			continue;
 		}//: if
 

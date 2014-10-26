@@ -85,7 +85,7 @@ void SOMJSONWriter::Write() {
 	// Try to save the model retrieved from the SOM data stream.
 	ptree ptree_file;
 
-	if(in_cloud_xyzrgb.empty()&&in_cloud_xyzsift.empty()&&in_mean_viewpoint_features_number.empty()){
+    if(in_cloud_xyzrgb.empty()&&in_cloud_xyzsift.empty()){
 		CLOG(LWARNING) << "There are no required datastreams enabling save of the SOM to file.";
 		return;
 	}
@@ -115,14 +115,12 @@ void SOMJSONWriter::Write() {
 	}
 
 	// Try to save the model retrieved from the three separate data streams.
-	if (!in_cloud_xyzsift.empty() && !in_mean_viewpoint_features_number.empty()) {
+    if (!in_cloud_xyzsift.empty()) {
 		LOG(LDEBUG) << "!in_cloud_xyzsift.empty() && !in_mean_viewpoint_features_number.empty()";
 
 		// Get model from datastreams.
 
 		pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift = in_cloud_xyzsift.read();
-		int mean_viewpoint_features_number = in_mean_viewpoint_features_number.read();
-
 
 		// Save feature cloud.
 		std::string name_cloud_xyzsift = std::string(dir) + std::string("/") + std::string(SOMname) + std::string("_xyzsift.pcd");
@@ -130,10 +128,8 @@ void SOMJSONWriter::Write() {
 		CLOG(LTRACE) << "Write: saved " << cloud_xyzsift->points.size () << " feature points to "<< name_cloud_xyzsift;
 
 		// Save JSON model description.
-
 		ptree_file.put("name", SOMname);
 		ptree_file.put("type", "SIFTObjectModel");
-		ptree_file.put("mean_viewpoint_features_number", mean_viewpoint_features_number);
 		ptree_file.put("cloud_xyzsift", name_cloud_xyzsift);
 
 
@@ -161,6 +157,15 @@ void SOMJSONWriter::Write() {
 
 
 	}
+
+    if (!in_mean_viewpoint_features_number.empty()){
+        LOG(LDEBUG) << "!in_mean_viewpoint_features_number.empty()";
+        int mean_viewpoint_features_number = in_mean_viewpoint_features_number.read();
+        ptree_file.put("mean_viewpoint_features_number", mean_viewpoint_features_number);
+    }
+    else{
+        ptree_file.put("mean_viewpoint_features_number", -1);
+    }
 
 /*
 if(in_cloud_xyzrgb.empty()&&in_cloud_xyzsift.empty()&&in_mean_viewpoint_features_number.empty()){

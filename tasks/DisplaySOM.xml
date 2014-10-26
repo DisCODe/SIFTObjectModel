@@ -1,0 +1,56 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Tomasz Kornuta</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>Displays SOM model</brief>
+			<full></full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+
+			<Executor name="Processing"  period="0.1">
+
+				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="0">
+                    <!--<param name="filenames">/home/discode/models/scena/scena_fragment1.json</param>-->
+                    <param name="filenames">/home/discode/models/scena/scena_fragment1.json;/home/discode/models/scena/scena_fragment2.json</param>
+					<!--<param name="filenames">/home/discode/cuboids/models/gigabyte.json</param>-->
+				</Component>
+
+				<Component name="SOMs2PC" type="SIFTObjectModel:SOMs2PC" priority="2" bump="0">
+                    <param name="model_number">0</param>
+				</Component>
+            </Executor>
+
+			<Executor name="Visualization" period="0.1">
+				<Component name="Window" type="PCL:CloudViewer" priority="1" bump="0">
+				</Component>
+            </Executor>
+
+		</Subtask>	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+
+		<Source name="SOMJSONReader.out_models">
+			<sink>SOMs2PC.in_models</sink>
+		</Source>
+
+		<Source name="SOMs2PC.out_cloud_xyzrgb">
+			<sink>Window.in_cloud_xyzrgb</sink>
+		</Source>
+		
+		<Source name="SOMs2PC.out_cloud_xyzsift">
+			<sink>Window.in_cloud_xyzsift</sink>
+		</Source>
+			
+	</DataStreams>
+</Task>

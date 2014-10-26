@@ -8,9 +8,9 @@ FILE(GLOB files *.cpp)
 
 
 # Create an executable file from sources:
-ADD_LIBRARY(CloudTransformer SHARED ${files})
+ADD_LIBRARY(InstanceGenerator SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(CloudTransformer ${DisCODe_LIBRARIES} )
+TARGET_LINK_LIBRARIES(InstanceGenerator ${DisCODe_LIBRARIES} )
 
-INSTALL_COMPONENT(CloudTransformer)
+INSTALL_COMPONENT(InstanceGenerator)

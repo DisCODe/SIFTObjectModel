@@ -16,10 +16,10 @@
 	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
-                                <Component name="Generator" type="SIFTObjectModel:CuboidModelGenerator" priority="1" bump="0">
+                                <Component name="Generator" type="TexturedSolidGeneration:CuboidModelGenerator" priority="1" bump="0">
                                         <param name="dataJSONname">/home/discode/cuboids/dataset/loyd_kinect/loyd.json</param>
 				</Component>
-                                <Component name="PassThrough" type="SIFTObjectModel:PassThrough" priority="2" bump="0">
+                                <Component name="PassThrough" type="PCL:PassThrough" priority="2" bump="0">
                                     <param name="x.a">0</param>
                                     <param name="x.b">0</param>
                                     <param name="y.a">0</param>
