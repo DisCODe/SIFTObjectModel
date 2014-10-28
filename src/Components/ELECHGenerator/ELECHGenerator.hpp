@@ -105,11 +105,15 @@ protected:
 
 
 	// Handlers
+    Base::EventHandler2 h_addViewToModelNormal;
     Base::EventHandler2 h_addViewToModel;
     Base::EventHandler2 h_Trigger;
 
 	// Handlers
+    void addViewToModelNormal();
     void addViewToModel();
+
+    bool loopDetection(int end, std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> &clouds, double dist, int &first, int &last);
 
     MergeUtils::Properties properties;
 

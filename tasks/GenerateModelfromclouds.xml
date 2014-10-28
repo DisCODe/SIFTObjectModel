@@ -19,31 +19,27 @@
 				<Component name="Trigger" type="CvBasic:Trigger" priority="1" bump="0">
 					<param name="">1</param>
 				</Component>
-				<Component name="ReaderSIFT" type="PCL:PCDReader" priority="2" bump="1">
-					<param name="filename">/home/mkamionk/RGB-D/cuboids1_xyzsift.pcd</param>
+				<Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
+					<param name="filenames">/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite4.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite1.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite3.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite2.json</param>
 				</Component>
-				<Component name="ReaderRGB" type="PCL:PCDReader" priority="3" bump="1">
-					<param name="filename">/home/mkamionk/RGB-D/cuboids1_xyzrgb.pcd</param>
-				</Component>
-				<Component name="Normals" type="SIFTObjectModel:NormalEstimation" priority="4">
-					<param name="radius">0.02</param>
+				<Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
 				</Component>	
   		              	<Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="5" bump="1">
-					<param name="View.Number">9</param>
-					<param name="Interations.Max">20</param>
-					<param name="Correspondenc.Treshold">10</param>
+					<param name="View.Number">4</param>
+					<param name="Interations.Max">50</param>
+					<param name="Correspondenc.Treshold">250</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="6" bump="0">
 					<param name="LeafSize.x">0.005</param>
 					<param name="LeafSize.y">0.005</param>
-					<param name="LeafSize.z">0.005</param>
+			
+		<param name="LeafSize.z">0.005</param>
 				</Component>
 		        	<Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="7" bump="10">
-					<param name="SOM">herbata</param>
+					<param name="SOM">gigabite_rozbity</param>
 					<param name="directory">/home/mkamionk/DisCODe/RGB-D/Model</param>
 			    	</Component>
 			</Executor>
-
 			<Executor name="Visualization" period="1">
 				<Component name="WindowPCL" type="PCL:CloudViewer" priority="1" bump="0">
 				</Component> 
@@ -54,24 +50,19 @@
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
 		<Source name="Trigger.out_trigger">
-			<sink>ReaderRGB.in_trigger</sink>
+			<sink>VtC.in_trigger</sink>
 		</Source>
-		<Source name="ReaderRGB.out_cloud_xyzrgb">
-			<sink>Normals.in_cloud_xyzrgb</sink>-->
+		<Source name="Reader.out_models">
+			<sink>VtC.in_models</sink>
+		</Source>
+		<Source name="VtC.out_cloud_xyzrgb">
 			<sink>Generator.in_cloud_xyzrgb</sink>
 		</Source>
 
-		<Source name="ReaderSIFT.out_cloud_xyzsift">
+		<Source name="VtC.out_cloud_xyzsift">
 			<sink>Generator.in_cloud_xyzsift</sink>		
 		</Source>
 
-		<Source name="Normals.out_cloud_xyzrgb_normals">
-			<sink>Generator.in_cloud_xyzrgb_normals</sink>
-                </Source>-->
-<!--            <Source name="Generator.out_cloud_xyzrgb">
-                        <sink>VoxelGrid.in_cloud_xyzrgb</sink>
-		</Source>
-		-->
 		<Source name="Generator.out_cloud_xyzrgb">
 			<sink>Writer.in_cloud_xyzrgb</sink>
 			<sink>WindowPCL.in_cloud_xyzrgb</sink>

@@ -94,8 +94,11 @@ protected:
 
 	// Handlers
     Base::EventHandler2 h_addViewToModel;
+    Base::EventHandler2 h_addViewToModelNormals;
 
     void addViewToModel();
+
+    void addViewToModelNormals();
 
     MergeUtils::Properties properties;
 
@@ -113,7 +116,7 @@ protected:
 
 	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> rgb_views;
 	std::vector<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> rgbn_views;
-    pcl::registration::LUM<PointXYZSIFT> lum_sift;
+    	pcl::registration::LUM<PointXYZSIFT> lum_sift;
 
 
 public:

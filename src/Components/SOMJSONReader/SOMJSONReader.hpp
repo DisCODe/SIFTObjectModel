@@ -15,6 +15,7 @@
 
 //#include <Types/SIFTObjectModel.hpp> 
 #include <Types/SIFTObjectModelFactory.hpp> 
+#include <Types/PointXYZSIFT.hpp>
 
 namespace Processors {
 namespace SOMJSONReader {
