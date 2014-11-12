@@ -43,3 +43,8 @@ ADD_COMPONENT(CorrespondenceMatcher)
 ADD_COMPONENT(PC2SOM)
 
 ADD_COMPONENT(VectorToSequence)
+
+ADD_COMPONENT(TransformCloud)
+
+ADD_COMPONENT(GaussCloud)
+
