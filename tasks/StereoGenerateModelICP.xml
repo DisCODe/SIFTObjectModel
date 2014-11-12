@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Marta Łępicka</name>
+			<link></link>
+		</Author>
+	
+		<Description>
+			<brief>Generates model with ICP algorithms using stereo images</brief>
+		</Description>
+	</Reference>
+
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Processing">
+			<Executor name="ExecDisp" period="2">
+				<Component name="NextImageTrigger" type="CvBasic:Trigger" priority="1" bump="0">
+				</Component>
+				<Component name="SequenceLeft" type="CvBasic:Sequence" priority="2" bump="0">
+					<param name="sequence.directory">/home/mort/Desktop/kakao/left/</param>
+					<param name="sequence.pattern">.*\.png</param>
+					<param name="mode.loop">1</param>
+					<param name="mode.auto_trigger">0</param>						
+				</Component>
+				<Component name="SequenceRight" type="CvBasic:Sequence" priority="3" bump="0">
+					<param name="sequence.directory">/home/mort/Desktop/kakao/right/</param>
+					<param name="sequence.pattern">.*\.png</param>
+					<param name="mode.loop">1</param>
+					<param name="mode.auto_trigger">0</param>					
+				</Component>
+				<Component name="CameraInfoLeft" type="CvCoreTypes:CameraInfoProvider" priority="4" bump="0">
+				<param name="camera_matrix">1526.039788256152 0.0 626.7003370372527 0.0 1516.6725148099088 514.6590972510979 0.0 0.0 1.0</param>
+				<param name="dist_coeffs">-0.23056559791316314 0.16329105650420236 -0.00030988744721386616 0.00037265489773335433 0.0</param>
+<param name="rectificaton_matrix">0.999988521058628 0.004059733444308367 0.0025448605735818777 -0.004044764329308744 0.9999746503973775 -0.005859901378275774 -0.002568585699983345 0.005849540751540319 0.9999795924120141 </param>
+<param name="projection_matrix">1493.1063145349501 0.0 617.8068695068359 0.0 0.0 1493.1063145349501 519.3150062561035 0.0 0.0 0.0 1.0 0.0 </param>
+<param name="rotation_matrix"> 1 0 0 0 1 0 0 0 1</param>
+<param name="translation_matrix"> 0 0 0</param>
+				<!--<param name="data_file">%[TASK_LOCATION]%/../data/velma-stereo/left.yml</param>-->
+				</Component>
+				<Component name="CameraInfoRight" type="CvCoreTypes:CameraInfoProvider" priority="5" bump="0">
+				<param name="camera_matrix">1524.4223111811432 0.0 620.8191566076059 0.0 1514.566723083793 524.852337516748 0.0 0.0 1.0</param>
+				<param name="dist_coeffs">-0.23164122550380076 0.17370074163985158 -0.0012558005600158903 0.0005241231227034188 0.0</param>
+<param name="rectificaton_matrix">0.9999763558404415 0.005216825302963936 0.0044802336801760415 -0.005242966638916691 0.9999691846905686 0.00584302747751352 -0.004449613566798258 -0.00586637903975925 0.9999728929006365</param>
+<param name="projection_matrix">1493.1063145349501 0.0 617.8068695068359 -133.64056642446636 0.0 1493.1063145349501 519.3150062561035 0.0 0.0 0.0 1.0 0.0</param>
+<param name="rotation_matrix"> 0.9999975129486985 -0.001209224472359545 -0.0018739990909905464 0.001187194027999177 0.9999306991660004 -0.0117127040316736 0.0018880325096432276 0.011710450101048495 0.9999296478711257</param>
+<param name="translation_matrix"> -0.08950294115339916 -0.0004669322483202088 -0.0004010035728234082</param>
+				<!--<param name="data_file">%[TASK_LOCATION]%/../data/velma-stereo/right.yml</param>-->
+				</Component>
+
+				<Component name="StereoEstimator" type="CvStereo:StereoEstimator" priority="6" bump="0">
+					<param name="minDisparity">160</param>
+					<param name="numberOfDisparities">320</param>
+					<param name="uniquenessRatio">25</param>
+				</Component>
+				<Component name="DepthConventer" type="CvStereo:DepthConventer" priority="7" bump="0">
+				</Component>
+				<Component name="PCDWriter" type="PCL:PCDWriter" priority="8" bump="0">
+					<param name="filename">%[TASK_LOCATION]%/../data/output.pcd</param>
+				</Component>
+			</Executor>
+		</Subtask>	
+
+		<Subtask name="Display">
+			<Executor name="DisplayExec" period="0.5">
+				<Component name="WindowCloud" type="PCL:CloudViewer" priority="1" bump="0">
+					<param name="window_name">Depth Cloud</param>
+				</Component>
+			</Executor>
+		</Subtask>	
+	</Subtasks>
+	
+	<!--pipes connecting datastreams -->
+	<DataStreams>
+		<Source name="NextImageTrigger.out_trigger">
+			<sink>SequenceLeft.in_trigger</sink>
+			<sink>SequenceRight.in_trigger</sink>
+		</Source>
+		<Source name="SequenceLeft.out_img">
+			<sink>StereoEstimator.l_in_img</sink>
+		</Source>
+		<Source name="SequenceRight.out_img">
+			<sink>StereoEstimator.r_in_img</sink>
+		</Source>
+		<Source name="CameraInfoLeft.out_camera_info">
+			<sink>StereoEstimator.l_cam_info</sink>
+		</Source>
+		<Source name="CameraInfoRight.out_camera_info">
+			<sink>StereoEstimator.r_cam_info</sink>
+		</Source>
+		<Source name="StereoEstimator.out_rgb_stereo">
+			<sink>DepthConventer.in_rgb_stereo</sink>
+		</Source>
+		<Source name="StereoEstimator.out_depth_xyz">
+			<sink>DepthConventer.in_depth_xyz</sink>
+		</Source>
+		<Source name="DepthConventer.out_cloud_xyzrgb">
+			<sink>WindowCloud.in_cloud_xyzrgb</sink>
+			<sink>PCDWriter.in_cloud_xyzrgb</sink>
+		</Source>
+	</DataStreams>
+</Task>
+
+
+
+

@@ -80,7 +80,7 @@ bool CorrespondencesViewer::onInit() {
 	LOG(LTRACE) << "CorrespondencesViewer::onInit";
 	viewer = new pcl::visualization::PCLVisualizer (prop_window_name);
 	viewer->setBackgroundColor (0, 0, 0);
-	viewer->addCoordinateSystem (1.0, "id", 0);
+//	viewer->addCoordinateSystem (1.0, "id", 0);
 	viewer->initCameraParameters ();
 
 	return true;

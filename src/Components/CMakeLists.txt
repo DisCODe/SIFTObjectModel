@@ -38,3 +38,6 @@ ADD_COMPONENT(SIFTNOMReader)
 
 ADD_COMPONENT(DrawCSystem)
 
+ADD_COMPONENT(TransformCloud)
+
+ADD_COMPONENT(GaussCloud)

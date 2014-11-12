@@ -26,7 +26,7 @@
 #include "pcl/registration/correspondence_rejection_sample_consensus.h"
 
 #include <opencv2/core/core.hpp>
-
+#include <Types/HomogMatrix.hpp>
 
 namespace Processors {
 namespace OpenCloudMerge {
@@ -83,13 +83,18 @@ protected:
 
 	/// Input data stream containing point cloud with normals from a given view.
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> in_cloud_xyzrgb_normals;
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> in_cloud_xyzrgb1_normals;
 
 	/// Input data stream containing feature cloud from a given view.
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
+	/// Input data stream containing point cloud from a given view.
+	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb1;
 
+	/// Input data stream containing feature cloud from a given view.
+	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift1;
 	/// Output data stream containing SIFTObjectModel - depricated.
 	Base::DataStreamOut<AbstractObject*> out_instance;
-
+	Base::DataStreamOut<Types::HomogMatrix> out_diff;
 	/// Output data stream containing object model point cloud.
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
 
@@ -128,10 +133,12 @@ protected:
 	int counter;
 
 
+
 	/// Total number of features (in all views).
 	int total_viewpoint_features_number;
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr previous_cloud;
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normal_merged;
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
