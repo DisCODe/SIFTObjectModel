@@ -40,9 +40,9 @@ namespace ClosedCloudMerge {
 
 ClosedCloudMerge::ClosedCloudMerge(const std::string & name) :
     Base::Component(name),
-    prop_ICP_alignment("ICP.Points", true),
-    prop_ICP_alignment_normal("ICP.Normals",false),
-    prop_ICP_alignment_color("ICP.Color",true),
+    prop_ICP_alignment("ICP.Points", false),
+    prop_ICP_alignment_normal("ICP.Normals", false),
+    prop_ICP_alignment_color("ICP.Color", false),
     ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
     ICP_max_correspondence_distance("ICP.Correspondence_distance",0.1),
     ICP_max_iterations("ICP.Iterations",2000),

@@ -1,5 +1,7 @@
 # Add all components here using ADD_COMPONENT(<COMPONENT_DIRECTORY>)
 
+ADD_COMPONENT(ComputeDistance)
+
 ADD_COMPONENT(SOMJSONReader)
 
 ADD_COMPONENT(SOMJSONWriter)
