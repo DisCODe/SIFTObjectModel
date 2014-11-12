@@ -30,7 +30,7 @@ ADD_COMPONENT(SIFTClusterExtraction)
 
 ADD_COMPONENT(ClosedCloudMerge)
 
-ADD_COMPONENT(OpenCloudMerge)
+#ADD_COMPONENT(OpenCloudMerge)
 
 ADD_COMPONENT(SIFTNOMWriter)
 
@@ -44,7 +44,7 @@ ADD_COMPONENT(PC2SOM)
 
 ADD_COMPONENT(VectorToSequence)
 
-ADD_COMPONENT(TransformCloud)
+#ADD_COMPONENT(CloudTransformer)
 
 ADD_COMPONENT(GaussCloud)
 

@@ -24,13 +24,13 @@
 				</Component>
 				<Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
 				</Component>
-				<Component name="GaussCloud" type="PCL:GaussCloud" priority="4" bump="1">
+				<Component name="GaussCloud" type="SIFTObjectModel:GaussCloud" priority="4" bump="1">
 				</Component>
                                 <Component name="HMP" type="CvCoreTypes:HomogenousMatrixProvider" priority="5" bump="0">
                                     <param name="offset.x">0</param>
                                     <param name="offset.y">0</param>
                                     <param name="offset.z">0</param>
-                                    <param name="offset.roll">1</param>
+                                    <param name="offset.roll">0</param>
                                     <param name="offset.pitch">0</param>
                                     <param name="offset.yaw">0</param>
                                 </Component>
@@ -72,16 +72,19 @@
 		</Source>
 
 		<Source name="VtC.out_cloud_xyzrgb">
-		 	<sink>CloudTransformer.in_cloud_xyzrgb</sink>
-		<!-- 	<sink>GaussCloud.in_cloud_xyzrgb</sink>-->
+		<!-- 	<sink>CloudTransformer.in_cloud_xyzrgb</sink>-->
+		 	<sink>GaussCloud.in_cloud_xyzrgb</sink>
 		</Source>
 		<Source name="VtC.out_cloud_xyzsift">
-			<sink>Distance.in_cloud_sift1</sink>
-			<sink>CloudTransformer.in_cloud_xyzsift</sink>		
+			<sink>GaussCloud.in_cloud_xyzsift</sink>		
 		</Source>
 
 		<Source name="GaussCloud.out_cloud_xyzrgb">
 			<sink>CloudTransformer.in_cloud_xyzrgb</sink>
+		</Source>
+		<Source name="GaussCloud.out_cloud_xyzsift">
+			<sink>Distance.in_cloud_sift1</sink>
+			<sink>CloudTransformer.in_cloud_xyzsift</sink>	
 		</Source>
 
                 <Source name="HMP.out_homogMatrix">
