@@ -97,5 +97,10 @@ void ComputeDistance::computeRGBDist() {
 	CLOG(LFATAL)<<"NOT IMPLEMENTED YET";
 }
 
+void ComputeDistance::computeTransDist() {
+    CLOG(LDEBUG)<<"computeRGBDist()";
+    CLOG(LFATAL)<<"NOT IMPLEMENTED YET";
+}
+
 } //: namespace CalcStatistics
 } //: namespace Processors

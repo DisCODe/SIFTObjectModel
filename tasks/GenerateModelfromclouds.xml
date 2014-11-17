@@ -104,8 +104,10 @@
 		</Source>
 		<Source name="Generator.out_cloud_xyzsift">
 			<sink>Writer.in_cloud_xyzsift</sink>	
-			<sink>Distance.in_cloud_sift2</sink>
 		</Source>
+                <Source name="Generator.out_cloud_lastsift">
+                        <sink>Distance.in_cloud_sift2</sink>
+                </Source>
 		<Source name="Generator.out_mean_viewpoint_features_number">
 			<sink>Writer.in_mean_viewpoint_features_number</sink>
 		</Source>		

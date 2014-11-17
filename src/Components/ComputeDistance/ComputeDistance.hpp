@@ -82,11 +82,14 @@ protected:
 	// Handlers
 	Base::EventHandler<ComputeDistance> h_computeSIFTDist;
 	Base::EventHandler<ComputeDistance> h_computeRGBDist;
+    Base::EventHandler<ComputeDistance> h_computeTransDist;
 
 
 	void computeSIFTDist();
 
 	void computeRGBDist();
+
+    void computeTransDist();
 
 };
 

@@ -84,6 +84,7 @@ void ClosedCloudMerge::prepareInterface() {
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzrgb_normals", &out_cloud_xyzrgb_normals);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
+    registerStream("out_cloud_lastsift", &out_cloud_lastsift);
 
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
 
@@ -180,7 +181,7 @@ void ClosedCloudMerge::addViewToModelNormals()
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzrgb_normals.write(cloud_normal_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
-
+        out_cloud_lastsift.write(cloud_sift_merged);
 		// Push SOM - depricated.
 //		out_instance.write(produce());
 		CLOG(LINFO) << "return ";
@@ -191,11 +192,11 @@ void ClosedCloudMerge::addViewToModelNormals()
 	pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
 	MergeUtils::computeCorrespondences(cloud_sift, cloud_sift_merged, correspondences);
 
-	CLOG(LINFO) << "  correspondences: " << correspondences->size() ;
+    CLOG(LINFO) << "  correspondences: " << correspondences->size() ;
     // Compute transformation between clouds and SOMGenerator global transformation of cloud.
 	pcl::Correspondences inliers;
-	Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
-	if (current_trans == Eigen::Matrix4f::Identity())
+    Eigen::Matrix4f transSAC = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
+    if (transSAC == Eigen::Matrix4f::Identity())
 	{
 		CLOG(LINFO) << "cloud couldn't be merged";
 		counter--;
@@ -203,38 +204,25 @@ void ClosedCloudMerge::addViewToModelNormals()
 		out_cloud_xyzrgb_normals.write(cloud_normal_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
 
-		// Push SOM - depricated.
-//		out_instance.write(produce());
 		return;
 	}
 
-//	pcl::transformPointCloud(*cloud, *cloud, current_trans);
-//	pcl::transformPointCloud(*cloudrgb, *cloudrgb, current_trans);
-//	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+    pcl::transformPointCloud(*cloud, *cloud, transSAC);
+    pcl::transformPointCloud(*cloudrgb, *cloudrgb, transSAC);
+    pcl::transformPointCloud(*cloud_sift, *cloud_sift, transSAC);
 
-	if(prop_ICP_alignment_normal){
+    Eigen::Matrix4f transIPCnorm = Eigen::Matrix4f::Identity();
 
-		current_trans = MergeUtils::computeTransformationICPNormals(cloud, cloud_normal_merged, properties);
-	        CLOG(LINFO) << "ICP transformation refinement: " << std::endl << current_trans;
+    if(prop_ICP_alignment_normal)
+    {
 
-	        // Refine the transformation.
-	//	if (current_trans.isIdentity()){
-		// Add clouds.
-	//		CLOG(LINFO) << "model cloud->size(): "<<cloud_normal_merged->size();
-	//		CLOG(LINFO) << "model cloud_sift_normal->size(): "<<cloud_sift_merged->size();
+        transIPCnorm =  MergeUtils::computeTransformationICPNormals(cloud, cloud_normal_merged, properties);
+            CLOG(LINFO) << "ICP transformation refinement: " << std::endl << transIPCnorm;
 
-			// Push results to output data ports.
-	//		out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
-	//		out_cloud_xyzrgb_normals.write(cloud_normal_merged);
-	//		out_cloud_xyzsift.write(cloud_sift_merged);
-	//		return;
-	//	}//: if
-		pcl::transformPointCloud(*cloud, *cloud, current_trans);
-		pcl::transformPointCloud(*cloudrgb, *cloudrgb, current_trans);
-		pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
-	    }
-
-	CLOG(LINFO) << "current trans: \n" << current_trans;
+        pcl::transformPointCloud(*cloud, *cloud, transIPCnorm);
+        pcl::transformPointCloud(*cloudrgb, *cloudrgb, transIPCnorm);
+        pcl::transformPointCloud(*cloud_sift, *cloud_sift, transIPCnorm);
+    }
 
 	lum_sift.addPointCloud(cloud_sift);
 	*rgbn_views[counter -1] = *cloud;
@@ -302,6 +290,8 @@ void ClosedCloudMerge::addViewToModelNormals()
 		cloud_sift_merged = lum_sift.getConcatenatedCloud ();
 	}
 
+    Eigen::Matrix4f lastCloudtrans = lum_sift.getTransformation(counter-1) * transIPCnorm * transSAC;
+
 		//*cloud_sift_merged += *cloud_sift;
 //
 	CLOG(LINFO) << "model cloud_merged->size(): "<< cloud_merged->size();
@@ -317,6 +307,7 @@ void ClosedCloudMerge::addViewToModelNormals()
 	out_cloud_xyzrgb.write(cloud_merged);
 	out_cloud_xyzrgb_normals.write(cloud_normal_merged);
 	out_cloud_xyzsift.write(cloud_sift_merged);
+    out_cloud_lastsift.write(lum_sift.getTransformedCloud(counter-1));
 }
 
 void ClosedCloudMerge::addViewToModel()
@@ -366,6 +357,7 @@ void ClosedCloudMerge::addViewToModel()
 
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
+        out_cloud_lastsift.write(cloud_sift_merged);
 
 		// Push SOM - depricated.
 //		out_instance.write(produce());
@@ -380,8 +372,8 @@ void ClosedCloudMerge::addViewToModel()
 	CLOG(LINFO) << "  correspondences: " << correspondences->size() ;
     // Compute transformation between clouds and SOMGenerator global transformation of cloud.
 	pcl::Correspondences inliers;
-	Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
-	if (current_trans == Eigen::Matrix4f::Identity())
+    Eigen::Matrix4f transSAC = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
+    if (transSAC == Eigen::Matrix4f::Identity())
 	{
 		CLOG(LINFO) << "cloud couldn't be merged";
 		counter--;
@@ -393,28 +385,37 @@ void ClosedCloudMerge::addViewToModel()
 		return;
 	}
 
-	pcl::transformPointCloud(*cloud, *cloud, current_trans);
-	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+    pcl::transformPointCloud(*cloud, *cloud, transSAC);
+    pcl::transformPointCloud(*cloud_sift, *cloud_sift, transSAC);
+
+    Eigen::Matrix4f transIPC = Eigen::Matrix4f::Identity();
 
 	if (prop_ICP_alignment) {
-		current_trans = MergeUtils::computeTransformationICP(cloud, cloud_merged, properties);
-		CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
+        transIPC = MergeUtils::computeTransformationICP(cloud, cloud_merged, properties);
+        CLOG(LINFO) << "ICP transformation refinement: " << transIPC;
 
-	    	// Refine the transformation.
-	    	pcl::transformPointCloud(*cloud, *cloud, current_trans);
-	    	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+        // Refine the transformation.
+        pcl::transformPointCloud(*cloud, *cloud, transIPC);
+        pcl::transformPointCloud(*cloud_sift, *cloud_sift, transIPC);
+
+        CLOG(LINFO) << "transformation after IPC color: \n" << transIPC;
 	}
+
+
+
+    Eigen::Matrix4f transIPCColor = Eigen::Matrix4f::Identity();
+
 	if(prop_ICP_alignment_color)
 	{
-		current_trans = MergeUtils::computeTransformationICPColor(cloud, cloud_merged, properties);
-	    	CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
+        transIPCColor = MergeUtils::computeTransformationICPColor(cloud, cloud_merged, properties);
+        CLOG(LINFO) << "ICP transformation refinement: " << transIPCColor;
 
-	    	// Refine the transformation.
-	    	pcl::transformPointCloud(*cloud, *cloud, current_trans);
-	    	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+        // Refine the transformation.
+        pcl::transformPointCloud(*cloud, *cloud, transIPCColor);
+        pcl::transformPointCloud(*cloud_sift, *cloud_sift, transIPCColor);
+
+        CLOG(LINFO) << "transformation after IPC color: \n" << transIPCColor;
 	}
-
-	CLOG(LINFO) << "current trans: \n" << current_trans;
 
 	lum_sift.addPointCloud(cloud_sift);
 	*rgb_views[counter -1] = *cloud;
@@ -467,15 +468,17 @@ void ClosedCloudMerge::addViewToModel()
 		for (int i = 1 ; i < counter; i++)
 		{
 			pcl::PointCloud<pcl::PointXYZRGB> tmprgb = *(rgb_views[i]);
-			pcl::transformPointCloud(tmprgb, tmprgb, lum_sift.getTransformation (i));
+            pcl::transformPointCloud(tmprgb, tmprgb, lum_sift.getTransformation(i));
 			*cloud_merged += tmprgb;
 		}
 		CLOG(LINFO) << "cloud added ";
-		cloud_sift_merged = lum_sift.getConcatenatedCloud ();
+        cloud_sift_merged = lum_sift.getConcatenatedCloud();
 	}
 
-		//*cloud_sift_merged += *cloud_sift;
-//
+    Eigen::Matrix4f lastCloudtrans = lum_sift.getTransformation(counter-1) * transIPCColor * transIPC * transSAC;
+
+    //*cloud_sift_merged += *cloud_sift;
+    //
 	CLOG(LINFO) << "model cloud_merged->size(): "<< cloud_merged->size();
 	CLOG(LINFO) << "model cloud_sift_merged->size(): "<< cloud_sift_merged->size();
 
@@ -487,6 +490,7 @@ void ClosedCloudMerge::addViewToModel()
 	out_mean_viewpoint_features_number.write(total_viewpoint_features_number/counter);
 	out_cloud_xyzrgb.write(cloud_merged);
 	out_cloud_xyzsift.write(cloud_sift_merged);
+    out_cloud_lastsift.write(lum_sift.getTransformedCloud(counter-1));
 }
 
 } // namespace ClosedCloudMerge
