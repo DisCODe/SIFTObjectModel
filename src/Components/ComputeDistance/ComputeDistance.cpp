@@ -76,18 +76,21 @@ void ComputeDistance::computeSIFTDist() {
 	pcl::PointCloud<PointXYZSIFT>::iterator first_iter = cloud_first->begin();
 	pcl::PointCloud<PointXYZSIFT>::iterator sec_iter = cloud_sec->begin();
 
-	double distance = 0;
+    double distance_sum = 0;
+    CLOG(LNOTICE)<<"distances: \n";
 
 	while(first_iter!=cloud_first->end() && sec_iter!=cloud_sec->end()){
-		distance += (first_iter->x - sec_iter->x) * (first_iter->x - sec_iter->x) 
+        double distance = (first_iter->x - sec_iter->x) * (first_iter->x - sec_iter->x)
 			 + (first_iter->y - sec_iter->y) * (first_iter->y - sec_iter->y)
 			 + (first_iter->z - sec_iter->z) * (first_iter->z - sec_iter->z);
+        std::cout<<" " << distance;
+        distance_sum += distance;
 		first_iter++;
 		sec_iter++;
 	}
 
-	out_distance.write(distance);
-	CLOG(LINFO)<<"distance: "<< distance;
+    out_distance.write(distance_sum);
+    CLOG(LNOTICE)<<"\ndistance_sum "<< distance_sum;
 	
 	
 }

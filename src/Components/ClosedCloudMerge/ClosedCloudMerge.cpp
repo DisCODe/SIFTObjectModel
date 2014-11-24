@@ -294,6 +294,7 @@ void ClosedCloudMerge::addViewToModelNormals()
 
 		//*cloud_sift_merged += *cloud_sift;
 //
+    CLOG(LINFO) << "transformacja: \n"<< lastCloudtrans << "\n";
 	CLOG(LINFO) << "model cloud_merged->size(): "<< cloud_merged->size();
 	CLOG(LINFO) << "model cloud_normal_merged->size(): "<< cloud_normal_merged->size();
 	CLOG(LINFO) << "model cloud_sift_merged->size(): "<< cloud_sift_merged->size();
@@ -333,7 +334,7 @@ void ClosedCloudMerge::addViewToModel()
 	CLOG(LDEBUG) << "cloud_xyzsift size without NaN: "<<cloud_sift->size();
 
 	counter++;
-	CLOG(LINFO) << "view number: "<<counter;
+    CLOG(LNOTICE) << "view number: "<<counter;
 	CLOG(LINFO) << "view cloud->size(): "<<cloud->size();
 	CLOG(LINFO) << "view cloud_sift->size(): "<<cloud_sift->size();
 
@@ -479,6 +480,8 @@ void ClosedCloudMerge::addViewToModel()
 
     //*cloud_sift_merged += *cloud_sift;
     //
+
+    CLOG(LNOTICE) << "transformacja: \n"<< lastCloudtrans << "\n";
 	CLOG(LINFO) << "model cloud_merged->size(): "<< cloud_merged->size();
 	CLOG(LINFO) << "model cloud_sift_merged->size(): "<< cloud_sift_merged->size();
 
