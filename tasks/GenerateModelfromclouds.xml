@@ -20,7 +20,7 @@
 					<param name="">1</param>
 				</Component>
 				<Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
-					<param name="filenames">/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite4.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite1.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite3.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite2.json</param>
+					<param name="filenames">/home/mikolaj/models/parts/gigabite4.json;/home/mikolaj/models/parts/gigabite1.json;/home/mikolaj/models/parts/gigabite3.json;/home/mikolaj/models/parts/gigabite2.json</param>
 				</Component>
 				<Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
 				</Component>
@@ -34,10 +34,10 @@
                                     <param name="offset.pitch">0</param>
                                     <param name="offset.yaw">0</param>
                                 </Component>
-                                <Component name="CloudTransformer" type="PCL:CloudTransformer" priority="6" bump="1">
-                                    <param name="filter">4</param>
-                                </Component>
-                                <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="7" bump="0">
+               <Component name="CloudTransformer" type="PCL:CloudTransformer" priority="6" bump="1">
+                 <param name="filter">4</param>
+               </Component>
+               <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="7" bump="0">
 				    <param name="View.Number">4</param>
 				    <param name="Interations.Max">50</param>
 				    <param name="Correspondenc.Treshold">50</param>

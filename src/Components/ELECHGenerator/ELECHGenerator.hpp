@@ -99,6 +99,8 @@ protected:
 
 	/// Output data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
+	
+	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_lastsift;
 
 	// Mean number of features per view.
 	Base::DataStreamOut<int> out_mean_viewpoint_features_number;
@@ -132,6 +134,10 @@ protected:
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
 
+public:
+    Base::Property<bool> prop_ICP_alignment;
+    Base::Property<bool> prop_ICP_alignment_color;
+    
     Base::Property<double> ICP_transformation_epsilon;
     Base::Property<float> Elch_max_correspondence_distance;
     Base::Property<int> Elch_ICP_max_iterations;

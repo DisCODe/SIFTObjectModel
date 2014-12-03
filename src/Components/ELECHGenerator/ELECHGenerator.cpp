@@ -107,6 +107,8 @@ class SIFTFeatureRepresentation: public pcl::DefaultFeatureRepresentation <Point
 
 ELECHGenerator::ELECHGenerator(const std::string & name) :
     Base::Component(name),
+    prop_ICP_alignment("ICP.Points", false),
+    prop_ICP_alignment_color("ICP.Color", false),
     Elch_loop_dist("ELCH.distance", 0.05),
     Elch_rejection_threshold("ELCH.rejection", 0.01),
     Elch_ICP_max_iterations("ELCH.maxIPCiterations", 2000),
@@ -117,6 +119,8 @@ ELECHGenerator::ELECHGenerator(const std::string & name) :
     RanSAC_inliers_threshold("RanSac.Inliers_threshold",0.01f),
     RanSAC_max_iterations("RanSac.Iterations",2000)
 {
+    registerProperty(prop_ICP_alignment);
+    registerProperty(prop_ICP_alignment_color);
 	registerProperty(Elch_loop_dist);
 	registerProperty(Elch_rejection_threshold);
 	registerProperty(Elch_ICP_max_iterations);
@@ -147,6 +151,7 @@ void ELECHGenerator::prepareInterface() {
 	registerStream("out_instance", &out_instance);
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
+	registerStream("out_cloud_lastsift", &out_cloud_lastsift);
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
 
     // Register single handler - the "addViewToModel" function.
@@ -442,10 +447,23 @@ void ELECHGenerator::addViewToModel() {
 	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
-	//	current_trans = MergeUtils::computeTransformationIPCNormals(cloud, cloud_normal_merged, properties);
-	//
-	//	pcl::transformPointCloud(*cloud, *cloud, current_trans);
-	//	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+	if (prop_ICP_alignment) {
+        current_trans = MergeUtils::computeTransformationICP(cloud, cloud_merged, properties);
+        CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
+
+        // Refine the transformation.
+        pcl::transformPointCloud(*cloud, *cloud, current_trans);
+        pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+
+        CLOG(LINFO) << "transformation after IPC color: \n" << current_trans;
+	}
+
+	if(prop_ICP_alignment_color) {
+		current_trans = MergeUtils::computeTransformationICPColor(cloud, cloud_merged, properties);
+		
+		pcl::transformPointCloud(*cloud, *cloud, current_trans);
+		pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+	}
 
 	*sift_views[counter -1] = *cloud_sift;
 	elch_sift.addPointCloud(sift_views[counter -1]);
@@ -456,20 +474,20 @@ void ELECHGenerator::addViewToModel() {
 	if (loopDetection(counter-1, rgb_views, Elch_loop_dist, first, last))
 	{
 		CLOG(LINFO) << "loop beetween " << first << " and " << last;
-		elch_rgb.setLoopStart(first);
-		elch_rgb.setLoopEnd(last);
+		elch_sift.setLoopStart(first);
+		elch_sift.setLoopEnd(last);
 		pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>::Ptr icp (new pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>);
 		icp->setMaximumIterations(Elch_ICP_max_iterations);
 		icp->setMaxCorrespondenceDistance(Elch_max_correspondence_distance);
 		icp->setRANSACOutlierRejectionThreshold(Elch_rejection_threshold);
-		elch_rgb.setReg(icp);
-		elch_rgb.compute();
-		
-		elch_sift.setLoopStart(first);
-		elch_sift.setLoopEnd(last);
-		
-		elch_sift.setLoopTransform(elch_rgb.getLoopTransform());
+		elch_sift.setReg(icp);
 		elch_sift.compute();
+		
+		elch_rgb.setLoopStart(first);
+		elch_rgb.setLoopEnd(last);
+		
+		elch_rgb.setLoopTransform(elch_rgb.getLoopTransform());
+		elch_rgb.compute();
 	}
 
 	*cloud_merged = *(rgb_views[0]);
@@ -481,6 +499,7 @@ void ELECHGenerator::addViewToModel() {
 		*cloud_merged += tmp;
 	}
 
+    CLOG(LNOTICE) << "transformacja: \n"<< elch_sift.getLoopTransform() << "\n";
 	CLOG(LINFO) << "model cloud->size(): "<< cloud_merged->size();
 	CLOG(LINFO) << "model cloud_sift->size(): "<< cloud_sift_merged->size();
 
@@ -492,6 +511,7 @@ void ELECHGenerator::addViewToModel() {
 	out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
 	out_cloud_xyzrgb.write(cloud_merged);
 	out_cloud_xyzsift.write(cloud_sift_merged);
+	out_cloud_lastsift.write(sift_views[counter-1]);
 }
 
 } //: namespace ELECHGenerator
