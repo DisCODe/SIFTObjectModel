@@ -209,7 +209,7 @@ bool ELECHGenerator::loopDetection (int end, std::vector<pcl::PointCloud<pcl::Po
     Eigen::Vector4f diff = cend - cstart;
     double norm = diff.norm ();
 
-    CLOG(LINFO) << endl << "distance between " << i << " and " << end << " is " << norm << " state is " << state << endl;
+    CLOG(LINFO) << endl << "distance between " << i+1 << " and " << end+1 << " is " << norm << " state is " << state << endl;
 
     if (state == 0 && norm > dist)
     {
@@ -262,7 +262,6 @@ void ELECHGenerator::addViewToModelNormal() {
 	CLOG(LDEBUG) << "cloud_xyzrgb size without NaN: "<<cloud->size();
 	CLOG(LDEBUG) << "cloud_xyzsift size without NaN: "<<cloud_sift->size();
 
-	CLOG(LINFO) << "view number: "<<counter;
 	CLOG(LINFO) << "view cloud->size(): "<<cloud->size();
 	CLOG(LINFO) << "view cloud_sift->size(): "<<cloud_sift->size();
 
@@ -271,7 +270,7 @@ void ELECHGenerator::addViewToModelNormal() {
 
 	counter++;
 	
-CLOG(LINFO) << "view number: "<<counter;
+    CLOG(LINFO) << "view number: "<<counter;
 	// First cloud.
 	if (counter == 1)
 	{
@@ -333,7 +332,7 @@ CLOG(LINFO) << "view number: "<<counter;
 	int first, last;
 	if (loopDetection(counter-1, rgb_views, Elch_loop_dist, first, last))
 	{
-		CLOG(LINFO) << "loop beetween " << first << " and " << last;
+        CLOG(LINFO) << "loop beetween " << first+1 << " and " << last+1;
 		elch_rgb.setLoopStart(first);
 		elch_rgb.setLoopEnd(last);
 		pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>::Ptr icp (new pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>);
@@ -393,7 +392,6 @@ void ELECHGenerator::addViewToModel() {
 	CLOG(LDEBUG) << "cloud_xyzrgb size without NaN: "<<cloud->size();
 	CLOG(LDEBUG) << "cloud_xyzsift size without NaN: "<<cloud_sift->size();
 
-	CLOG(LINFO) << "view number: "<<counter;
 	CLOG(LINFO) << "view cloud->size(): "<<cloud->size();
 	CLOG(LINFO) << "view cloud_sift->size(): "<<cloud_sift->size();
 
@@ -402,7 +400,7 @@ void ELECHGenerator::addViewToModel() {
 
 	counter++;
 	
-	CLOG(LINFO) << "view number: "<<counter;
+    CLOG(LINFO) << "view number: "<<counter;
 	// First cloud.
 	if (counter == 1)
 	{
@@ -422,6 +420,7 @@ void ELECHGenerator::addViewToModel() {
 
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
+        out_cloud_lastsift.write(cloud_sift_merged);
 		return;
 	}
 	//	 Find corespondences between feature clouds.
@@ -455,14 +454,16 @@ void ELECHGenerator::addViewToModel() {
         pcl::transformPointCloud(*cloud, *cloud, current_trans);
         pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
-        CLOG(LINFO) << "transformation after IPC color: \n" << current_trans;
+        CLOG(LINFO) << "transformation after IPC : \n" << current_trans;
 	}
 
 	if(prop_ICP_alignment_color) {
+         CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
 		current_trans = MergeUtils::computeTransformationICPColor(cloud, cloud_merged, properties);
 		
 		pcl::transformPointCloud(*cloud, *cloud, current_trans);
 		pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+        CLOG(LINFO) << "transformation after IPC color : \n" << current_trans;
 	}
 
 	*sift_views[counter -1] = *cloud_sift;
@@ -474,28 +475,30 @@ void ELECHGenerator::addViewToModel() {
 	if (loopDetection(counter-1, rgb_views, Elch_loop_dist, first, last))
 	{
 		CLOG(LINFO) << "loop beetween " << first << " and " << last;
-		elch_sift.setLoopStart(first);
-		elch_sift.setLoopEnd(last);
-		pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>::Ptr icp (new pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>);
+        elch_rgb.setLoopStart(first);
+        elch_rgb.setLoopEnd(last);
+        pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>::Ptr icp (new pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>);
 		icp->setMaximumIterations(Elch_ICP_max_iterations);
 		icp->setMaxCorrespondenceDistance(Elch_max_correspondence_distance);
 		icp->setRANSACOutlierRejectionThreshold(Elch_rejection_threshold);
-		elch_sift.setReg(icp);
-		elch_sift.compute();
+        elch_rgb.setReg(icp);
+        elch_rgb.compute();
 		
-		elch_rgb.setLoopStart(first);
-		elch_rgb.setLoopEnd(last);
+        elch_sift.setLoopStart(first);
+        elch_sift.setLoopEnd(last);
 		
-		elch_rgb.setLoopTransform(elch_rgb.getLoopTransform());
-		elch_rgb.compute();
+        elch_sift.setLoopTransform(elch_sift.getLoopTransform());
+        elch_sift.compute();
 	}
 
-	*cloud_merged = *(rgb_views[0]);
+    *cloud_merged = *(rgb_views[0]);
+    *cloud_sift_merged = *(sift_views[0]);
+
 	for (int i = 1 ; i < counter; i++)
 	{
 		pcl::PointCloud<PointXYZSIFT> tmp_sift = *(sift_views[i]);
 		pcl::PointCloud<pcl::PointXYZRGB> tmp = *(rgb_views[i]);
-		*cloud_sift_merged += tmp_sift;
+        *cloud_sift_merged += tmp_sift;
 		*cloud_merged += tmp;
 	}
 

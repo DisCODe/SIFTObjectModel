@@ -20,7 +20,7 @@
 					<param name="">1</param>
 				</Component>
 				<Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
-					<param name="filenames">/home/mikolaj/models/parts/gigabite4.json;/home/mikolaj/models/parts/gigabite1.json;/home/mikolaj/models/parts/gigabite3.json;/home/mikolaj/models/parts/gigabite2.json</param>
+                                        <param name="filenames">/home/mkamionk/RGB-D/cuboids/parts/gigabite4.json;/home/mkamionk/RGB-D/cuboids/parts/gigabite1.json;/home/mkamionk/RGB-D/cuboids/parts/gigabite3.json;/home/mkamionk/RGB-D/cuboids/parts/gigabite2.json</param>
 				</Component>
 				<Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
 				</Component>	
@@ -35,7 +35,7 @@
                                     <param name="offset.yaw">0</param>
                                 </Component>
                <Component name="CloudTransformer" type="PCL:CloudTransformer" priority="6" bump="1">
-                 <param name="filter">4</param>
+                 <param name="filter">5</param>
                </Component>
   		              	<Component name="Generator" type="SIFTObjectModel:ELECHGenerator" priority="7" bump="1">
 					<param name="View.Number">4</param>
@@ -109,7 +109,7 @@
 		<Source name="Generator.out_cloud_xyzsift">
 			<sink>Writer.in_cloud_xyzsift</sink>	
 		</Source>
-		               <Source name="Generator.out_cloud_lastsift">
+                 <Source name="Generator.out_cloud_lastsift">
                         <sink>Distance.in_cloud_sift2</sink>
                 </Source>
 
