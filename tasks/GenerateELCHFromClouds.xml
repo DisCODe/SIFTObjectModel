@@ -1,31 +1,31 @@
 <Task>
-	<!-- reference task information -->
-	<Reference>
-		<Author>
-			<name>Mikołaj Kamionka</name>
-			<link></link>
-		</Author>
-		
-		<Description>
-			<brief>Generates SOM and stores it in PCD file</brief>
-			<full>Loads a sequence of object views and joins them into SIFT object model (SOM)</full>	
-		</Description>
-	</Reference>
-	
-	<!-- task definition -->
-	<Subtasks>
-		<Subtask name="Main">
-			<Executor name="Processing"  period="1">
-				<Component name="Trigger" type="CvBasic:Trigger" priority="1" bump="0">
-					<param name="">1</param>
-				</Component>
-				<Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
-                                        <param name="filenames">/home/mkamionk/RGB-D/cuboids/parts/gigabite4.json;/home/mkamionk/RGB-D/cuboids/parts/gigabite1.json;/home/mkamionk/RGB-D/cuboids/parts/gigabite3.json;/home/mkamionk/RGB-D/cuboids/parts/gigabite2.json</param>
-				</Component>
-				<Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
-				</Component>	
-								<Component name="GaussCloud" type="SIFTObjectModel:GaussCloud" priority="4" bump="1">
-				</Component>
+        <!-- reference task information -->
+        <Reference>
+                <Author>
+                        <name>Mikołaj Laszkowsk</name>
+                        <link></link>
+                </Author>
+
+                <Description>
+                        <brief>Generates SOM and stores it in PCD file</brief>
+                        <full>Loads a sequence of object views and joins them into SIFT object model (SOM)</full>
+                </Description>
+        </Reference>
+
+        <!-- task definition -->
+        <Subtasks>
+                <Subtask name="Main">
+                        <Executor name="Processing"  period="1">
+                                <Component name="Trigger" type="CvBasic:Trigger" priority="1" bump="1">
+                                        <param name="">1</param>
+                                </Component>
+                                <Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
+                                        <param name="filenames">/home/mkamionk/RGB-D/cuboids/parts2/loyd1.json;/home/mkamionk/RGB-D/cuboids/parts2/loyd2.json;/home/mkamionk/RGB-D/cuboids/parts2/loyd3.json;/home/mkamionk/RGB-D/cuboids/parts2/loyd4.json</param>
+                                </Component>
+                                <Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
+                                </Component>
+                                <Component name="GaussCloud" type="SIFTObjectModel:GaussCloud" priority="4" bump="1">
+                                </Component>
                                 <Component name="HMP" type="CvCoreTypes:HomogenousMatrixProvider" priority="5" bump="1">
                                     <param name="offset.x">0</param>
                                     <param name="offset.y">0</param>
@@ -34,57 +34,57 @@
                                     <param name="offset.pitch">0</param>
                                     <param name="offset.yaw">0</param>
                                 </Component>
-               <Component name="CloudTransformer" type="PCL:CloudTransformer" priority="6" bump="1">
-                 <param name="filter">5</param>
-               </Component>
-  		              	<Component name="Generator" type="SIFTObjectModel:ELECHGenerator" priority="7" bump="1">
-					<param name="View.Number">4</param>
-					<param name="Interations.Max">50</param>
-					<param name="Correspondenc.Treshold">250</param>
-				</Component>
-				                                <Component name="Distance" type="SIFTObjectModel:ComputeDistance" priority="8" bump="0">
-				</Component>
-				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="6" bump="0">
-					<param name="LeafSize.x">0.005</param>
-					<param name="LeafSize.y">0.005</param>
-			
-		<param name="LeafSize.z">0.005</param>
-				</Component>
-		        	<Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="9" bump="10">
-					<param name="SOM">gigabite_rozbity</param>
-					<param name="directory">/home/mikolaj/models/parts</param>
-			    	</Component>
-			</Executor>
-			<Executor name="Visualization" period="1">
-				<Component name="WindowPCL" type="PCL:CloudViewer" priority="1" bump="0">
-				</Component> 
-			</Executor>
-		</Subtask>
-    	</Subtasks>
-	
-	<!-- pipes connecting datastreams -->
-	<DataStreams>
-		<Source name="Trigger.out_trigger">
-			<sink>VtC.in_trigger</sink>
-		</Source>
-		<Source name="Reader.out_models">
-			<sink>VtC.in_models</sink>
-		</Source>
-		<Source name="VtC.out_cloud_xyzrgb">
-		<!-- 	<sink>CloudTransformer.in_cloud_xyzrgb</sink>-->
-		 	<sink>GaussCloud.in_cloud_xyzrgb</sink>
-		</Source>
-		<Source name="VtC.out_cloud_xyzsift">
-			<sink>GaussCloud.in_cloud_xyzsift</sink>		
-		</Source>
+                                <Component name="CloudTransformer" type="PCL:CloudTransformer" priority="6" bump="1">
+                                    <param name="filter">5</param>
+                                </Component>
+                                <Component name="Generator" type="SIFTObjectModel:ELECHGenerator" priority="7" bump="1">
+                                    <param name="ICP.Color">0</param>
+                                    <param name="ELCH.distance">0.03</param>
+                                </Component>
+                                <Component name="Distance" type="SIFTObjectModel:ComputeDistance" priority="8" bump="0">
+                                </Component>
+                                <Component name="VoxelGrid" type="PCL:VoxelGrid" priority="9" bump="0">
+                                    <param name="LeafSize.x">0.005</param>
+                                    <param name="LeafSize.y">0.005</param>
+                                    <param name="LeafSize.z">0.005</param>
+                                </Component>
+                                <Component name="Writer" type="SIFTObjectModel:SOMJSONWriter" priority="10" bump="1">
+                                    <param name="SOM">gigabite_rozbity</param>
+                                    <param name="directory">/home/mkamionk/DisCODe/RGB-D/Model</param>
+                                </Component>
+                        </Executor>
+                        <Executor name="Visualization" period="1">
+                                <Component name="WindowPCL" type="PCL:CloudViewer" priority="1" bump="1">
+                                </Component>
+                        </Executor>
+                </Subtask>
+        </Subtasks>
 
-		<Source name="GaussCloud.out_cloud_xyzrgb">
-			<sink>CloudTransformer.in_cloud_xyzrgb</sink>
-		</Source>
-		<Source name="GaussCloud.out_cloud_xyzsift">
-			<sink>Distance.in_cloud_sift1</sink>
-			<sink>CloudTransformer.in_cloud_xyzsift</sink>	
-		</Source>
+        <!-- pipes connecting datastreams -->
+        <DataStreams>
+                <Source name="Trigger.out_trigger">
+                        <sink>VtC.in_trigger</sink>
+                </Source>
+
+                <Source name="Reader.out_models">
+                        <sink>VtC.in_models</sink>
+                </Source>
+
+                <Source name="VtC.out_cloud_xyzrgb">
+                <!-- 	<sink>CloudTransformer.in_cloud_xyzrgb</sink>-->
+                        <sink>GaussCloud.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="VtC.out_cloud_xyzsift">
+                        <sink>GaussCloud.in_cloud_xyzsift</sink>
+                </Source>
+
+                <Source name="GaussCloud.out_cloud_xyzrgb">
+                        <sink>CloudTransformer.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="GaussCloud.out_cloud_xyzsift">
+                        <sink>Distance.in_cloud_sift1</sink>
+                        <sink>CloudTransformer.in_cloud_xyzsift</sink>
+                </Source>
 
                 <Source name="HMP.out_homogMatrix">
                         <sink>CloudTransformer.in_hm</sink>
@@ -97,27 +97,24 @@
                         <sink>Generator.in_cloud_xyzsift</sink>
                 </Source>
 
-		<Source name="VtC.out_cloud_xyzsift">
-			<sink>Generator.in_cloud_xyzsift</sink>		
-		</Source>
-
-		<Source name="Generator.out_cloud_xyzrgb">
-			<sink>Writer.in_cloud_xyzrgb</sink>
-			<sink>WindowPCL.in_cloud_xyzrgb</sink>
-		</Source>
-		
-		<Source name="Generator.out_cloud_xyzsift">
-			<sink>Writer.in_cloud_xyzsift</sink>	
-		</Source>
-                 <Source name="Generator.out_cloud_lastsift">
+                <Source name="Generator.out_cloud_xyzrgb">
+                        <sink>Writer.in_cloud_xyzrgb</sink>
+                        <sink>WindowPCL.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="Generator.out_cloud_xyzsift">
+                        <sink>Writer.in_cloud_xyzsift</sink>
+                </Source>
+                <Source name="Generator.out_cloud_lastsift">
                         <sink>Distance.in_cloud_sift2</sink>
                 </Source>
+                <Source name="Generator.out_mean_viewpoint_features_number">
+                        <sink>Writer.in_mean_viewpoint_features_number</sink>
+                </Source>
 
-		<Source name="Generator.out_mean_viewpoint_features_number">
-			<sink>Writer.in_mean_viewpoint_features_number</sink>
-		</Source>			
-	</DataStreams>
+        </DataStreams>
 </Task>
+
+
 
 
 

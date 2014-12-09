@@ -110,7 +110,7 @@ ELECHGenerator::ELECHGenerator(const std::string & name) :
     prop_ICP_alignment("ICP.Points", false),
     prop_ICP_alignment_color("ICP.Color", false),
     Elch_loop_dist("ELCH.distance", 0.05),
-    Elch_rejection_threshold("ELCH.rejection", 0.01),
+    Elch_rejection_threshold("ELCH.rejection", 0.01f),
     Elch_ICP_max_iterations("ELCH.maxIPCiterations", 2000),
     Elch_max_correspondence_distance("ELCH.maxIPCdistance", 0.005),
     ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
@@ -425,28 +425,29 @@ void ELECHGenerator::addViewToModel() {
 	}
 	//	 Find corespondences between feature clouds.
 	//	 Initialize parameters.
-	pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
-	MergeUtils::computeCorrespondences(cloud_sift, cloud_sift_merged, correspondences);
-	CLOG(LINFO) << "Number of reciprocal correspondences: " << correspondences->size() << " out of " << cloud_sift->size() << " features";
+    pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
+    MergeUtils::computeCorrespondences(cloud_sift, cloud_sift_merged, correspondences);
 
+    CLOG(LINFO) << "  correspondences: " << correspondences->size() ;
     // Compute transformation between clouds and SOMGenerator global transformation of cloud.
-	pcl::Correspondences inliers;
-	Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
-	if (current_trans == Eigen::Matrix4f::Identity())
-	{
-		CLOG(LINFO) << "cloud couldn't be merged";
-		counter--;
-		out_cloud_xyzrgb.write(cloud_merged);
-		out_cloud_xyzsift.write(cloud_sift_merged);
-		// Push SOM - depricated.
+    pcl::Correspondences inliers;
+    Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
+    if (current_trans == Eigen::Matrix4f::Identity())
+    {
+        CLOG(LINFO) << "cloud couldn't be merged";
+        counter--;
+        out_cloud_xyzrgb.write(cloud_merged);
+        out_cloud_xyzsift.write(cloud_sift_merged);
+
+        // Push SOM - depricated.
 //		out_instance.write(produce());
-		return;
-	}
+        return;
+    }
+    LOG(LNOTICE) << "transformacja: \n"<< current_trans;
+    pcl::transformPointCloud(*cloud, *cloud, current_trans);
+    pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
-	pcl::transformPointCloud(*cloud, *cloud, current_trans);
-	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
-
-	if (prop_ICP_alignment) {
+    if (prop_ICP_alignment) {
         current_trans = MergeUtils::computeTransformationICP(cloud, cloud_merged, properties);
         CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
 
@@ -455,52 +456,52 @@ void ELECHGenerator::addViewToModel() {
         pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
         CLOG(LINFO) << "transformation after IPC : \n" << current_trans;
-	}
+    }
 
-	if(prop_ICP_alignment_color) {
+    if(prop_ICP_alignment_color) {
          CLOG(LINFO) << "ICP transformation refinement: " << current_trans;
-		current_trans = MergeUtils::computeTransformationICPColor(cloud, cloud_merged, properties);
+        current_trans = MergeUtils::computeTransformationICPColor(cloud, cloud_merged, properties);
 		
-		pcl::transformPointCloud(*cloud, *cloud, current_trans);
-		pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+        pcl::transformPointCloud(*cloud, *cloud, current_trans);
+        pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
         CLOG(LINFO) << "transformation after IPC color : \n" << current_trans;
-	}
+    }
 
-	*sift_views[counter -1] = *cloud_sift;
-	elch_sift.addPointCloud(sift_views[counter -1]);
-	*rgb_views[counter -1] = *cloud;
-	elch_rgb.addPointCloud(rgb_views[counter -1]);
+    *sift_views[counter -1] = *cloud_sift;
+    elch_sift.addPointCloud(sift_views[counter -1]);
+    *rgb_views[counter -1] = *cloud;
+    elch_rgb.addPointCloud(rgb_views[counter -1]);
 
-	int first, last;
-	if (loopDetection(counter-1, rgb_views, Elch_loop_dist, first, last))
-	{
-		CLOG(LINFO) << "loop beetween " << first << " and " << last;
-        elch_rgb.setLoopStart(first);
-        elch_rgb.setLoopEnd(last);
-        pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>::Ptr icp (new pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB>);
-		icp->setMaximumIterations(Elch_ICP_max_iterations);
-		icp->setMaxCorrespondenceDistance(Elch_max_correspondence_distance);
-		icp->setRANSACOutlierRejectionThreshold(Elch_rejection_threshold);
-        elch_rgb.setReg(icp);
-        elch_rgb.compute();
-		
+    int first, last;
+    if (loopDetection(counter-1, rgb_views, Elch_loop_dist, first, last))
+    {
+        CLOG(LINFO) << "loop beetween " << first << " and " << last;
         elch_sift.setLoopStart(first);
         elch_sift.setLoopEnd(last);
-		
-        elch_sift.setLoopTransform(elch_sift.getLoopTransform());
+        pcl::IterativeClosestPoint<PointXYZSIFT, PointXYZSIFT>::Ptr icp (new pcl::IterativeClosestPoint<PointXYZSIFT, PointXYZSIFT>);
+        icp->setMaximumIterations(Elch_ICP_max_iterations);
+        icp->setMaxCorrespondenceDistance(Elch_max_correspondence_distance);
+        icp->setRANSACOutlierRejectionThreshold(Elch_rejection_threshold);
+        elch_sift.setReg(icp);
         elch_sift.compute();
-	}
+		
+        elch_rgb.setLoopStart(first);
+        elch_rgb.setLoopEnd(last);
+		
+        elch_rgb.setLoopTransform(elch_sift.getLoopTransform());
+        elch_rgb.compute();
+    }
 
     *cloud_merged = *(rgb_views[0]);
     *cloud_sift_merged = *(sift_views[0]);
 
-	for (int i = 1 ; i < counter; i++)
-	{
-		pcl::PointCloud<PointXYZSIFT> tmp_sift = *(sift_views[i]);
-		pcl::PointCloud<pcl::PointXYZRGB> tmp = *(rgb_views[i]);
+    for (int i = 1 ; i < counter; i++)
+    {
+        pcl::PointCloud<PointXYZSIFT> tmp_sift = *(sift_views[i]);
+        pcl::PointCloud<pcl::PointXYZRGB> tmp = *(rgb_views[i]);
         *cloud_sift_merged += tmp_sift;
-		*cloud_merged += tmp;
-	}
+        *cloud_merged += tmp;
+    }
 
     CLOG(LNOTICE) << "transformacja: \n"<< elch_sift.getLoopTransform() << "\n";
 	CLOG(LINFO) << "model cloud->size(): "<< cloud_merged->size();
