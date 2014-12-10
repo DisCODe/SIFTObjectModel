@@ -425,7 +425,7 @@ void ELECHGenerator::addViewToModel() {
 	}
 	//	 Find corespondences between feature clouds.
 	//	 Initialize parameters.
-    pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
+ /*   pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
     MergeUtils::computeCorrespondences(cloud_sift, cloud_sift_merged, correspondences);
 
     CLOG(LINFO) << "  correspondences: " << correspondences->size() ;
@@ -465,7 +465,7 @@ void ELECHGenerator::addViewToModel() {
         pcl::transformPointCloud(*cloud, *cloud, current_trans);
         pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
         CLOG(LINFO) << "transformation after IPC color : \n" << current_trans;
-    }
+    } */
 
     *sift_views[counter -1] = *cloud_sift;
     elch_sift.addPointCloud(sift_views[counter -1]);
@@ -490,7 +490,7 @@ void ELECHGenerator::addViewToModel() {
 		
         elch_rgb.setLoopTransform(elch_sift.getLoopTransform());
         elch_rgb.compute();
-    }
+    } 
 
     *cloud_merged = *(rgb_views[0]);
     *cloud_sift_merged = *(sift_views[0]);
