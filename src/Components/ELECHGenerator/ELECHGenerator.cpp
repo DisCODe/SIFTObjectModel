@@ -515,7 +515,10 @@ void ELECHGenerator::addViewToModel() {
 	out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
 	out_cloud_xyzrgb.write(cloud_merged);
 	out_cloud_xyzsift.write(cloud_sift_merged);
-	out_cloud_lastsift.write(sift_views[counter-1]);
+    if (counter > 4)
+        out_cloud_lastsift.write(sift_views[3]);
+    else
+        out_cloud_lastsift.write(sift_views[counter-1]);
 }
 
 } //: namespace ELECHGenerator
