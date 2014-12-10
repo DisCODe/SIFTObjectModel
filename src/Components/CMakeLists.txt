@@ -39,3 +39,5 @@ ADD_COMPONENT(CloudViewer)
 ADD_COMPONENT(CorrespondenceMatcher)
 
 ADD_COMPONENT(PC2SOM)
+
+ADD_COMPONENT(xyzrgb2xyzsift)
