@@ -60,8 +60,10 @@ bool xyzrgb2xyzsift::onStart() {
 }
 
 void xyzrgb2xyzsift::compute() {
-
+    CLOG(LTRACE) << "xyzrgb2xyzsift::compute";
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud = in_cloud_xyzrgb.read();
+
+    cloud->is_dense = true ;
 
     cv::Mat rgbimg(cloud->height, cloud->width, CV_8UC3, cv::Scalar::all(0)) ;
     for (register int row = 0; row  < cloud->height; row++)
@@ -72,6 +74,7 @@ void xyzrgb2xyzsift::compute() {
             rgbvec[1] = pt.g ;
             rgbvec[0] = pt.b ;
     }
+
 
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat descriptors;
@@ -89,7 +92,7 @@ void xyzrgb2xyzsift::compute() {
         LOG(LERROR) << "sdasdas\n";
     }
 
-    pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift;
+    pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift(new pcl::PointCloud<PointXYZSIFT>);
 
     //Create output point cloud (this time - unorganized)
     cloud_xyzsift->height = 1 ;
@@ -97,9 +100,12 @@ void xyzrgb2xyzsift::compute() {
     cloud_xyzsift->is_dense = false ;
     cloud_xyzsift->points.resize(cloud_xyzsift->height * cloud_xyzsift->width) ;
 
+
+
     //Convert SIFT keypoints/descriptors into PointXYZRGBSIFT cloud
     pcl::PointCloud<PointXYZSIFT>::iterator pt_iter = cloud_xyzsift->begin();
     for (register int i = 0; i < keypoints.size() ; i++) {
+
         //std::cout << " " << keypoints[i].pt.x << " " << keypoints[i].pt.y << std::endl ;
         int keyx = std::min(std::max(((unsigned int) round(keypoints[i].pt.x)), 0u), cloud->width) ;
         int keyy = std::min(std::max(((unsigned int) round(keypoints[i].pt.y)), 0u), cloud->height) ;
