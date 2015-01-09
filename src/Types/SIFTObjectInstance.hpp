@@ -17,9 +17,6 @@
 class SIFTObjectModel : public PointCloudObject
 {
 	public:
-	/// Cloud of SIFT - features extracted from RGB image and transformed from image into Cartesian space.
-	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift;
-
 	/// Name of the model.
 	std::string model_id;
 
@@ -31,7 +28,11 @@ class SIFTObjectModel : public PointCloudObject
 
 
 
+	/// Cloud of SIFTs constituting the whole model
+	pcl::PointCloud<PointXYZSIFT>::Ptr model_cloud_xyzsift;
 
+	/// Cloud of SIFTs constituting the instance.
+	pcl::PointCloud<PointXYZSIFT>::Ptr instance_cloud_xyzsift;
 
 };
 

@@ -38,6 +38,5 @@ ADD_COMPONENT(CorrespondenceMatcher)
 
 ADD_COMPONENT(PC2SOM)
 
-ADD_COMPONENT(InstanceGenerator)
+ADD_COMPONENT(xyzrgb2xyzsift)
 
-ADD_COMPONENT(SOMs2PC)
