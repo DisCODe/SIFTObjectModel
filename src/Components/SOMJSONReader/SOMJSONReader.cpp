@@ -21,6 +21,14 @@ using boost::property_tree::write_json;
 namespace Processors {
 namespace SOMJSONReader {
 
+std::string dirnameOf(const std::string& fname)
+{
+     size_t pos = fname.find_last_of("\\/");
+     return (std::string::npos == pos)
+         ? ""
+         : fname.substr(0, pos);
+}
+
 SOMJSONReader::SOMJSONReader(const std::string & name) :
 		Base::Component(name) , 
 		filenames("filenames", boost::bind(&SOMJSONReader::onFilenamesChanged, this, _1, _2), "")
@@ -86,8 +94,14 @@ void SOMJSONReader::loadModels() {
 			// Read JSON properties.
 			model_name = ptree_file.get<std::string>("name");
 			mean_viewpoint_features_number = ptree_file.get<int>("mean_viewpoint_features_number");
-			name_cloud_xyzrgb = ptree_file.get<std::string>("cloud_xyzrgb");
-			name_cloud_xyzsift = ptree_file.get<std::string>("cloud_xyzsift");
+
+			// Get path to files.
+			std::string dir = dirnameOf(namesList[i]);
+			if (dir != "")
+				dir = dir + "/";
+
+			name_cloud_xyzrgb = dir + ptree_file.get<std::string>("cloud_xyzrgb");
+			name_cloud_xyzsift = dir + ptree_file.get<std::string>("cloud_xyzsift");
 
 		}//: try
 		catch(std::exception const& e){

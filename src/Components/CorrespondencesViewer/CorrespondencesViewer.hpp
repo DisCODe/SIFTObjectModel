@@ -98,7 +98,7 @@ protected:
 	void on_spin();
 
 	/// Handler for showing/hiding coordinate system.
-	void onCSShowClick(const bool & new_show_cs_);
+	void onCSShowClick(bool new_show_cs_);
 
 	/// Handler for changing background color.
 	void onBackgroundColorChange(std::string color_);

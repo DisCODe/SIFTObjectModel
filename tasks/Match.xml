@@ -18,33 +18,30 @@
 
 			<Executor name="Processing"  period="1">
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="0">
-                                        <param name="filenames">/home/discode/cuboids/models/loyd_kinect.json</param>
-<!--
-					<param name="names">/home/discode/14.06.13objects/kakao_model_ICP_normal/Kakao_normalne.json</param>
--->
+                    <!--<param name="filenames">/home/discode/cuboids/models/loyd_kinect.json</param>-->
+                    <param name="filenames">/home/tkornuta/discode_ecovi/DCL/TexturedSolidGeneration/data/lipton_green_tea_citrus_model.json</param>
+					<!--<param name="names">/home/discode/14.06.13objects/kakao_model_ICP_normal/Kakao_normalne.json</param>-->
 				</Component>
 				<Component name="Source" type="CameraNUI:CameraNUI" priority="2" bump="0">
-					<param name="sync">1</param>
-                                </Component>
-				<Component name="SIFT" type="CvBasic:CvSIFT" priority="5" bump="0">
 				</Component>
-				<Component name="Converter" type="PCL:DepthConverter" priority="6" bump="10">
+				<Component name="SIFT" type="CvBasic:CvSIFT" priority="3" bump="0">
 				</Component>
-				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="7" bump="10">
+				<Component name="Converter" type="PCL:DepthConverter" priority="4" bump="0">
 				</Component>
-				<Component name="RANSAC" type="PCL:RANSACPlane" priority="8" bump="0">
-				</Component>				
-				<Component name="CloudCutter" type="SIFTObjectModel:CloudCutter" priority="9" bump="0">
+				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="5" bump="0">
 				</Component>
-				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="10" bump="0">
-                                    <param name="max_distance">150</param>
-                                </Component>
+				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="6" bump="1">
+					<!--<param name="max_distance">150</param>-->
+                </Component>
             </Executor>
 
 			<Executor name="Visualization" period="1">
-				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="2" bump="0">
+				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
+					<param name="coordinate_system">0</param>
+					<param name="display_bounding_box">1</param>
+<!--					<param name="background_color">255,255,255</param>-->
 				</Component>
-				<Component name="Window2" type="CvBasic:CvWindow" priority="1" bump="0">
+				<Component name="Window2" type="CvBasic:CvWindow" priority="2" bump="0">
 					<param name="count">1</param>
 					<param name="title">RGB</param>
 				</Component>
@@ -55,60 +52,65 @@
 	
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
-		<Source name="Source.out_img">
-			<sink>SIFT.in_img</sink>
-			<sink>Converter.in_color</sink>
-		</Source>
-		<Source name="Source.out_depth">	
-                        <sink>Converter.in_depth</sink>
-                        <sink>FeatureCloudConverter.in_depth</sink>
-		</Source>
+
 		<Source name="Source.out_camera_info">
 			<sink>Converter.in_camera_info</sink>	
 			<sink>FeatureCloudConverter.in_camera_info</sink>
 		</Source>
+
+		<Source name="Source.out_img">
+			<sink>SIFT.in_img</sink>
+			<sink>Converter.in_color</sink>
+		</Source>
+		
+		<Source name="Source.out_depth">	
+			<sink>Converter.in_depth</sink>
+            <sink>FeatureCloudConverter.in_depth</sink>
+		</Source>
+
 		<Source name="SIFT.out_descriptors">
 			<sink>FeatureCloudConverter.in_descriptors</sink>	
 		</Source>
 		<Source name="SIFT.out_features">
 			<sink>FeatureCloudConverter.in_features</sink>	
 		</Source>		
+		
 		<Source name="Converter.out_cloud_xyzrgb">
-			<sink>RANSAC.in_pcl</sink>
-		</Source>
-		<Source name="RANSAC.out_outliers">
 			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
 		</Source>
-		<Source name="RANSAC.out_inliers">
-			<sink>CloudCutter.in_indices</sink>
-		</Source>
+		
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
-			<sink>CloudCutter.in_cloud</sink>	
-		</Source>
-		<Source name="CloudCutter.out_cloud">
 			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>
-                </Source>
+		</Source>
+
 		<Source name="SOMJSONReader.out_models">
 			<sink>SIFTObjectMatcher.in_models</sink>
 		</Source>
+		
 		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
 			<sink>Window.in_cloud_xyzrgb1</sink>
 		</Source>
+		
 		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
 			<sink>Window.in_cloud_xyzrgb2</sink>
 		</Source>
+		
 		<Source name="SIFTObjectMatcher.out_cloud_xyzsift">
 			<sink>Window.in_cloud_xyzsift1</sink>
 		</Source>
-                <Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
+		
+		<Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
 			<sink>Window.in_cloud_xyzsift2</sink>
-                </Source>
+        </Source>
+        
 <!--		<Source name="SIFTObjectMatcher.out_correspondences">
 			<sink>Window.in_correspondences</sink>
                 </Source>-->
-                <Source name="SIFTObjectMatcher.out_clustered_correspondences">
-                        <sink>Window.in_clustered_correspondences</sink>
-                </Source>
+                
+        <Source name="SIFTObjectMatcher.out_clustered_correspondences">
+        	<sink>Window.in_clustered_correspondences</sink>
+		</Source>
+		
 		<Source name="Source.out_img">
 			<sink>Window2.in_img0</sink>		
 		</Source>		

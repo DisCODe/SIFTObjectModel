@@ -32,14 +32,14 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 		display_cloud_xyzrgb2("display_cloud_xyzrgb2", true),
 		display_cloud_xyzsift1("display_cloud_xyzsift1", true),
 		display_cloud_xyzsift2("display_cloud_xyzsift2", true),
-        display_correspondences("display_correspondences", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), true),
+        display_correspondences("display_correspondences", true),
 		display_good_correspondences("display_good_correspondences", true),
-        display_bounding_box("display_bounding_box", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), false),
+        display_bounding_box("display_bounding_box", false),
 		tx("tx", 0.3f),
 		ty("ty", 0.0f),
         tz("tz", 0.0f),
-        display_one_cluster("display_one_cluster", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), false),
-        display_cluster("display_cluster", boost::bind(&CorrespondencesViewer::displayCorrespondences, this), 0)
+        display_one_cluster("display_one_cluster", false),
+        display_cluster("display_cluster", 0)
 {
 	registerProperty(prop_window_name);
 	registerProperty(prop_coordinate_system);
@@ -72,15 +72,20 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 	((cv::Mat)correspondences_colours).at<uchar>(0,0) = 255;
 	((cv::Mat)correspondences_colours).at<uchar>(0,1) = 0;
 	((cv::Mat)correspondences_colours).at<uchar>(0,2) = 0;
+
+	// Initialize viewer to NULL!
+	viewer = NULL;
 }
 
 CorrespondencesViewer::~CorrespondencesViewer() {
 }
 
-void CorrespondencesViewer::onCSShowClick(const bool & new_show_cs_){
+void CorrespondencesViewer::onCSShowClick(const bool new_show_cs_){
     CLOG(LDEBUG) << "CorrespondencesViewer::onCSShowClick show="<<new_show_cs_;
+
     if (!viewer)
     	return;
+
     if(new_show_cs_) {
 #if PCL_VERSION_COMPARE(>=,1,7,1)
         viewer->addCoordinateSystem (1.0, "CloudViewer", 0);
@@ -205,7 +210,7 @@ void CorrespondencesViewer::displayCorrespondences(){
                 c[(index+1+i)%3] = 0;
                 c[(index+2+i)%3] = 100 + rand()%155;
                 r=c[0];g=c[1];b=c[2];
-                std::cout<<r<<","<<g<<","<<b<<endl;
+                //std::cout<<r<<","<<g<<","<<b<<endl;
 
                 ostringstream ss;
                 ss << i;
