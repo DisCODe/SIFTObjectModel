@@ -140,7 +140,7 @@ public:
     
     Base::Property<double> ICP_transformation_epsilon;
     Base::Property<float> Elch_max_correspondence_distance;
-    Base::Property<int> Elch_ICP_max_iterations;
+    Base::Property<float> Elch_ICP_max_iterations;
 
     ///RanSAC Properties
     Base::Property<float> RanSAC_inliers_threshold;
@@ -150,7 +150,7 @@ public:
 	/// ICP properties
     Base::Property<float> Elch_loop_dist;
     Base::Property<float> ICP_max_correspondence_distance;
-    Base::Property<int> ICP_max_iterations;
+    Base::Property<float> ICP_max_iterations;
     Base::Property<float> Elch_rejection_threshold;
 
 };

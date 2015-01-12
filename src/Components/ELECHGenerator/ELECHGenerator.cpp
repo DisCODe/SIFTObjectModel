@@ -315,7 +315,7 @@ void ELECHGenerator::addViewToModelNormal() {
 
 	pcl::transformPointCloud(*cloud, *cloud, current_trans);
 	pcl::transformPointCloud(*cloudrgb, *cloudrgb, current_trans);
-	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans); 
 
 	//	current_trans = MergeUtils::computeTransformationIPCNormals(cloud, cloud_normal_merged, properties);
 	//
@@ -425,13 +425,14 @@ void ELECHGenerator::addViewToModel() {
 	}
 	//	 Find corespondences between feature clouds.
 	//	 Initialize parameters.
- /*   pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
+    pcl::CorrespondencesPtr correspondences(new pcl::Correspondences()) ;
     MergeUtils::computeCorrespondences(cloud_sift, cloud_sift_merged, correspondences);
 
     CLOG(LINFO) << "  correspondences: " << correspondences->size() ;
     // Compute transformation between clouds and SOMGenerator global transformation of cloud.
     pcl::Correspondences inliers;
-    Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
+    Eigen::Matrix4f current_trans = Eigen::Matrix4f::Identity();
+   /* current_trans = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
     if (current_trans == Eigen::Matrix4f::Identity())
     {
         CLOG(LINFO) << "cloud couldn't be merged";
@@ -445,7 +446,7 @@ void ELECHGenerator::addViewToModel() {
     }
     LOG(LNOTICE) << "transformacja: \n"<< current_trans;
     pcl::transformPointCloud(*cloud, *cloud, current_trans);
-    pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
+    pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans); */
 
     if (prop_ICP_alignment) {
         current_trans = MergeUtils::computeTransformationICP(cloud, cloud_merged, properties);
@@ -465,7 +466,7 @@ void ELECHGenerator::addViewToModel() {
         pcl::transformPointCloud(*cloud, *cloud, current_trans);
         pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
         CLOG(LINFO) << "transformation after IPC color : \n" << current_trans;
-    } */
+    } 
 
     *sift_views[counter -1] = *cloud_sift;
     elch_sift.addPointCloud(sift_views[counter -1]);

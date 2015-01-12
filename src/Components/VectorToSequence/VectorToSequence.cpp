@@ -71,7 +71,7 @@ void VectorToSequence::throwClouds() {
 	LOG(LTRACE) << "VectorToSequence::throwClouds()";
 	if (models.empty())
 		return;
-
+	in_trigger.read();
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudrgb = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
 
