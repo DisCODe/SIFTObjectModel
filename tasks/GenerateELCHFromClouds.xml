@@ -20,7 +20,7 @@
                                         <param name="">1</param>
                                 </Component>
                                 <Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
-                                        <param name="filenames">/home/mikolaj/models/parts/gigabite4.json;/home/mikolaj/models/parts/gigabite1.json;/home/mikolaj/models/parts/gigabite2.json;/home/mikolaj/models/parts/gigabite3.json</param>
+                                                                           <param name="filenames">/home/mkamionk/RGB-D/cuboids/parts4/gigabite4.json;/home/mkamionk/RGB-D/cuboids/parts4/gigabite1.json;/home/mkamionk/RGB-D/cuboids/parts4/gigabite2.json;/home/mkamionk/RGB-D/cuboids/parts4/gigabite3.json</param>
                                 </Component>
                                 <Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
                                 </Component>

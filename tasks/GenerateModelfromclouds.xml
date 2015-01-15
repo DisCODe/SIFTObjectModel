@@ -20,7 +20,7 @@
 					<param name="">1</param>
 				</Component>
 				<Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
-                                        <param name="filenames">/home/mkamionk/RGB-D/cuboids/parts2/loyd1.json;/home/mkamionk/RGB-D/cuboids/parts2/loyd2.json;/home/mkamionk/RGB-D/cuboids/parts2/loyd3.json;/home/mkamionk/RGB-D/cuboids/parts2/loyd4.json</param>
+                                        <param name="filenames">/home/mkamionk/RGB-D/cuboids/parts4/gigabite4.json;/home/mkamionk/RGB-D/cuboids/parts4/gigabite1.json;/home/mkamionk/RGB-D/cuboids/parts4/gigabite2.json;/home/mkamionk/RGB-D/cuboids/parts4/gigabite3.json</param>
 				</Component>
 				<Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
 				</Component>
@@ -39,6 +39,7 @@
                                 </Component>
                                 <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="7" bump="0">
                                     <param name="ICP.Color">0</param>
+				    <param name="Visual_odometry">0</param>
 				    <param name="View.Number">4</param>
 				    <param name="Interations.Max">50</param>
 				    <param name="Correspondenc.Treshold">50</param>
