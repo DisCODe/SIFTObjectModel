@@ -18,7 +18,7 @@
 		<Subtask name="Processing">
 			<Executor name="Exec1"  period="0.1">
 				<Component name="Source" type="PCL:PCDReader" priority="1" bump="0">
-					<param name="filename">/home/mlaszkow/pcd/stol.pcd</param>
+					<param name="filename">/home/tkornuta/Objects/cereal_box_1_co5_xyzrgb.pcd</param>
 				</Component>
 				<Component name="Filter" type="PCL:VoxelGrid" priority="1" bump="0">
 				</Component>
@@ -40,11 +40,11 @@
 	
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
-		<Source name="Source.out_pcl">
-			<sink>Filter.in_pcl</sink>
+		<Source name="Source.out_cloud_xyzrgb">
+			<sink>Filter.in_cloud_xyzrgb</sink>
 		</Source>
-		<Source name="Filter.out_pcl">
-			<sink>Window.in_cloud_xyz</sink>
+		<Source name="Filter.out_cloud_xyzrgb">
+			<sink>Window.in_cloud_xyzrgb</sink>
 		</Source>
 	</DataStreams>
 </Task>
