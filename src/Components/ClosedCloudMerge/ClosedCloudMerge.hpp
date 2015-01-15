@@ -125,6 +125,7 @@ public:
     Base::Property<bool> prop_ICP_alignment;
     Base::Property<bool> prop_ICP_alignment_normal;
     Base::Property<bool> prop_ICP_alignment_color;
+    Base::Property<bool> prop_visual_odometry;
     Base::Property<double> ICP_transformation_epsilon;
     Base::Property<float> ICP_max_correspondence_distance;
     Base::Property<int> ICP_max_iterations;

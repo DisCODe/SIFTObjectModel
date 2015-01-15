@@ -43,6 +43,7 @@ ClosedCloudMerge::ClosedCloudMerge(const std::string & name) :
     prop_ICP_alignment("ICP.Points", false),
     prop_ICP_alignment_normal("ICP.Normals", false),
     prop_ICP_alignment_color("ICP.Color", false),
+    prop_visual_odometry("Visual_odometry", true),
     ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
     ICP_max_correspondence_distance("ICP.Correspondence_distance",0.1),
     ICP_max_iterations("ICP.Iterations",2000),
@@ -55,6 +56,7 @@ ClosedCloudMerge::ClosedCloudMerge(const std::string & name) :
     registerProperty(prop_ICP_alignment);
     registerProperty(prop_ICP_alignment_normal);
     registerProperty(prop_ICP_alignment_color);
+    registerProperty(prop_visual_odometry);
     registerProperty(ICP_transformation_epsilon);
     registerProperty(ICP_max_correspondence_distance);
     registerProperty(ICP_max_iterations);
@@ -373,21 +375,26 @@ void ClosedCloudMerge::addViewToModel()
 	CLOG(LINFO) << "  correspondences: " << correspondences->size() ;
     // Compute transformation between clouds and SOMGenerator global transformation of cloud.
 	pcl::Correspondences inliers;
-    Eigen::Matrix4f transSAC = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
-    if (transSAC == Eigen::Matrix4f::Identity())
+    Eigen::Matrix4f transSAC = Eigen::Matrix4f::Identity();
+	
+	if (prop_visual_odometry)
 	{
-		CLOG(LINFO) << "cloud couldn't be merged";
-		counter--;
-		out_cloud_xyzrgb.write(cloud_merged);
-		out_cloud_xyzsift.write(cloud_sift_merged);
+		transSAC = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
+		if (transSAC == Eigen::Matrix4f::Identity())
+		{
+			CLOG(LINFO) << "cloud couldn't be merged";
+			counter--;
+			out_cloud_xyzrgb.write(cloud_merged);
+			out_cloud_xyzsift.write(cloud_sift_merged);
 
-		// Push SOM - depricated.
-//		out_instance.write(produce());
-		return;
+			// Push SOM - depricated.
+	//		out_instance.write(produce());
+			return;
+		}
+
+		pcl::transformPointCloud(*cloud, *cloud, transSAC);
+		pcl::transformPointCloud(*cloud_sift, *cloud_sift, transSAC);
 	}
-
-    pcl::transformPointCloud(*cloud, *cloud, transSAC);
-    pcl::transformPointCloud(*cloud_sift, *cloud_sift, transSAC);
 
     Eigen::Matrix4f transIPC = Eigen::Matrix4f::Identity();
 
