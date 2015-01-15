@@ -83,6 +83,7 @@ void ComputeDistance::computeSIFTDist() {
         double distance = (first_iter->x - sec_iter->x) * (first_iter->x - sec_iter->x)
 			 + (first_iter->y - sec_iter->y) * (first_iter->y - sec_iter->y)
 			 + (first_iter->z - sec_iter->z) * (first_iter->z - sec_iter->z);
+			 distance = sqrt(distance);
         std::cout<<" " << distance;
         distance_sum += distance;
 		first_iter++;

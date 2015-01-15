@@ -20,7 +20,7 @@
                                         <param name="">1</param>
                                 </Component>
                                 <Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
-                                <param name="filenames">/home/mikolaj/models/parts6/gigabite1.json;/home/mikolaj/models/parts6/gigabite2.json;/home/mikolaj/models/parts6/gigabite3.json;/home/mikolaj/models/parts6/gigabite4.json;/home/mikolaj/models/parts6/gigabite5.json;/home/mikolaj/models/parts6/gigabite6.json</param>
+                                <param name="filenames">/home/mikolaj/models/parts4/loyd1.json;/home/mikolaj/models/parts4/loyd2.json;/home/mikolaj/models/parts4/loyd3.json;/home/mikolaj/models/parts4/loyd4.json</param>
                                 </Component>
                                 <Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
                                 </Component>
@@ -37,6 +37,9 @@
                                 <Component name="CloudTransformer" type="PCL:CloudTransformer" priority="6" bump="1">
                                     <param name="filter">4</param>
                                 </Component>
+                                <Component name="CloudTransformer2" type="PCL:CloudTransformer" priority="6" bump="1">
+                                    <param name="filter">3</param>
+                                </Component>
                                 <Component name="Generator" type="SIFTObjectModel:ELECHGenerator" priority="7" bump="1">
 									<param name="ELCH.rejection">0.001</param>
                                     <param name="ICP.Color">0</param>
@@ -47,6 +50,10 @@
                                 <Component name="Distance" type="SIFTObjectModel:ComputeDistance" priority="8" bump="0">
                                 </Component>
                                 <Component name="Macher" type="SIFTObjectModel:CorrespondenceMatcher" priority="9" bump="1">
+                                </Component>
+                                <Component name="Distance2" type="SIFTObjectModel:ComputeDistance" priority="8" bump="0">
+                                </Component>
+                                <Component name="Macher2" type="SIFTObjectModel:CorrespondenceMatcher" priority="9" bump="1">
                                 </Component>
                                 <Component name="VoxelGrid" type="PCL:VoxelGrid" priority="10" bump="0">
                                     <param name="LeafSize.x">0.005</param>
@@ -92,17 +99,29 @@
 
                 <Source name="HMP.out_homogMatrix">
                         <sink>CloudTransformer.in_hm</sink>
+                        <sink>CloudTransformer2.in_hm</sink>
                 </Source>
-
+                
                 <Source name="CloudTransformer.out_cloud_xyzrgb">
-                        <sink>Generator.in_cloud_xyzrgb</sink>
+                        <sink>CloudTransformer2.in_cloud_xyzrgb</sink>
                 </Source>
                 <Source name="CloudTransformer.out_cloud_xyzsift">
-                        <sink>Generator.in_cloud_xyzsift</sink>
+                        <sink>CloudTransformer2.in_cloud_xyzsift</sink>
                 </Source>
                 <Source name="CloudTransformer.out_cloud_transformedsift">
                     <sink>Distance.in_cloud_sift1</sink>
                     <sink>Macher.in_cloud_first_xyzsift</sink>
+                </Source>
+                
+                <Source name="CloudTransformer2.out_cloud_xyzrgb">
+                        <sink>Generator.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="CloudTransformer2.out_cloud_xyzsift">
+                        <sink>Generator.in_cloud_xyzsift</sink>
+                </Source>
+                <Source name="CloudTransformer2.out_cloud_transformedsift">
+                    <sink>Distance2.in_cloud_sift1</sink>
+                    <sink>Macher2.in_cloud_first_xyzsift</sink>
                 </Source>
 
                 <Source name="Generator.out_cloud_xyzrgb">
@@ -116,7 +135,10 @@
                         <sink>Distance.in_cloud_sift2</sink>
                         <sink>Macher.in_cloud_sec_xyzsift</sink>
                 </Source>
-
+                <Source name="Generator.out_cloud_lastsift2">
+					    <sink>Distance2.in_cloud_sift2</sink>
+                        <sink>Macher2.in_cloud_sec_xyzsift</sink>
+				</Source>
                 <Source name="Generator.out_mean_viewpoint_features_number">
                         <sink>Writer.in_mean_viewpoint_features_number</sink>
                 </Source>

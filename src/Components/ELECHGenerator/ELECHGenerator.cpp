@@ -112,7 +112,7 @@ ELECHGenerator::ELECHGenerator(const std::string & name) :
     Elch_loop_dist("ELCH.distance", 0.05),
     Elch_rejection_threshold("ELCH.rejection", 0.01f),
     Elch_ICP_max_iterations("ELCH.maxIPCiterations", 2000),
-    Elch_max_correspondence_distance("ELCH.maxIPCdistance", 0.005),
+    Elch_max_correspondence_distance("ELCH.maxIPCdistance", 0.1),
     ICP_transformation_epsilon("ICP.Tranformation_epsilon",1e-6),
     ICP_max_correspondence_distance("ICP.Correspondence_distance",0.1),
     ICP_max_iterations("ICP.Iterations",2000),
@@ -152,6 +152,7 @@ void ELECHGenerator::prepareInterface() {
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 	registerStream("out_cloud_lastsift", &out_cloud_lastsift);
+    registerStream("out_cloud_lastsift2", &out_cloud_lastsift2);
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
 
     // Register single handler - the "addViewToModel" function.
@@ -421,6 +422,7 @@ void ELECHGenerator::addViewToModel() {
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
         out_cloud_lastsift.write(cloud_sift_merged);
+        out_cloud_lastsift2.write(cloud_sift_merged);
 		return;
 	}
 	//	 Find corespondences between feature clouds.
@@ -516,10 +518,13 @@ void ELECHGenerator::addViewToModel() {
 	out_mean_viewpoint_features_number.write(mean_viewpoint_features_number);
 	out_cloud_xyzrgb.write(cloud_merged);
 	out_cloud_xyzsift.write(cloud_sift_merged);
-    if (counter > 4)
+    if (counter > 4) {
+        out_cloud_lastsift2.write(sift_views[2]);
         out_cloud_lastsift.write(sift_views[3]);
-    else
+	} else {
         out_cloud_lastsift.write(sift_views[counter-1]);
+        out_cloud_lastsift2.write(sift_views[counter-2]);
+	}
 }
 
 } //: namespace ELECHGenerator

@@ -20,7 +20,7 @@
 					<param name="">1</param>
 				</Component>
 				<Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
-                      <param name="filenames">/home/mikolaj/models/parts2/loyd1.json;/home/mikolaj/models/parts2/loyd2.json;/home/mikolaj/models/parts2/loyd3.json;/home/mikolaj/models/parts2/loyd4.json</param>
+                      <param name="filenames">/home/mikolaj/models/parts6/gigabite1.json;/home/mikolaj/models/parts6/gigabite2.json;/home/mikolaj/models/parts6/gigabite3.json;/home/mikolaj/models/parts6/gigabite4.json;/home/mikolaj/models/parts6/gigabite5.json;/home/mikolaj/models/parts6/gigabite6.json</param>
 				</Component>
 				<Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
 				</Component>
@@ -40,7 +40,7 @@
                                 <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="7" bump="0">
                                     <param name="ICP.Color">0</param>
 				    <param name="Visual_odometry">0</param>
-				    <param name="View.Number">4</param>
+				    <param name="View.Number">6</param>
 				    <param name="Interations.Max">50</param>
 				    <param name="Correspondenc.Treshold">50</param>Visual_odometry
 				    <param name="Visual_odometry">0</param>
@@ -86,10 +86,8 @@
 			<sink>CloudTransformer.in_cloud_xyzrgb</sink>
 		</Source>
 		<Source name="GaussCloud.out_cloud_xyzsift">
-			<sink>Distance.in_cloud_sift1</sink>
 			<sink>CloudTransformer.in_cloud_xyzsift</sink>	
 		</Source>
-
                 <Source name="HMP.out_homogMatrix">
                         <sink>CloudTransformer.in_hm</sink>
                 </Source>
@@ -100,6 +98,9 @@
                 <Source name="CloudTransformer.out_cloud_xyzsift">
                         <sink>Generator.in_cloud_xyzsift</sink>
                 </Source>
+                <Source name="CloudTransformer.out_cloud_transformedsift">
+                			<sink>Distance.in_cloud_sift1</sink>
+				</Source>
 
 		<Source name="Generator.out_cloud_xyzrgb">
 			<sink>Writer.in_cloud_xyzrgb</sink>

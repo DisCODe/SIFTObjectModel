@@ -87,6 +87,7 @@ void ClosedCloudMerge::prepareInterface() {
 	registerStream("out_cloud_xyzrgb_normals", &out_cloud_xyzrgb_normals);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
     registerStream("out_cloud_lastsift", &out_cloud_lastsift);
+    registerStream("out_cloud_lastsift2", &out_cloud_lastsift2);
 
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
 
@@ -214,7 +215,7 @@ void ClosedCloudMerge::addViewToModelNormals()
 
 		pcl::transformPointCloud(*cloud, *cloud, transSAC);
 		pcl::transformPointCloud(*cloudrgb, *cloudrgb, transSAC);
-		pcl::transformPointCloud(*cloud_sift, *cloud_sift, transSAC);*/
+		pcl::transformPointCloud(*cloud_sift, *cloud_sift, transSAC);
 	}
 	
 	Eigen::Matrix4f transIPCnorm = Eigen::Matrix4f::Identity();
@@ -365,6 +366,7 @@ void ClosedCloudMerge::addViewToModel()
 		out_cloud_xyzrgb.write(cloud_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
         out_cloud_lastsift.write(cloud_sift_merged);
+        out_cloud_lastsift2.write(cloud_sift_merged);
 
 		// Push SOM - depricated.
 //		out_instance.write(produce());
@@ -487,12 +489,7 @@ void ClosedCloudMerge::addViewToModel()
         cloud_sift_merged = lum_sift.getConcatenatedCloud();
 	}
 
-    Eigen::Matrix4f lastCloudtrans = lum_sift.getTransformation(counter-1) * transIPCColor * transIPC * transSAC;
-
-    //*cloud_sift_merged += *cloud_sift;
-    //
-
-    CLOG(LNOTICE) << "transformacja: \n"<< lastCloudtrans << "\n";
+    
 	CLOG(LINFO) << "model cloud_merged->size(): "<< cloud_merged->size();
 	CLOG(LINFO) << "model cloud_sift_merged->size(): "<< cloud_sift_merged->size();
 
@@ -504,7 +501,13 @@ void ClosedCloudMerge::addViewToModel()
 	out_mean_viewpoint_features_number.write(total_viewpoint_features_number/counter);
 	out_cloud_xyzrgb.write(cloud_merged);
 	out_cloud_xyzsift.write(cloud_sift_merged);
-    out_cloud_lastsift.write(lum_sift.getTransformedCloud(counter-1));
+    if (counter > 4) {
+        out_cloud_lastsift2.write(lum_sift.getTransformedCloud(2));
+        out_cloud_lastsift.write(lum_sift.getTransformedCloud(3));
+	} else {
+        out_cloud_lastsift.write(lum_sift.getTransformedCloud(counter-1));
+        out_cloud_lastsift2.write(lum_sift.getTransformedCloud(counter-2));
+	}
 }
 
 } // namespace ClosedCloudMerge

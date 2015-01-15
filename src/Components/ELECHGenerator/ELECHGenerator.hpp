@@ -101,6 +101,7 @@ protected:
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 	
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_lastsift;
+	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_lastsift2;
 
 	// Mean number of features per view.
 	Base::DataStreamOut<int> out_mean_viewpoint_features_number;
