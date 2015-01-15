@@ -87,20 +87,19 @@ void CorrespondencesViewer::onCSShowClick(const bool new_show_cs_){
     	return;
 
     if(new_show_cs_) {
+	if (new_show_cs_) {
 #if PCL_VERSION_COMPARE(>=,1,7,1)
-        viewer->addCoordinateSystem (1.0, "CloudViewer", 0);
-#else
-        viewer->addCoordinateSystem (1.0);
+		viewer->addCoordinateSystem ();
 #endif
-    }
-    else {
-#if PCL_VERSION_COMPARE(>=,1,7,2)
-        viewer->removeCoordinateSystem ("CloudViewer", 0);
-#elif PCL_VERSION_COMPARE(>=,1,7,1)
-        viewer->removeCoordinateSystem ("CloudViewer");
-#else
-        viewer->removeCoordinateSystem (1.0);
+	// TODO: Currently only 1.7.1 is available in the 012/031 laboratories.
+	// TODO: Fix for other versions of PCL.
+	} else {
+#if PCL_VERSION_COMPARE(>=,1,7,1)
+		viewer->removeCoordinateSystem ();
 #endif
+	// TODO: Currently only 1.7.1 is available in the 012/031 laboratories.
+	// TODO: Fix for other versions of PCL.
+	}
     }
 
     prop_coordinate_system = new_show_cs_;
