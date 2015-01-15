@@ -20,7 +20,7 @@
                                         <param name="">1</param>
                                 </Component>
                                 <Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
-                                        <param name="filenames">/home/mikolaj/models/parts/gigabite4.json;/home/mikolaj/models/parts/gigabite1.json;/home/mikolaj/models/parts/gigabite2.json;/home/mikolaj/models/parts/gigabite3.json</param>
+                                         <param name="filenames">/home/mikolaj/models/parts2/loyd1.json;/home/mikolaj/models/parts2/loyd2.json;/home/mikolaj/models/parts2/loyd3.json;/home/mikolaj/models/parts2/loyd4.json</param>
                                 </Component>
                                 <Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
                                 </Component>
@@ -32,15 +32,16 @@
                                     <param name="offset.z">0</param>
                                     <param name="offset.roll">0</param>
                                     <param name="offset.pitch">0</param>
-                                    <param name="offset.yaw">0</param>
+                                    <param name="offset.yaw">-0.32</param>
                                 </Component>
                                 <Component name="CloudTransformer" type="PCL:CloudTransformer" priority="6" bump="1">
-                                    <param name="filter">4</param>
+                                    <param name="filter">5</param>
                                 </Component>
                                 <Component name="Generator" type="SIFTObjectModel:ELECHGenerator" priority="7" bump="1">
 									<param name="ELCH.rejection">0.001</param>
                                     <param name="ICP.Color">0</param>
                                     <param name="ELCH.distance">0.03</param>
+                                    <param name="ELCH.maxIPCIterations">1000</param>
                                 </Component>
                                 <Component name="Distance" type="SIFTObjectModel:ComputeDistance" priority="8" bump="0">
                                 </Component>

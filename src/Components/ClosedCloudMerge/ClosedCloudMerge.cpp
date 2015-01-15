@@ -197,23 +197,27 @@ void ClosedCloudMerge::addViewToModelNormals()
     CLOG(LINFO) << "  correspondences: " << correspondences->size() ;
     // Compute transformation between clouds and SOMGenerator global transformation of cloud.
 	pcl::Correspondences inliers;
-/*    Eigen::Matrix4f transSAC = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
-    if (transSAC == Eigen::Matrix4f::Identity())
+    Eigen::Matrix4f transSAC = Eigen::Matrix4f::Identity();
+	
+	if (prop_visual_odometry)
 	{
-		CLOG(LINFO) << "cloud couldn't be merged";
-		counter--;
-		out_cloud_xyzrgb.write(cloud_merged);
-		out_cloud_xyzrgb_normals.write(cloud_normal_merged);
-		out_cloud_xyzsift.write(cloud_sift_merged);
+		transSAC = MergeUtils::computeTransformationSAC(cloud_sift, cloud_sift_merged, correspondences, inliers, properties);
+		{
+			CLOG(LINFO) << "cloud couldn't be merged";
+			counter--;
+			out_cloud_xyzrgb.write(cloud_merged);
+			out_cloud_xyzrgb_normals.write(cloud_normal_merged);
+			out_cloud_xyzsift.write(cloud_sift_merged);
 
-		return;
+			return;
+		}
+
+		pcl::transformPointCloud(*cloud, *cloud, transSAC);
+		pcl::transformPointCloud(*cloudrgb, *cloudrgb, transSAC);
+		pcl::transformPointCloud(*cloud_sift, *cloud_sift, transSAC);*/
 	}
-
-    pcl::transformPointCloud(*cloud, *cloud, transSAC);
-    pcl::transformPointCloud(*cloudrgb, *cloudrgb, transSAC);
-    pcl::transformPointCloud(*cloud_sift, *cloud_sift, transSAC);*/
-
-    Eigen::Matrix4f transIPCnorm = Eigen::Matrix4f::Identity();
+	
+	Eigen::Matrix4f transIPCnorm = Eigen::Matrix4f::Identity();
 
     if(prop_ICP_alignment_normal)
     {
