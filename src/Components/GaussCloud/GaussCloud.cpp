@@ -135,7 +135,7 @@ float GaussCloud::generateNumber(float m, float s){
 	      y2 = x2 * w;
 	   }
 	   pass = !pass;
-	   CLOG(LINFO) << "number randoM is: " << (y1 * s + (float) m) ;
+	//   CLOG(LINFO) << "number randoM is: " << (y1 * s + (float) m) ;
 	   return ( (y1 * s + (float) m));
 }
 
