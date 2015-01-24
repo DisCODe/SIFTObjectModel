@@ -20,7 +20,7 @@
 					<param name="">1</param>
 				</Component>
 				<Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
-                      <param name="filenames">/home/mikolaj/models/parts6/gigabite1.json;/home/mikolaj/models/parts6/gigabite2.json;/home/mikolaj/models/parts6/gigabite3.json;/home/mikolaj/models/parts6/gigabite4.json;/home/mikolaj/models/parts6/gigabite5.json;/home/mikolaj/models/parts6/gigabite6.json</param>
+                     <param name="filenames">/home/mikolaj/models/parts4/gigabite4.json;/home/mikolaj/models/parts4/gigabite2.json;/home/mikolaj/models/parts6/gigabite3.json;/home/mikolaj/models/parts6/gigabite1.json</param>
 				</Component>
 				<Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="3" bump="1">
 				</Component>
@@ -47,6 +47,8 @@
 				</Component>
                                 <Component name="Distance" type="SIFTObjectModel:ComputeDistance" priority="8" bump="0">
 				</Component>
+				                                <Component name="Macher" type="SIFTObjectModel:CorrespondenceMatcher" priority="9" bump="1">
+                                </Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="9" bump="0">
                                     <param name="LeafSize.x">0.005</param>
                                     <param name="LeafSize.y">0.005</param>
@@ -100,6 +102,7 @@
                 </Source>
                 <Source name="CloudTransformer.out_cloud_transformedsift">
                 			<sink>Distance.in_cloud_sift1</sink>
+                			<sink>Macher.in_cloud_first_xyzsift</sink>
 				</Source>
 
 		<Source name="Generator.out_cloud_xyzrgb">
@@ -111,6 +114,7 @@
 		</Source>
                 <Source name="Generator.out_cloud_lastsift">
                         <sink>Distance.in_cloud_sift2</sink>
+                        <sink>Macher.in_cloud_sec_xyzsift</sink>
                 </Source>
 		<Source name="Generator.out_mean_viewpoint_features_number">
 			<sink>Writer.in_mean_viewpoint_features_number</sink>

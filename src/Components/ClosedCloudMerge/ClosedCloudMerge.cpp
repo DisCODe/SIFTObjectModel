@@ -352,7 +352,7 @@ void ClosedCloudMerge::addViewToModel()
 	if (counter == 1)
 	{
 		//counter++;
-	//	mean_viewpoint_features_number = cloud_sift->size();
+		//	mean_viewpoint_features_number = cloud_sift->size();
 		// Push results to output data ports.
 		out_mean_viewpoint_features_number.write(cloud_sift->size());
 
