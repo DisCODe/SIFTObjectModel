@@ -78,11 +78,11 @@ ClosedCloudMerge::~ClosedCloudMerge() {
 void ClosedCloudMerge::prepareInterface() {
 	// Register data streams.
 	registerStream("in_cloud_xyzrgb", &in_cloud_xyzrgb);
-	registerStream("in_cloud_xyzrgb_normals", &in_cloud_xyzrgb_normals);
+//NORM:	registerStream("in_cloud_xyzrgb_normals", &in_cloud_xyzrgb_normals);
 	registerStream("in_cloud_xyzsift", &in_cloud_xyzsift);
 	registerStream("out_instance", &out_instance);
 	registerStream("out_cloud_xyzrgb", &out_cloud_xyzrgb);
-	registerStream("out_cloud_xyzrgb_normals", &out_cloud_xyzrgb_normals);
+//NORM:	registerStream("out_cloud_xyzrgb_normals", &out_cloud_xyzrgb_normals);
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 
 	registerStream("out_mean_viewpoint_features_number", &out_mean_viewpoint_features_number);
@@ -92,7 +92,7 @@ void ClosedCloudMerge::prepareInterface() {
 	registerHandler("addViewToModel", &h_addViewToModel);
 	addDependency("addViewToModel", &in_cloud_xyzsift);
 	addDependency("addViewToModel", &in_cloud_xyzrgb);
-	addDependency("addViewToModel", &in_cloud_xyzrgb_normals);
+//NORM:	addDependency("addViewToModel", &in_cloud_xyzrgb_normals);
 }
 
 bool ClosedCloudMerge::onInit() {
@@ -105,7 +105,7 @@ bool ClosedCloudMerge::onInit() {
 
 	cloud_rgb_merged = pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>());
 	cloud_sift_merged = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
-	cloud_normals_merged = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+//NORM:	cloud_normals_merged = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
 	return true;
 }
 
@@ -127,21 +127,21 @@ void ClosedCloudMerge::addViewToModel()
     CLOG(LTRACE) << "ClosedCloudMerge::addViewToModel";
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_rgb = in_cloud_xyzrgb.read();
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normals = in_cloud_xyzrgb_normals.read();
+//NORM:	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normals = in_cloud_xyzrgb_normals.read();
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift = in_cloud_xyzsift.read();
 
 	// TODO if empty()
 
 	CLOG(LINFO) << "cloud_xyzrgb size: "<<cloud_rgb->size();
-	CLOG(LINFO) << "cloud_xyzrgb_normals size: "<<cloud_normals->size();
+//NORM:	CLOG(LINFO) << "cloud_xyzrgb_normals size: "<<cloud_normals->size();
 	CLOG(LINFO) << "cloud_xyzsift size: "<<cloud_sift->size();
 
 	// Remove NaNs.
 	std::vector<int> indices;
 	cloud_rgb->is_dense = false;
 	pcl::removeNaNFromPointCloud(*cloud_rgb, *cloud_rgb, indices);
-	cloud_normals->is_dense = false;
-	pcl::removeNaNFromPointCloud(*cloud_normals, *cloud_normals, indices);
+//NORM:	cloud_normals->is_dense = false;
+//NORM:	pcl::removeNaNFromPointCloud(*cloud_normals, *cloud_normals, indices);
 	cloud_sift->is_dense = false;
 	pcl::removeNaNFromPointCloud(*cloud_sift, *cloud_sift, indices);
 
@@ -150,12 +150,12 @@ void ClosedCloudMerge::addViewToModel()
 
 	// Increment counter.
 	counter++;
-	CLOG(LINFO) << "Adding view number: "<<counter << " to model";
+	CLOG(LINFO) << "Adding view number: "<< (counter-1) << " to model";
 	CLOG(LINFO) << "View cloud_rgb->size(): "<<cloud_rgb->size();
 	CLOG(LINFO) << "View cloud_sift->size(): "<<cloud_sift->size();
 
 	rgb_views.push_back(pcl::PointCloud<pcl::PointXYZRGB>::Ptr (new pcl::PointCloud<pcl::PointXYZRGB>()));
-	rgbn_views.push_back(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr (new pcl::PointCloud<pcl::PointXYZRGBNormal>()));
+//NORM:	rgbn_views.push_back(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr (new pcl::PointCloud<pcl::PointXYZRGBNormal>()));
 	
 
 	// First cloud.
@@ -168,16 +168,16 @@ void ClosedCloudMerge::addViewToModel()
 		out_mean_viewpoint_features_number.write(cloud_sift->size());
 
 		lum_sift.addPointCloud(cloud_sift);
-		*rgbn_views[0] = *cloud_normals;
+//NORM:		*rgbn_views[0] = *cloud_normals;
 		*rgb_views[0] = *cloud_rgb;
 
 
 		*cloud_rgb_merged = *cloud_rgb;
-		*cloud_normals_merged = *cloud_normals;
+//NORM:		*cloud_normals_merged = *cloud_normals;
 		*cloud_sift_merged = *cloud_sift;
 
 		out_cloud_xyzrgb.write(cloud_rgb_merged);
-		out_cloud_xyzrgb_normals.write(cloud_normals_merged);
+//NORM:		out_cloud_xyzrgb_normals.write(cloud_normals_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
 
 		// Push SOM - depricated.
@@ -201,7 +201,7 @@ void ClosedCloudMerge::addViewToModel()
 		CLOG(LWARNING) << "Cloud couldn't be merged - skipping frame from model";
 		counter--;
 		out_cloud_xyzrgb.write(cloud_rgb_merged);
-		out_cloud_xyzrgb_normals.write(cloud_normals_merged);
+//NORM:		out_cloud_xyzrgb_normals.write(cloud_normals_merged);
 		out_cloud_xyzsift.write(cloud_sift_merged);
 
 		// Push SOM - depricated.
@@ -209,7 +209,7 @@ void ClosedCloudMerge::addViewToModel()
 		return;
 	}
 
-	pcl::transformPointCloud(*cloud_normals, *cloud_normals, current_trans);
+//NORM:	pcl::transformPointCloud(*cloud_normals, *cloud_normals, current_trans);
 	pcl::transformPointCloud(*cloud_rgb, *cloud_rgb, current_trans);
 	pcl::transformPointCloud(*cloud_sift, *cloud_sift, current_trans);
 
@@ -222,28 +222,28 @@ void ClosedCloudMerge::addViewToModel()
 
 
 	lum_sift.addPointCloud(cloud_sift);
-	*rgbn_views[counter -1] = *cloud_normals;
+//NORM:	*rgbn_views[counter -1] = *cloud_normals;
 	*rgb_views[counter -1] = *cloud_rgb;
 
-
-	int number_of_corresponding_views = 0;
-
-	CLOG(LINFO) << "Searching for correspondences between current and all previous frames:";
-	for (int i = counter - 2 ; i >= 0; i--)
-	{
-		// Find correspondences.
-		pcl::CorrespondencesPtr correspondences2(new pcl::Correspondences()) ;
-		MergeUtils::computeCorrespondences(lum_sift.getPointCloud(counter - 1), lum_sift.getPointCloud(i), correspondences2);
-
-		// Compute transformation basing on RANSAC.
-		pcl::CorrespondencesPtr correspondences3(new pcl::Correspondences()) ;
-		MergeUtils::computeTransformationSAC(lum_sift.getPointCloud(counter - 1), lum_sift.getPointCloud(i), correspondences2, *correspondences3, properties) ;
-
-		CLOG(LINFO) << " - correspondences with view " << i <<": " << correspondences3->size() << " out of " << correspondences2->size();
-		if (correspondences3->size() > corrTreshold) {
-			lum_sift.setCorrespondences(counter-1, i, correspondences3);
-			number_of_corresponding_views++;
-
+	// If refinement selected - find correspondences and optimize graph.
+	if (prop_LUM_refinement) {
+		int number_of_corresponding_views = 0;
+		CLOG(LINFO) << "Searching for correspondences between current and all previous frames:";
+		for (int i = counter - 2 ; i >= 0; i--)
+		{
+			// Find correspondences.
+			pcl::CorrespondencesPtr correspondences2(new pcl::Correspondences()) ;
+			MergeUtils::computeCorrespondences(lum_sift.getPointCloud(counter - 1), lum_sift.getPointCloud(i), correspondences2);
+	
+			// Compute transformation basing on RANSAC.
+			pcl::CorrespondencesPtr correspondences3(new pcl::Correspondences()) ;
+			MergeUtils::computeTransformationSAC(lum_sift.getPointCloud(counter - 1), lum_sift.getPointCloud(i), correspondences2, *correspondences3, properties) ;
+	
+			CLOG(LINFO) << " - correspondences with view " << i <<": " << correspondences3->size() << " out of " << correspondences2->size();
+			if (correspondences3->size() > corrTreshold) {
+				lum_sift.setCorrespondences(counter-1, i, correspondences3);
+				number_of_corresponding_views++;
+	
 /*			for(int j = 0; j< correspondences3->size();j++){
 				if (correspondences3->at(j).index_query >=lum_sift.getPointCloud(counter - 1)->size() || correspondences3->at(j).index_match >=lum_sift.getPointCloud(i)->size()){
 					continue;
@@ -258,37 +258,34 @@ void ClosedCloudMerge::addViewToModel()
 */
 		}//: if
 
-		//break;
-		//CLOG(LINFO) << "computet for "<<counter-1 <<" and "<< i << "  correspondences2: " << correspondences2->size() << " out of " << correspondences2->size();
-	}//: for
+			//break;
+			//CLOG(LINFO) << "computet for "<<counter-1 <<" and "<< i << "  correspondences2: " << correspondences2->size() << " out of " << correspondences2->size();
+		}//: for
+		if (number_of_corresponding_views == 0 )
+			CLOG(LWARNING) << " No corespondences found between view " << counter << " and other views!";
+		else
+			CLOG(LINFO) << "View " << counter << " has correspondences with " << number_of_corresponding_views << " views";
 
-	if (number_of_corresponding_views == 0 )
-		CLOG(LWARNING) << " No corespondences found between view " << counter << " and other views!";
-	else
-		CLOG(LINFO) << "View " << counter << " has correspondences with " << number_of_corresponding_views << " views";
-
-	*cloud_rgb_merged = *(rgb_views[0]);
-	*cloud_normals_merged = *(rgbn_views[0]);
-
-	// Check LUM.
-	if (prop_LUM_refinement) {
+		// Perform LUM refinement.
 		CLOG(LINFO) << "Refining model with graph optimization - LUM";
 		lum_sift.setMaxIterations(maxIterations);
 		lum_sift.compute();
 		cloud_sift_merged = lum_sift.getConcatenatedCloud ();
-	}
+	}//: if prop_LUM_refinement
 
 	CLOG(LINFO) << "Merging views together";
+	*cloud_rgb_merged = *(rgb_views[0]);
+//NORM:	*cloud_normals_merged = *(rgbn_views[0]);
 
 	for (int i = 1 ; i < counter; i++)
 	{
 		CLOG(LINFO) << "Adding " << i << " view";
 		pcl::PointCloud<pcl::PointXYZRGB> tmp_rgb = *(rgb_views[i]);
-		pcl::PointCloud<pcl::PointXYZRGBNormal> tmp_normals = *(rgbn_views[i]);
-		pcl::transformPointCloud(tmp_normals, tmp_normals, lum_sift.getTransformation (i));
+//NORM:		pcl::PointCloud<pcl::PointXYZRGBNormal> tmp_normals = *(rgbn_views[i]);
+//NORM:		pcl::transformPointCloud(tmp_normals, tmp_normals, lum_sift.getTransformation (i));
 		pcl::transformPointCloud(tmp_rgb, tmp_rgb, lum_sift.getTransformation (i));
 		*cloud_rgb_merged += tmp_rgb;
-		*cloud_normals_merged += tmp_normals;
+//NORM:		*cloud_normals_merged += tmp_normals;
 	}
 
 /*		// Delete points.
@@ -306,7 +303,7 @@ void ClosedCloudMerge::addViewToModel()
 	CLOG(LINFO) << "!Finished!";
 
 	CLOG(LINFO) << "Final model cloud_rgb_merged->size(): "<< cloud_rgb_merged->size();
-	CLOG(LINFO) << "Final model cloud_normals_merged->size(): "<< cloud_normals_merged->size();
+//NORM:	CLOG(LINFO) << "Final model cloud_normals_merged->size(): "<< cloud_normals_merged->size();
 	CLOG(LINFO) << "Final model cloud_sift_merged->size(): "<< cloud_sift_merged->size();
 
 
@@ -316,7 +313,7 @@ void ClosedCloudMerge::addViewToModel()
 	// Push results to output data ports.
 	out_mean_viewpoint_features_number.write(total_viewpoint_features_number/counter);
 	out_cloud_xyzrgb.write(cloud_rgb_merged);
-	out_cloud_xyzrgb_normals.write(cloud_normals_merged);
+//NORM:	out_cloud_xyzrgb_normals.write(cloud_normals_merged);
 	out_cloud_xyzsift.write(cloud_sift_merged);
 }
 

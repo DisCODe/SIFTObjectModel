@@ -71,7 +71,7 @@ protected:
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
 
 	/// Input data stream containing point cloud with normals from a given view.
-	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> in_cloud_xyzrgb_normals;
+//NORM:	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> in_cloud_xyzrgb_normals;
 
 	/// Input data stream containing feature cloud from a given view.
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift;
@@ -83,7 +83,7 @@ protected:
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
 
 	/// Output data stream containing object model point cloud with normals.
-	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> out_cloud_xyzrgb_normals;
+//NORM:	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> out_cloud_xyzrgb_normals;
 
 
 	/// Output data stream containing object model feature cloud (SIFTs).
@@ -107,12 +107,12 @@ protected:
 	int total_viewpoint_features_number;
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_rgb_merged;
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normals_merged;
+//NORM:	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normals_merged;
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
 
 	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> rgb_views;
-	std::vector<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> rgbn_views;
+//NORM:	std::vector<pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr> rgbn_views;
     pcl::registration::LUM<PointXYZSIFT> lum_sift;
 
 
