@@ -106,8 +106,8 @@ protected:
 	/// Total number of features (in all views).
 	int total_viewpoint_features_number;
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged;
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normal_merged;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_rgb_merged;
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_normals_merged;
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
 
@@ -128,7 +128,9 @@ public:
     Base::Property<float> RanSAC_inliers_threshold;
     Base::Property<float> RanSAC_max_iterations;
 
-    Base::Property<int> viewNumber, maxIterations, corrTreshold;
+    Base::Property<int> maxIterations, corrTreshold;
+
+    Base::Property<bool> prop_LUM_refinement;
 };
 
 REGISTER_COMPONENT("ClosedCloudMerge", Processors::ClosedCloudMerge::ClosedCloudMerge)
