@@ -38,5 +38,7 @@ ADD_COMPONENT(CorrespondenceMatcher)
 
 ADD_COMPONENT(PC2SOM)
 
+ADD_COMPONENT(SOMs2PC)
+
 ADD_COMPONENT(xyzrgb2xyzsift)
 
