@@ -48,9 +48,9 @@ ClosedCloudMerge::ClosedCloudMerge(const std::string & name) :
     ICP_max_iterations("ICP.Iterations",2000),
     RanSAC_inliers_threshold("RanSac.Inliers_threshold",0.01f),
     RanSAC_max_iterations("RanSac.Iterations",2000),
-    viewNumber("View.Number", 5),
-    maxIterations("Interations.Max", 5),
-    corrTreshold("Correspondenc.Treshold", 10)
+    prop_LUM_refinement("LUM.use_refinement", false),
+    maxIterations("LUM.max_iterations", 5),
+    corrTreshold("LUM.correspondence_threshold", 10)
 {
     registerProperty(prop_ICP_alignment);
     registerProperty(prop_ICP_alignment_normal);
@@ -61,7 +61,7 @@ ClosedCloudMerge::ClosedCloudMerge(const std::string & name) :
     registerProperty(RanSAC_inliers_threshold);
     registerProperty(RanSAC_max_iterations);
     registerProperty(maxIterations);
-    registerProperty(viewNumber);
+    registerProperty(prop_LUM_refinement);
     registerProperty(corrTreshold);
 
 	properties.ICP_transformation_epsilon = ICP_transformation_epsilon;
@@ -270,23 +270,26 @@ void ClosedCloudMerge::addViewToModel()
 	*cloud_rgb_merged = *(rgb_views[0]);
 	*cloud_normals_merged = *(rgbn_views[0]);
 
-	if (counter > viewNumber) {
-		CLOG(LINFO) << "Refining the model with graph optimization - LUM";
+	// Check LUM.
+	if (prop_LUM_refinement) {
+		CLOG(LINFO) << "Refining model with graph optimization - LUM";
 		lum_sift.setMaxIterations(maxIterations);
 		lum_sift.compute();
 		cloud_sift_merged = lum_sift.getConcatenatedCloud ();
-		CLOG(LINFO) << "Merging views together";
 	}
-		for (int i = 1 ; i < viewNumber; i++)
-		{
-			CLOG(LINFO) << "Adding " << i << " view with refined transformations";
-			pcl::PointCloud<pcl::PointXYZRGB> tmp_rgb = *(rgb_views[i]);
-			pcl::PointCloud<pcl::PointXYZRGBNormal> tmp_normals = *(rgbn_views[i]);
-			pcl::transformPointCloud(tmp_normals, tmp_normals, lum_sift.getTransformation (i));
-			pcl::transformPointCloud(tmp_rgb, tmp_rgb, lum_sift.getTransformation (i));
-			*cloud_rgb_merged += tmp_rgb;
-			*cloud_normals_merged += tmp_normals;
-		}
+
+	CLOG(LINFO) << "Merging views together";
+
+	for (int i = 1 ; i < counter; i++)
+	{
+		CLOG(LINFO) << "Adding " << i << " view";
+		pcl::PointCloud<pcl::PointXYZRGB> tmp_rgb = *(rgb_views[i]);
+		pcl::PointCloud<pcl::PointXYZRGBNormal> tmp_normals = *(rgbn_views[i]);
+		pcl::transformPointCloud(tmp_normals, tmp_normals, lum_sift.getTransformation (i));
+		pcl::transformPointCloud(tmp_rgb, tmp_rgb, lum_sift.getTransformation (i));
+		*cloud_rgb_merged += tmp_rgb;
+		*cloud_normals_merged += tmp_normals;
+	}
 
 /*		// Delete points.
 		pcl::PointCloud<PointXYZSIFT>::iterator pt_iter = cloud_sift_merged->begin();
@@ -297,20 +300,9 @@ void ClosedCloudMerge::addViewToModel()
 				++pt_iter;
 			}
 		}*/
-	} else {
-		CLOG(LINFO) << "Merging views together";
-		for (int i = 1 ; i < counter; i++)
-		{
-			CLOG(LINFO) << "Adding " << i << " view";
-			pcl::PointCloud<pcl::PointXYZRGB> tmp_rgb = *(rgb_views[i]);
-			pcl::PointCloud<pcl::PointXYZRGBNormal> tmp_normals = *(rgbn_views[i]);
-			pcl::transformPointCloud(tmp_normals, tmp_normals, lum_sift.getTransformation (i));
-			pcl::transformPointCloud(tmp_rgb, tmp_rgb, lum_sift.getTransformation (i));
-			*cloud_rgb_merged += tmp_rgb;
-			*cloud_normals_merged += tmp_normals;
-		}
-		cloud_sift_merged = lum_sift.getConcatenatedCloud ();
-	}
+
+	cloud_sift_merged = lum_sift.getConcatenatedCloud ();
+
 	CLOG(LINFO) << "!Finished!";
 
 	CLOG(LINFO) << "Final model cloud_rgb_merged->size(): "<< cloud_rgb_merged->size();
