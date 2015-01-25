@@ -108,6 +108,7 @@ void SOMJSONReader::loadModels() {
 			CLOG(LERROR) << "SOMJSONReader: file "<< namesList[i] <<" not found or invalid\n";
 			continue;	
 		}//: catch
+		CLOG(LINFO) << "Loading SOM from JSON file:" << namesList[i];
 
 		CLOG(LDEBUG) << "name_cloud_xyzrgb:" << name_cloud_xyzrgb;
 		CLOG(LDEBUG) << "name_cloud_xyzsift:" << name_cloud_xyzsift;
@@ -136,9 +137,11 @@ void SOMJSONReader::loadModels() {
 		SIFTObjectModel* model;
 		model = dynamic_cast<SIFTObjectModel*>(produce());
 		models.push_back(model);
+		CLOG(LINFO) << "Properly loaded " << model_name << "SIFT Object Model";
 
 	}//: for
 
+	CLOG(LINFO) << "Loaded " << models.size() << " SIFT Object Models";
 	// Push models to output datastream.
 	out_models.write(models);
 }

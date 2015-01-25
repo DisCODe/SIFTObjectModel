@@ -36,7 +36,7 @@ void SOMs2PC::prepareInterface() {
 	registerHandler("receiveSOMs", boost::bind(&SOMs2PC::receiveSOMs, this));
 	addDependency("receiveSOMs", &in_models);
 
-	registerHandler("returnSelectedSOMClouds", boost::bind(&SOMs2PC::returnSelectedSOMClouds, this));
+//	registerHandler("returnSelectedSOMClouds", boost::bind(&SOMs2PC::returnSelectedSOMClouds, this));
 
 }
 
@@ -88,10 +88,13 @@ void SOMs2PC::receiveSOMs() {
 		else
             CLOG(LWARNING) << "Improper model type!" << endl;
 	}
-    CLOG(LTRACE) << "Received " <<models.size() << " models" << endl;
+	CLOG(LINFO) << "Received " <<models.size() << " SIFT Object Models" << endl;
 
-    //
-    returnSelectedSOMClouds();
+	// Return model if any available.
+	if(models.size() > 0)
+	    returnSelectedSOMClouds();
+	else
+            CLOG(LWARNING) << "No models loaded";
 }
 
 } //: namespace SOMs2PC
