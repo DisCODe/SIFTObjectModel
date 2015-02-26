@@ -21,6 +21,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/registration/correspondence_estimation.h>
 
+
 namespace Processors {
 namespace SIFTObjectMatcher {
 
@@ -80,7 +81,7 @@ protected:
 
 // Output data streams
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
-	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb_model;
+    Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb_model;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift_model;
 	Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;

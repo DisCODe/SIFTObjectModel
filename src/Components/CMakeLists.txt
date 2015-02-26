@@ -42,3 +42,5 @@ ADD_COMPONENT(SOMs2PC)
 
 ADD_COMPONENT(xyzrgb2xyzsift)
 
+
+ADD_COMPONENT(ProjectionGrouping)
