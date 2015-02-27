@@ -64,36 +64,38 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr ProjectionGrouping::getBoundingBox(pcl::Poin
     pcl::PointCloud<pcl::PointXYZ>::Ptr bounding_box (new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointXYZ minPt, maxPt, tmpPt;
     pcl::getMinMax3D(*cloud, minPt, maxPt);
-    bounding_box->push_back(minPt);
-    bounding_box->push_back(maxPt);
+
+
     float x = maxPt.x - minPt.x;
     float y = maxPt.y - minPt.y;
     float z = maxPt.z - minPt.z;
 
+    bounding_box->push_back(minPt); //0
     tmpPt.x = minPt.x + x;
     tmpPt.y = minPt.y;
     tmpPt.z = minPt.z;
-    bounding_box->push_back(tmpPt);
-    tmpPt.x = minPt.x;
-    tmpPt.y = minPt.y + y;
-    tmpPt.z = minPt.z;
-    bounding_box->push_back(tmpPt);
-    tmpPt.x = minPt.x;
-    tmpPt.y = minPt.y;
-    tmpPt.z = minPt.z + z;
-    bounding_box->push_back(tmpPt);
+    bounding_box->push_back(tmpPt); //1
     tmpPt.x = minPt.x + x;
     tmpPt.y = minPt.y + y;
     tmpPt.z = minPt.z;
-    bounding_box->push_back(tmpPt);
+    bounding_box->push_back(tmpPt); //2
+    tmpPt.x = minPt.x;
+    tmpPt.y = minPt.y + y;
+    tmpPt.z = minPt.z;
+    bounding_box->push_back(tmpPt); //3
+    tmpPt.x = minPt.x;
+    tmpPt.y = minPt.y;
+    tmpPt.z = minPt.z + z;
+    bounding_box->push_back(tmpPt); //4
     tmpPt.x = minPt.x + x;
     tmpPt.y = minPt.y;
     tmpPt.z = minPt.z + z;
-    bounding_box->push_back(tmpPt);
+    bounding_box->push_back(tmpPt); //5
+    bounding_box->push_back(maxPt); //6
     tmpPt.x = minPt.x;
     tmpPt.y = minPt.y + y;
     tmpPt.z = minPt.z + z;
-    bounding_box->push_back(tmpPt);
+    bounding_box->push_back(tmpPt); //7
 
     return bounding_box;
 }
@@ -136,23 +138,30 @@ void ProjectionGrouping::group() {
 
     //Get clusters projections by transformations of their bounding boxes
     vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clusters_projections;
-    for(int i=0; i < rototranslations.size(); i++){
+    for(int i=0; i < clustered_correspondences.size(); i++){
         pcl::PointCloud<pcl::PointXYZ>::Ptr tmp (new pcl::PointCloud<pcl::PointXYZ>);
-    //TODO get clusters xyz clouds
         for(int j=0; j < clustered_correspondences[i].size(); j++){
             pcl::PointXYZ tmpPt;
-//            tmpPt.x = cloud_xyzsift_model[clustered_correspondences[i].at(j).index_query]->x;
-//            tmpPt.y = cloud_xyzsift_model[clustered_correspondences[i].at(j).index_query]->y;
-//            tmpPt.z = cloud_xyzsift_model[clustered_correspondences[i].at(j).index_query]->z;
-//            tmp->push_back(tmpPt);
+            int iq = clustered_correspondences[i][j].index_query;
+            //cout << "iq " << iq<<endl;
+            tmpPt.x = cloud_xyzsift_model->at(iq).x;
+            tmpPt.y = cloud_xyzsift_model->at(iq).y;
+            tmpPt.z = cloud_xyzsift_model->at(iq).z;
+            tmp->push_back(tmpPt);
         }
-
-        pcl::transformPointCloud(*tmp, *tmp, rototranslations[i]);
-        clusters_projections.push_back(tmp);
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cluster_bounding_box = getBoundingBox(tmp);
+        pcl::transformPointCloud(*cluster_bounding_box, *cluster_bounding_box, rototranslations[i]);
+        clusters_projections.push_back(cluster_bounding_box);
     }
 
+    vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> projections;
+    //model projections
+    projections.insert(projections.end(), model_projections.begin(), model_projections.end());
+    //clusters projections
+    projections.insert(projections.end(), clusters_projections.begin(), clusters_projections.end());
+
     out_model_bounding_box.write(model_bounding_box);
-    out_projections.write(model_projections);
+    out_projections.write(projections);
 }
 
 

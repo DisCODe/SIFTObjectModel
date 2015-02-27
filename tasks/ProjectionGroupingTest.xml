@@ -18,8 +18,7 @@
 			<Executor name="Processing"  period="1">
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
                                         <param name="filenames">/home/discode/cuboids/models/loyd_kinect.json</param>
-				</Component>
-                                <!-- TODO dostosować do nowej wersji triggera -->
+                                </Component>
                                 <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="2" bump="0">
                                 </Component>
                                 <Component name="SequenceRGB" type="CvBasic:Sequence" priority="3" bump="0">
@@ -27,14 +26,14 @@
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.sort">1</param>
-                                    <param name="mode.auto_trigger">0</param>
+                                    <param name="mode.auto_next_image">0</param>
                                 </Component>
                                 <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="4" bump="0">
                                     <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
                                     <param name="sequence.pattern">.*\_xyz\.yml</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.sort">1</param>
-                                    <param name="mode.auto_trigger">0</param>
+                                    <param name="mode.auto_next_image">0</param>
                                 </Component>
 				<Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
 				</Component>
@@ -69,8 +68,8 @@
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
                 <Source name="NextImageTrigger.out_trigger">
-                        <sink>SequenceRGB.in_trigger</sink>
-                        <sink>SequenceXYZ.in_trigger</sink>
+                        <sink>SequenceRGB.in_next_image_trigger</sink>
+                        <sink>SequenceXYZ.in_next_image_trigger</sink>
                 </Source>
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
@@ -125,7 +124,7 @@
                         <sink>CloudViewer.in_cloud_xyz</sink>
                 </Source>
                 <Source name="ProjectionGrouping.out_projections">
-                        <sink>ClustersViewer.in_clouds</sink>
+                        <sink>ClustersViewer.in_projections</sink>
                 </Source>
 
 
