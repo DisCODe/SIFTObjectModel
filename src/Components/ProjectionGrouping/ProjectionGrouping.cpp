@@ -16,8 +16,9 @@ namespace Processors {
 namespace ProjectionGrouping {
 
 ProjectionGrouping::ProjectionGrouping(const std::string & name) :
-		Base::Component(name)  {
-
+        Base::Component(name),
+        mcn("mcn", 1000) {
+            registerProperty(mcn);
 }
 
 ProjectionGrouping::~ProjectionGrouping() {
@@ -105,6 +106,27 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr ProjectionGrouping::getBoundingBox(pcl::Poin
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz (new pcl::PointCloud<pcl::PointXYZ>);
     copyPointCloud(*cloud_xyzsift, *cloud_xyz);
     return getBoundingBox(cloud_xyz);
+}
+
+float ProjectionGrouping::cuboidIntersection(pcl::PointCloud<pcl::PointXYZ>::Ptr cuboid1, pcl::PointCloud<pcl::PointXYZ>::Ptr cuboid2){
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cuboids (new pcl::PointCloud<pcl::PointXYZ>);
+    *cuboids = *cuboid1 + *cuboid2;
+    pcl::PointXYZ minPt, maxPt;
+    pcl::getMinMax3D(*cuboids, minPt, maxPt);
+
+    int inc1 = 0;
+    int inc2 = 0;
+    int inboth = 0;
+    float x, y, z;
+    //Monte Carlo method
+    srand(time(NULL));
+    for(int i=0; i < mcn; i++){
+        x = minPt.x + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxPt.x-minPt.x)));
+        y = minPt.y + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxPt.y-minPt.y)));
+        z = minPt.z + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxPt.z-minPt.z)));
+    }
+
+    return 0;
 }
 
 void ProjectionGrouping::group() {

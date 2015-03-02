@@ -73,6 +73,8 @@ protected:
     pcl::PointCloud<pcl::PointXYZ>::Ptr getBoundingBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);
     pcl::PointCloud<pcl::PointXYZ>::Ptr getBoundingBox(pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift);
 
+    float cuboidIntersection(pcl::PointCloud<pcl::PointXYZ>::Ptr cuboid1, pcl::PointCloud<pcl::PointXYZ>::Ptr cuboid2);
+
 	// Input data streams
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb_model;
@@ -86,6 +88,8 @@ protected:
     Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZ>::Ptr > out_model_bounding_box;
 
 	// Properties
+    ///Precision of Monte carlo method
+    Base::Property<int> mcn;
 	
 	// Handlers
 	void group();
