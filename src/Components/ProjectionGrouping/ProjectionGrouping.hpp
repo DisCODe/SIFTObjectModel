@@ -73,6 +73,7 @@ protected:
     pcl::PointCloud<pcl::PointXYZ>::Ptr getBoundingBox(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);
     pcl::PointCloud<pcl::PointXYZ>::Ptr getBoundingBox(pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift);
 
+    ///Compute % of cuboid2 is in cuboid1
     float cuboidIntersection(pcl::PointCloud<pcl::PointXYZ>::Ptr cuboid1, pcl::PointCloud<pcl::PointXYZ>::Ptr cuboid2);
 
     void threePointsToPlane (const pcl::PointXYZ &point_a, const pcl::PointXYZ &point_b, const pcl::PointXYZ &point_c, const pcl::ModelCoefficients::Ptr plane);

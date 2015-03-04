@@ -17,7 +17,7 @@ namespace ProjectionGrouping {
 
 ProjectionGrouping::ProjectionGrouping(const std::string & name) :
         Base::Component(name),
-        mcn("mcn", 1000) {
+        mcn("mcn", 10000) {
             registerProperty(mcn);
 }
 
@@ -125,6 +125,7 @@ void ProjectionGrouping::threePointsToPlane (const pcl::PointXYZ &point_a,
     plane->values[i] = eigen_plane.coeffs ()[i];
 }
 
+
 float ProjectionGrouping::cuboidIntersection(pcl::PointCloud<pcl::PointXYZ>::Ptr cuboid1, pcl::PointCloud<pcl::PointXYZ>::Ptr cuboid2){
     CLOG(LTRACE) << "ProjectionGrouping::cuboidIntersection";
     pcl::PointCloud<pcl::PointXYZ>::Ptr cuboids (new pcl::PointCloud<pcl::PointXYZ>);
@@ -161,29 +162,6 @@ float ProjectionGrouping::cuboidIntersection(pcl::PointCloud<pcl::PointXYZ>::Ptr
     threePointsToPlane(cuboid2->at(0), cuboid2->at(1), cuboid2->at(5), plane25);
     threePointsToPlane(cuboid2->at(2), cuboid2->at(3), cuboid2->at(7), plane26);
 
-    // \/A^2 +B^2 +C^2
-    float p11 = sqrt( (plane11->values[0] * plane11->values[0]) + (plane11->values[1] * plane11->values[1]) + (plane11->values[2] * plane11->values[2]) );
-    float p12 = sqrt( (plane12->values[0] * plane12->values[0]) + (plane12->values[1] * plane12->values[1]) + (plane12->values[2] * plane12->values[2]) );
-    float p13 = sqrt( (plane13->values[0] * plane13->values[0]) + (plane13->values[1] * plane13->values[1]) + (plane13->values[2] * plane13->values[2]) );
-    float p14 = sqrt( (plane14->values[0] * plane14->values[0]) + (plane14->values[1] * plane14->values[1]) + (plane14->values[2] * plane14->values[2]) );
-    float p15 = sqrt( (plane15->values[0] * plane15->values[0]) + (plane15->values[1] * plane15->values[1]) + (plane15->values[2] * plane15->values[2]) );
-    float p16 = sqrt( (plane16->values[0] * plane16->values[0]) + (plane16->values[1] * plane16->values[1]) + (plane16->values[2] * plane16->values[2]) );
-    float p21 = sqrt( (plane21->values[0] * plane21->values[0]) + (plane21->values[1] * plane21->values[1]) + (plane21->values[2] * plane21->values[2]) );
-    float p22 = sqrt( (plane22->values[0] * plane22->values[0]) + (plane22->values[1] * plane22->values[1]) + (plane22->values[2] * plane22->values[2]) );
-    float p23 = sqrt( (plane23->values[0] * plane23->values[0]) + (plane23->values[1] * plane23->values[1]) + (plane23->values[2] * plane23->values[2]) );
-    float p24 = sqrt( (plane24->values[0] * plane24->values[0]) + (plane24->values[1] * plane24->values[1]) + (plane24->values[2] * plane24->values[2]) );
-    float p25 = sqrt( (plane25->values[0] * plane25->values[0]) + (plane25->values[1] * plane25->values[1]) + (plane25->values[2] * plane25->values[2]) );
-    float p26 = sqrt( (plane26->values[0] * plane26->values[0]) + (plane26->values[1] * plane26->values[1]) + (plane26->values[2] * plane26->values[2]) );
-
-    //różnica między płaszczyznami
-    float diff112 = abs( plane11->values[3] - plane12->values[3]);
-    float diff134 = abs( plane13->values[3] - plane14->values[3]);
-    float diff156 = abs( plane15->values[3] - plane16->values[3]);
-    float diff212 = abs( plane21->values[3] - plane22->values[3]);
-    float diff234 = abs( plane23->values[3] - plane24->values[3]);
-    float diff256 = abs( plane25->values[3] - plane26->values[3]);
-
-    int inc1 = 0;
     int inc2 = 0;
     int inboth = 0;
     float x, y, z;
@@ -194,45 +172,44 @@ float ProjectionGrouping::cuboidIntersection(pcl::PointCloud<pcl::PointXYZ>::Ptr
         y = minPt.y + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxPt.y-minPt.y)));
         z = minPt.z + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxPt.z-minPt.z)));
 
-        bool in1 = false;
-
-        float dd11 = abs( (plane11->values[0] * x) + (plane11->values[1] * y) + (plane11->values[2] * z) + (plane11->values[3]));
-        float dd12 = abs( (plane12->values[0] * x) + (plane12->values[1] * y) + (plane12->values[2] * z) + (plane12->values[3]));
-        if( (dd11/p11) + (dd12/p12) - diff112 < 0.001){ //czy jest pomiedzy plaszczyznami 1 i 2
-            float dd13 = abs( (plane13->values[0] * x) + (plane13->values[1] * y) + (plane13->values[2] * z) + (plane13->values[3]));
-            float dd14 = abs( (plane14->values[0] * x) + (plane14->values[1] * y) + (plane14->values[2] * z) + (plane14->values[3]));
-            if( (dd13/p13) + (dd14/p14) - diff134 < 0.001){
-                float dd15 = abs( (plane15->values[0] * x) + (plane15->values[1] * y) + (plane13->values[2] * z) + (plane15->values[3]));
-                float dd16 = abs( (plane16->values[0] * x) + (plane16->values[1] * y) + (plane14->values[2] * z) + (plane16->values[3]));
-                if( (dd15/p15) + (dd16/p16) - diff156 < 0.001){
-                    inc1++;
-                    in1 = true;
-                }
-            }
-        }
-
-        float dd21 = abs( (plane21->values[0] * x) + (plane21->values[1] * y) + (plane21->values[2] * z) + (plane21->values[3]));
-        float dd22 = abs( (plane22->values[0] * x) + (plane22->values[1] * y) + (plane22->values[2] * z) + (plane22->values[3]));
-        if( (dd21/p21) + (dd22/p22) - diff212 < 0.001){
-            float dd23 = abs( (plane23->values[0] * x) + (plane23->values[1] * y) + (plane23->values[2] * z) + (plane23->values[3]));
-            float dd24 = abs( (plane24->values[0] * x) + (plane24->values[1] * y) + (plane24->values[2] * z) + (plane24->values[3]));
-            if( (dd23/p23) + (dd24/p24) - diff234 < 0.001){
-                float dd25 = abs( (plane25->values[0] * x) + (plane25->values[1] * y) + (plane23->values[2] * z) + (plane25->values[3]));
-                float dd26 = abs( (plane26->values[0] * x) + (plane26->values[1] * y) + (plane24->values[2] * z) + (plane26->values[3]));
-                if( (dd25/p25) + (dd26/p26) - diff256 < 0.001){
+        bool in2 = false;
+        float dd21 = (plane21->values[0] * x) + (plane21->values[1] * y) + (plane21->values[2] * z) + (plane21->values[3]);
+        float dd22 = (plane22->values[0] * x) + (plane22->values[1] * y) + (plane22->values[2] * z) + (plane22->values[3]);
+        if( (dd21 >= 0 && dd22 <= 0) || (dd21 <= 0 && dd22 >= 0) ){ //is between planes 1 and 2
+            float dd23 = (plane23->values[0] * x) + (plane23->values[1] * y) + (plane23->values[2] * z) + (plane23->values[3]);
+            float dd24 = (plane24->values[0] * x) + (plane24->values[1] * y) + (plane24->values[2] * z) + (plane24->values[3]);
+            if( (dd23 >= 0 && dd24 <= 0) || (dd23 <= 0 && dd24 >= 0)){ //is between planes 3 and 4
+                float dd25 = (plane25->values[0] * x) + (plane25->values[1] * y) + (plane25->values[2] * z) + (plane25->values[3]);
+                float dd26 = (plane26->values[0] * x) + (plane26->values[1] * y) + (plane26->values[2] * z) + (plane26->values[3]);
+                if( (dd25 >= 0 && dd26 <= 0) || (dd25 <= 0 && dd26 >= 0) ){ //is between planes 5 and 6
                     inc2++;
-                    if(in1)
-                        inboth++;
+                    in2 = true;
                 }
             }
         }
-    }
+        if(in2){
+            float dd11 = (plane11->values[0] * x) + (plane11->values[1] * y) + (plane11->values[2] * z) + (plane11->values[3]);
+            float dd12 = (plane12->values[0] * x) + (plane12->values[1] * y) + (plane12->values[2] * z) + (plane12->values[3]);
+            if( (dd11 >= 0 && dd12 <= 0) || (dd11 <= 0 && dd12 >= 0) ){ //is between planes 1 and 2
+                float dd13 = (plane13->values[0] * x) + (plane13->values[1] * y) + (plane13->values[2] * z) + (plane13->values[3]);
+                float dd14 = (plane14->values[0] * x) + (plane14->values[1] * y) + (plane14->values[2] * z) + (plane14->values[3]);
+                if( (dd13 >= 0 && dd14 <= 0) || (dd13 <= 0 && dd14 >= 0)){ //is between planes 3 and 4
+                    float dd15 = (plane15->values[0] * x) + (plane15->values[1] * y) + (plane15->values[2] * z) + (plane15->values[3]);
+                    float dd16 = (plane16->values[0] * x) + (plane16->values[1] * y) + (plane16->values[2] * z) + (plane16->values[3]);
+                    if( (dd15 >= 0 && dd16 <= 0) || (dd15 <= 0 && dd16 >= 0) ){ //is between planes 5 and 6
+                        inboth++;
+                    }
+                }
+            }
+        }//if(in2)
 
-    cout<< "inc1 " <<inc1 << " inc2 " << inc2 << " inboth " << inboth <<endl;
-    if(inc1 == 0)
-        return -1;
 
-    float r = inboth / inc1;
+    }//for
+    CLOG(LTRACE) << "ProjectionGrouping::cuboidIntersection: " << mcn << " random points, " << inc2 << " points in cuboid2, " << inboth << " points in both cuboids.";
+    if(inc2 == 0)
+        return 0;
+    //% of cuboid2 is in cuboid1
+    float r = (float)inboth / (float)inc2;
     return r;
 }
 
@@ -272,7 +249,6 @@ void ProjectionGrouping::group() {
         for(int j=0; j < clustered_correspondences[i].size(); j++){
             pcl::PointXYZ tmpPt;
             int iq = clustered_correspondences[i][j].index_query;
-            //cout << "iq " << iq<<endl;
             tmpPt.x = cloud_xyzsift_model->at(iq).x;
             tmpPt.y = cloud_xyzsift_model->at(iq).y;
             tmpPt.z = cloud_xyzsift_model->at(iq).z;
