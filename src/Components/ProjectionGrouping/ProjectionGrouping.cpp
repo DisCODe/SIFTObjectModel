@@ -259,17 +259,16 @@ void ProjectionGrouping::group() {
         clusters_projections.push_back(cluster_bounding_box);
     }
 
-    if(model_projections.size() >=2 && clusters_projections.size() >= 2){
-        float f1 = cuboidIntersection(model_projections[0], clusters_projections[1]);
-        cout << "wynik m0 c1: " <<f1<< endl;
-        float f2 = cuboidIntersection(model_projections[1], clusters_projections[0]);
-        cout << "wynik m1 c0: " <<f2<< endl;
-        float f3 = cuboidIntersection(model_projections[1], model_projections[0]);
-        cout << "wynik m1 m0: " <<f3<< endl;
+    CLOG(LINFO)<< "Cuboids intersections: ";
+    for(int i = 0; i < model_projections.size(); i++){
+        for(int j = 0; j < clusters_projections.size(); j++){
+            if(i!=j){
+                float f = cuboidIntersection(model_projections[i], clusters_projections[j]);
+                CLOG(LINFO) << "cuboidIntersection(model_projections[" << i << "], clusters_projections[" << j << "]): " << f << endl;
+            }
+        }
     }
-    else{
-        cout<<"za mało danych" <<endl;
-    }
+
 
 
     vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> projections;
