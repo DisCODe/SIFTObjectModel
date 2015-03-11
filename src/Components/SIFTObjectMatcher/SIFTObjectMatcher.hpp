@@ -88,11 +88,7 @@ protected:
     Base::DataStreamOut<pcl::CorrespondencesPtr> out_good_correspondences;
     Base::DataStreamOut<std::vector<pcl::Correspondences> > out_clustered_correspondences;
     Base::DataStreamOut<std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > > out_rototranslations;
-	// Handlers
-	Base::EventHandler2 h_readModels;
-	Base::EventHandler2 h_match;
 
-	
 	// Handlers
 	void readModels();
 	void match();

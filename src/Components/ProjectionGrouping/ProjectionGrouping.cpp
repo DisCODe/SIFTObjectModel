@@ -265,9 +265,14 @@ void ProjectionGrouping::group() {
             if(i!=j){
                 float f = cuboidIntersection(model_projections[i], clusters_projections[j]);
                 CLOG(LINFO) << "cuboidIntersection(model_projections[" << i << "], clusters_projections[" << j << "]): " << f << endl;
+                if(f > 0){ //parametr?
+
+                }
             }
         }
     }
+
+    //TODO średnia transformacja z CvBasic CalcObjectLocation
 
 
 
