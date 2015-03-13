@@ -17,6 +17,7 @@
 #include <pcl/point_types.h>
 #include <pcl/common/common.h>
 #include <pcl/registration/correspondence_estimation.h>
+#include "Types/HomogMatrix.hpp"
 
 
 namespace Processors {
@@ -78,6 +79,8 @@ protected:
 
     void threePointsToPlane (const pcl::PointXYZ &point_a, const pcl::PointXYZ &point_b, const pcl::PointXYZ &point_c, const pcl::ModelCoefficients::Ptr plane);
 
+    Types::HomogMatrix calculateMeanTransformation(std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations);
+
 	// Input data streams
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb;
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb_model;
@@ -89,6 +92,7 @@ protected:
 	// Output data streams
     Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> > out_projections;
     Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZ>::Ptr > out_model_bounding_box;
+    Base::DataStreamOut<Types::HomogMatrix> out_homogMatrix;
 
 	// Properties
     ///Precision of Monte carlo method

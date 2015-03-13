@@ -12,6 +12,9 @@
 
 #include <boost/bind.hpp>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
+
 namespace Processors {
 namespace ProjectionGrouping {
 
@@ -34,6 +37,7 @@ void ProjectionGrouping::prepareInterface() {
 	registerStream("in_rototranslations", &in_rototranslations);
     registerStream("out_projections", &out_projections);
     registerStream("out_model_bounding_box", &out_model_bounding_box);
+    registerStream("out_homogMatrix", &out_homogMatrix);
 	// Register handlers
     registerHandler("group", boost::bind(&ProjectionGrouping::group, this));
     //addDependency("group", &in_cloud_xyzsift);
@@ -162,17 +166,25 @@ float ProjectionGrouping::cuboidIntersection(pcl::PointCloud<pcl::PointXYZ>::Ptr
     threePointsToPlane(cuboid2->at(0), cuboid2->at(1), cuboid2->at(5), plane25);
     threePointsToPlane(cuboid2->at(2), cuboid2->at(3), cuboid2->at(7), plane26);
 
+    //how many points is in cuboid 2
     int inc2 = 0;
+    //in both cuboids
     int inboth = 0;
+
     float x, y, z;
     //Monte Carlo method
     srand(time(NULL));
     for(int i=0; i < mcn; i++){
+        //random point in bounding box of 2 cuboids
         x = minPt.x + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxPt.x-minPt.x)));
         y = minPt.y + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxPt.y-minPt.y)));
         z = minPt.z + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxPt.z-minPt.z)));
 
-        bool in2 = false;
+        bool in2 = false; //point is in cuboid2
+        //equation of a plane : Ax + By + Cz + d = 0
+        //point (xp, yp, zp)
+        //dd = Axp + Byp + Czp + D
+        //if dd1 and dd2 have different signs point is between planes
         float dd21 = (plane21->values[0] * x) + (plane21->values[1] * y) + (plane21->values[2] * z) + (plane21->values[3]);
         float dd22 = (plane22->values[0] * x) + (plane22->values[1] * y) + (plane22->values[2] * z) + (plane22->values[3]);
         if( (dd21 >= 0 && dd22 <= 0) || (dd21 <= 0 && dd22 >= 0) ){ //is between planes 1 and 2
@@ -211,6 +223,95 @@ float ProjectionGrouping::cuboidIntersection(pcl::PointCloud<pcl::PointXYZ>::Ptr
     //% of cuboid2 is in cuboid1
     float r = (float)inboth / (float)inc2;
     return r;
+}
+
+Types::HomogMatrix ProjectionGrouping::calculateMeanTransformation(std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations) {
+    if (rototranslations.size() == 0) {
+        Eigen::Matrix4f i = Eigen::Matrix4f::Identity();
+        Types::HomogMatrix hm;
+        hm.setElements(i);
+        return hm;
+    }
+    if (rototranslations.size() == 1) {
+        Types::HomogMatrix hm;
+        hm.setElements(rototranslations[0]);
+        return hm;
+    }
+
+    vector<cv::Mat_<double> > rvec;
+    vector<cv::Mat_<double> > tvec;
+
+    cv::Mat_<double> tvectemp;
+    cv::Mat_<double> rotMatrix;
+    rotMatrix = cv::Mat_<double>::zeros(3,3);
+    tvectemp = cv::Mat_<double>::zeros(3,1);
+
+
+    for (int r = 0; r < rototranslations.size(); r++) {
+        cv::Mat_<double> rvectemp;
+
+        if (rototranslations[r] == Eigen::Matrix4f::Identity()) {
+            continue;
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                rotMatrix(i,j)=rototranslations[r](i, j);
+            }
+            tvectemp(i, 0) = rototranslations[r](i, 3);
+        }
+
+        Rodrigues(rotMatrix, rvectemp);
+        CLOG(LINFO) << rvectemp << "\n";
+        rvec.push_back(rvectemp);
+        tvec.push_back(tvectemp);
+    }
+
+
+    float fi_sum=0, fi_avg;
+    cv::Mat_<double> axis_sum, axis_avg;
+    cv::Mat_<double> rvec_avg;
+    cv::Mat_<double> tvec_avg, tvec_sum;
+    vector<cv::Mat_<double> > axis;
+    vector<double> fi;
+
+    axis_sum = cv::Mat_<double>::zeros(3,1);
+    tvec_sum = cv::Mat_<double>::zeros(3,1);
+
+    for(int i = 0; i < rvec.size(); i++) {
+        float fitmp = sqrt((pow(rvec.at(i)(0,0), 2) + pow(rvec.at(i)(1,0), 2)+pow(rvec.at(i)(2,0),2)));
+        fi.push_back(fitmp);
+
+        fi_sum+=fitmp;
+        cv::Mat_<double> axistemp;
+        axistemp.create(3,1);
+        for(int k=0;k<3;k++) {
+                axistemp(k,0)=rvec.at(i)(k,0)/fitmp;
+        }
+        axis.push_back(axistemp);
+        axis_sum+=axistemp;
+        tvec_sum+=tvec.at(i);
+    }
+
+    fi_avg = fi_sum/fi.size();
+    axis_avg = axis_sum/axis.size();
+    rvec_avg = axis_avg * fi_avg;
+    tvec_avg = tvec_sum/tvec.size();
+
+    Types::HomogMatrix hm;
+    cv::Mat_<double> rottMatrix;
+    Rodrigues(rvec_avg, rottMatrix);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            hm.setElement(i, j, rottMatrix(i, j));
+            CLOG(LINFO) << hm.getElement(i, j) << "  ";
+        }
+        hm.setElement(i, 3, tvec_avg(i, 0));
+        CLOG(LINFO) << hm.getElement(i, 3) << "\n";
+    }
+
+    return hm;
 }
 
 void ProjectionGrouping::group() {
@@ -259,22 +360,23 @@ void ProjectionGrouping::group() {
         clusters_projections.push_back(cluster_bounding_box);
     }
 
+    //vector<int>
     CLOG(LINFO)<< "Cuboids intersections: ";
     for(int i = 0; i < model_projections.size(); i++){
         for(int j = 0; j < clusters_projections.size(); j++){
             if(i!=j){
                 float f = cuboidIntersection(model_projections[i], clusters_projections[j]);
                 CLOG(LINFO) << "cuboidIntersection(model_projections[" << i << "], clusters_projections[" << j << "]): " << f << endl;
-                if(f > 0){ //parametr?
+                if(f > 0){
 
                 }
             }
         }
     }
 
-    //TODO średnia transformacja z CvBasic CalcObjectLocation
-
-
+    Types::HomogMatrix hm;
+    hm = calculateMeanTransformation(rototranslations);
+    out_homogMatrix.write(hm);
 
     vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> projections;
     //model projections

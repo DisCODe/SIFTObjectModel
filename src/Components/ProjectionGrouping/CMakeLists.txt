@@ -5,12 +5,12 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 FILE(GLOB files *.cpp)
 
 # Find required packages
-
+FIND_PACKAGE( OpenCV REQUIRED )
 
 # Create an executable file from sources:
 ADD_LIBRARY(ProjectionGrouping SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(ProjectionGrouping ${DisCODe_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
+TARGET_LINK_LIBRARIES(ProjectionGrouping ${DisCODe_LIBRARIES} ${OpenCV_LIBS} ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES} )
 
 INSTALL_COMPONENT(ProjectionGrouping)
