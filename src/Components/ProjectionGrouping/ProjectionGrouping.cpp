@@ -333,6 +333,18 @@ void ProjectionGrouping::group() {
         return;
     }
 
+    if(clustered_correspondences.size() == 0){
+        return;
+    }
+
+    if(clustered_correspondences.size() == 1){
+        Types::HomogMatrix hm;
+        hm.setElements(rototranslations[0]);
+        out_homogMatrix.write(hm);
+        return;
+    }
+
+
     //Get 8 points XYZ cloud bounding box of model
     pcl::PointCloud<pcl::PointXYZ>::Ptr model_bounding_box = getBoundingBox(cloud_xyzsift_model);
     //Get model projections by transformations of model bounding box
@@ -360,22 +372,59 @@ void ProjectionGrouping::group() {
         clusters_projections.push_back(cluster_bounding_box);
     }
 
-    //vector<int>
+
+    vector< vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > > hypothesis;
+    //vector<int> h;
+    vector<vector<int> > clusters; //indexy translacji dodanych
     CLOG(LINFO)<< "Cuboids intersections: ";
     for(int i = 0; i < model_projections.size(); i++){
-        for(int j = 0; j < clusters_projections.size(); j++){
-            if(i!=j){
-                float f = cuboidIntersection(model_projections[i], clusters_projections[j]);
-                CLOG(LINFO) << "cuboidIntersection(model_projections[" << i << "], clusters_projections[" << j << "]): " << f << endl;
-                if(f > 0){
-
+        for(int j = i+1; j < clusters_projections.size(); j++){
+                //float f = cuboidIntersection(model_projections[i], clusters_projections[j]);
+                //CLOG(LINFO) << "cuboidIntersection(model_projections[" << i << "], clusters_projections[" << j << "]): " << f << endl;
+                if(cuboidIntersection(model_projections[i], clusters_projections[j]) > 0 || cuboidIntersection(model_projections[j], clusters_projections[i]) > 0){
+                    if(clusters.empty()){ //jeżeli nie ma clustra dodajemy nowy
+                        vector<int> h;
+                        h.push_back(i);
+                        h.push_back(j);
+                        clusters.push_back(h);
+                        vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > hyp;
+                        hyp.push_back(rototranslations[i]);
+                        hyp.push_back(rototranslations[j]);
+                        hypothesis.push_back(hyp);
+                    }
+                    else{
+                        bool added = false;
+                        for(int k = 0; k < clusters.size(); k++){
+                            if(find(clusters[k].begin(), clusters[k].end(), i) != clusters[k].end()){ //jeżeli jest i to dodajemy tylko j
+                                clusters[k].push_back(j);
+                                hypothesis[k].push_back(rototranslations[j]);
+                                added = true;
+                                break;
+                            }
+                            else if(find(clusters[k].begin(), clusters[k].end(), j) != clusters[k].end()){ //jeżeli jest j to dodajemy tylko i
+                                clusters[k].push_back(i);
+                                hypothesis[k].push_back(rototranslations[i]);
+                                added = true;
+                                break;
+                            }
+                        }
+                        if(!added){//jeżeli nie ma nigdzi to nowy klaster
+                            vector<int> h;
+                            h.push_back(i);
+                            h.push_back(j);
+                            clusters.push_back(h);
+                            vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > hyp;
+                            hyp.push_back(rototranslations[i]);
+                            hyp.push_back(rototranslations[j]);
+                            hypothesis.push_back(hyp);
+                        }
+                    }
                 }
-            }
         }
     }
 
     Types::HomogMatrix hm;
-    hm = calculateMeanTransformation(rototranslations);
+    hm = calculateMeanTransformation(hypothesis[0]); //TODO z wybranych macierzy translacji
     out_homogMatrix.write(hm);
 
     vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> projections;
