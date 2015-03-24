@@ -167,12 +167,12 @@ float ProjectionGrouping::cuboidIntersection(pcl::PointCloud<pcl::PointXYZ>::Ptr
     threePointsToPlane(cuboid2->at(0), cuboid2->at(1), cuboid2->at(5), plane25);
     threePointsToPlane(cuboid2->at(2), cuboid2->at(3), cuboid2->at(7), plane26);
 
-    const float diff = 0.001;
-    //if cuboid is plane
-    if(abs(plane11->values[3] - plane12->values[3]) < diff || abs(plane13->values[3] - plane14->values[3]) < diff || abs(plane15->values[3] - plane16->values[3]) < diff ||
-       abs(plane21->values[3] - plane22->values[3]) < diff || abs(plane23->values[3] - plane24->values[3]) < diff || abs(plane25->values[3] - plane26->values[3]) < diff){
-        //TODO
-    }
+//    const float diff = 0.001;
+//    //if cuboid is plane
+//    if(abs(plane11->values[3] - plane12->values[3]) < diff || abs(plane13->values[3] - plane14->values[3]) < diff || abs(plane15->values[3] - plane16->values[3]) < diff ||
+//       abs(plane21->values[3] - plane22->values[3]) < diff || abs(plane23->values[3] - plane24->values[3]) < diff || abs(plane25->values[3] - plane26->values[3]) < diff){
+//        //TODO
+//    }
 
     //how many points is in cuboid 2
     int inc2 = 0;
@@ -270,7 +270,7 @@ Types::HomogMatrix ProjectionGrouping::calculateMeanTransformation(std::vector<E
         }
 
         Rodrigues(rotMatrix, rvectemp);
-        CLOG(LINFO) << rvectemp << "\n";
+        //CLOG(LINFO) << rvectemp << "\n";
         rvec.push_back(rvectemp);
         tvec.push_back(tvectemp);
     }
@@ -313,10 +313,10 @@ Types::HomogMatrix ProjectionGrouping::calculateMeanTransformation(std::vector<E
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             hm.setElement(i, j, rottMatrix(i, j));
-            CLOG(LINFO) << hm.getElement(i, j) << "  ";
+            //CLOG(LINFO) << hm.getElement(i, j) << "  ";
         }
         hm.setElement(i, 3, tvec_avg(i, 0));
-        CLOG(LINFO) << hm.getElement(i, 3) << "\n";
+        //CLOG(LINFO) << hm.getElement(i, 3) << "\n";
     }
 
     return hm;
@@ -340,7 +340,7 @@ void ProjectionGrouping::group() {
         CLOG(LERROR) << "Different number of clusters and translations";
         return;
     }
-
+    CLOG(LTRACE) << "clustered_correspondences size " << clustered_correspondences.size();
     if(clustered_correspondences.size() == 0){
         return;
     }
@@ -384,9 +384,15 @@ void ProjectionGrouping::group() {
     vector< vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > > clusters;
     //vector<int> h;
     vector<vector<int> > clusters_indexes; //indexy translacji dodanych
-    CLOG(LINFO)<< "Cuboids intersections: ";
+    vector<bool> projection_selected;
+    for(int i = 0; i < model_projections.size(); i++){
+        projection_selected.push_back(false);
+    }
+    //CLOG(LINFO)<< "Cuboids intersections: ";
     for(int i = 0; i < model_projections.size(); i++){
         for(int j = i+1; j < clusters_projections.size(); j++){
+                if(projection_selected[i] && projection_selected[j])
+                    continue;
                 //float f = cuboidIntersection(model_projections[i], clusters_projections[j]);
                 //CLOG(LINFO) << "cuboidIntersection(model_projections[" << i << "], clusters_projections[" << j << "]): " << f << endl;
                 if(cuboidIntersection(model_projections[i], clusters_projections[j]) > 0 || cuboidIntersection(model_projections[j], clusters_projections[i]) > 0){
@@ -398,6 +404,8 @@ void ProjectionGrouping::group() {
                         vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > hyp;
                         hyp.push_back(rototranslations[i]);
                         hyp.push_back(rototranslations[j]);
+                        projection_selected[i] = true;
+                        projection_selected[j] = true;
                         clusters.push_back(hyp);
                     }
                     else{
@@ -406,12 +414,14 @@ void ProjectionGrouping::group() {
                             if(find(clusters_indexes[k].begin(), clusters_indexes[k].end(), i) != clusters_indexes[k].end()){ //jeżeli jest i to dodajemy tylko j
                                 clusters_indexes[k].push_back(j);
                                 clusters[k].push_back(rototranslations[j]);
+                                projection_selected[j] = true;
                                 added = true;
                                 break;
                             }
                             else if(find(clusters_indexes[k].begin(), clusters_indexes[k].end(), j) != clusters_indexes[k].end()){ //jeżeli jest j to dodajemy tylko i
                                 clusters_indexes[k].push_back(i);
                                 clusters[k].push_back(rototranslations[i]);
+                                projection_selected[i] = true;
                                 added = true;
                                 break;
                             }
@@ -424,6 +434,8 @@ void ProjectionGrouping::group() {
                             vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > hyp;
                             hyp.push_back(rototranslations[i]);
                             hyp.push_back(rototranslations[j]);
+                            projection_selected[i] = true;
+                            projection_selected[j] = true;
                             clusters.push_back(hyp);
                         }
                     }
@@ -431,8 +443,10 @@ void ProjectionGrouping::group() {
         }
     }
 
+    CLOG(LTRACE) << "clusters.size " <<clusters.size();
     vector<Types::HomogMatrix> hms;
     for(int i = 0; i < clusters.size(); i++){
+        CLOG(LTRACE) << "clusters["<< i << "].size " << clusters[i].size();
         Types::HomogMatrix hm;
         hm = calculateMeanTransformation(clusters[i]);
         hms.push_back(hm);

@@ -46,7 +46,7 @@
                                     <param name="cg_size">0.01f</param>
                                     <param name="cg_thresh">9.0f</param>
 				</Component>
-                                <Component name="ProjectionGrouping" type="SIFTObjectModel:ProjectionGrouping" priority="9" bump="10">
+                                <Component name="ProjectionGrouping" type="SIFTObjectModel:ProjectionGrouping" priority="10" bump="10">
                                     <param name="mcn">10000</param>
                                 </Component>
                         </Executor>
