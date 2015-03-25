@@ -54,11 +54,11 @@
 			<Executor name="Visualization" period="1">
 				<Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
 				</Component>
-                                <Component name="CloudViewer" type="PCL:CloudViewer" priority="2" bump="0">
-                                </Component>
-                                <Component name="ClustersViewer" type="PCL:ClustersViewer" priority="2" bump="0">
+<!--                                <Component name="CloudViewer" type="PCL:CloudViewer" priority="2" bump="0">
+                                </Component>-->
+<!--                                <Component name="ClustersViewer" type="PCL:ClustersViewer" priority="2" bump="0">
                                     <param name="title">Projections</param>
-                                </Component>
+                                </Component>-->
 
                         </Executor>
             </Subtask>
@@ -120,11 +120,11 @@
                 </Source>
 
                 <!-- ProjectionGrouping -->
-                <Source name="ProjectionGrouping.out_model_bounding_box">
+<!--                <Source name="ProjectionGrouping.out_model_bounding_box">
                         <sink>CloudViewer.in_cloud_xyz</sink>
-                </Source>
+                </Source>-->
                 <Source name="ProjectionGrouping.out_projections">
-                        <sink>ClustersViewer.in_projections</sink>
+                        <sink>Window.in_projections</sink>
                 </Source>
 
 

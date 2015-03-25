@@ -94,6 +94,7 @@ protected:
     Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZ>::Ptr > out_model_bounding_box;
     Base::DataStreamOut<Types::HomogMatrix> out_homogMatrix;
     Base::DataStreamOut<vector<Types::HomogMatrix> > out_clustered_translations;
+    Base::DataStreamOut<vector<pcl::PointCloud<pcl::PointXYZ>::Ptr > > out_clustered_clouds;
 
 	// Properties
     ///Precision of Monte carlo method

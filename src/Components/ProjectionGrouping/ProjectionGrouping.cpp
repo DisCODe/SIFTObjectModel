@@ -349,6 +349,25 @@ void ProjectionGrouping::group() {
         Types::HomogMatrix hm;
         hm.setElements(rototranslations[0]);
         out_homogMatrix.write(hm);
+        pcl::PointCloud<pcl::PointXYZ>::Ptr model_bounding_box = getBoundingBox(cloud_xyzsift_model);
+        out_model_bounding_box.write(model_bounding_box);
+        vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> projections;
+        pcl::PointCloud<pcl::PointXYZ>::Ptr model_projection (new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::transformPointCloud(*model_bounding_box, *model_projection, rototranslations[0]);
+        projections.push_back(model_projection);
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cluster_projection (new pcl::PointCloud<pcl::PointXYZ>);
+        for(int j=0; j < clustered_correspondences[0].size(); j++){
+            pcl::PointXYZ tmpPt;
+            int iq = clustered_correspondences[0][j].index_query;
+            tmpPt.x = cloud_xyzsift_model->at(iq).x;
+            tmpPt.y = cloud_xyzsift_model->at(iq).y;
+            tmpPt.z = cloud_xyzsift_model->at(iq).z;
+            cluster_projection->push_back(tmpPt);
+        }
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cluster_bounding_box = getBoundingBox(cluster_projection);
+        pcl::transformPointCloud(*cluster_bounding_box, *cluster_bounding_box, rototranslations[0]);
+        projections.push_back(cluster_bounding_box);
+        out_projections.write(projections);
         return;
     }
 
@@ -365,15 +384,17 @@ void ProjectionGrouping::group() {
 
     //Get clusters projections by transformations of their bounding boxes
     vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clusters_projections;
+    vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clusters_clouds; //chmury XYZ klastrow
     for(int i=0; i < clustered_correspondences.size(); i++){
         pcl::PointCloud<pcl::PointXYZ>::Ptr tmp (new pcl::PointCloud<pcl::PointXYZ>);
+        clusters_clouds.push_back(tmp);
         for(int j=0; j < clustered_correspondences[i].size(); j++){
             pcl::PointXYZ tmpPt;
             int iq = clustered_correspondences[i][j].index_query;
             tmpPt.x = cloud_xyzsift_model->at(iq).x;
             tmpPt.y = cloud_xyzsift_model->at(iq).y;
             tmpPt.z = cloud_xyzsift_model->at(iq).z;
-            tmp->push_back(tmpPt);
+            clusters_clouds[i]->push_back(tmpPt);
         }
         pcl::PointCloud<pcl::PointXYZ>::Ptr cluster_bounding_box = getBoundingBox(tmp);
         pcl::transformPointCloud(*cluster_bounding_box, *cluster_bounding_box, rototranslations[i]);
@@ -452,6 +473,16 @@ void ProjectionGrouping::group() {
         hms.push_back(hm);
     }
     out_clustered_translations.write(hms);
+
+    vector< pcl::PointCloud<pcl::PointXYZ>::Ptr > clouds;
+    for(int i = 0; i < clusters_indexes.size(); i++){
+        pcl::PointCloud<pcl::PointXYZ>::Ptr tmp(new pcl::PointCloud<pcl::PointXYZ>);
+        for(int j = 0; j < clusters_indexes[i].size(); j++){
+            *tmp += *(clusters_clouds[clusters_indexes[i][j]]);
+        }
+        clouds.push_back(tmp);
+    }
+    out_clustered_clouds.write(clouds);
 
     Types::HomogMatrix hm;
     hm = calculateMeanTransformation(clusters[0]);
