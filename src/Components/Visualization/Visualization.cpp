@@ -60,6 +60,8 @@ void Visualization::prepareInterface() {
     h_refresh.setup(boost::bind(&Visualization::refresh, this));
     registerHandler("Refresh", &h_refresh);
     addDependency("Refresh",NULL);
+
+
 }
 
 bool Visualization::onInit() {
@@ -74,6 +76,7 @@ bool Visualization::onInit() {
 
 	 // viewer->addCoordinateSystem (1.0);
 	  viewer->initCameraParameters ();
+	  counter=0;
 
 	return true;
 }
@@ -122,8 +125,10 @@ void Visualization::visualize(){
 	//  else
 	//	  point_cloud_ptr=cloud_xyzrgb;
 
+counter++;
 
 	   point_cloud_ptr=in_cloud_xyzrgb.read();
+
 
 	   CLOG(LINFO)<<"Size of in_cloud_xyzrgb "<<point_cloud_ptr->size();
 

@@ -153,14 +153,14 @@ Eigen::Matrix4f MergeUtils::computeTransformationICP(const pcl::PointCloud<pcl::
         // Set the transformation epsilon (criterion 2)
         icp.setTransformationEpsilon (properties.ICP_transformation_epsilon); //property
         // Set the euclidean distance difference epsilon (criterion 3)
-        icp.setEuclideanFitnessEpsilon (1); // property ?
+        icp.setEuclideanFitnessEpsilon (0.001); // property ?
 
         icp.setInputSource(cloud_src);
         icp.setInputTarget(cloud_trg);
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr Final (new pcl::PointCloud<pcl::PointXYZRGB>());
         icp.align(*Final);
-      //  CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
-
+        //CLOG(LINFO) << "ICP has converged:" << icp.hasConverged() << " score: " << icp.getFitnessScore();
+        //CLOG(LINFO) << "Sensor origin: " << icp.getInputSource()->sensor_origin_;
         // Get the transformation from target to source.
         return icp.getFinalTransformation();//.inverse();
 }
@@ -177,7 +177,7 @@ Eigen::Matrix4f MergeUtils::computeTransformationICPColor(const pcl::PointCloud<
         // Set the transformation epsilon (criterion 2)
         icp.setTransformationEpsilon (properties.ICP_transformation_epsilon); //property
         // Set the euclidean distance difference epsilon (criterion 3)
-        icp.setEuclideanFitnessEpsilon (1); // property ?
+        icp.setEuclideanFitnessEpsilon (0.001); // property ?
 
         pcl::registration::CorrespondenceEstimationColor<pcl::PointXYZRGB, pcl::PointXYZRGB, float>::Ptr ceptr(new pcl::registration::CorrespondenceEstimationColor<pcl::PointXYZRGB, pcl::PointXYZRGB, float>);
         icp.setCorrespondenceEstimation(ceptr);
@@ -200,6 +200,7 @@ Eigen::Matrix4f MergeUtils::computeTransformationICPColor(const pcl::PointCloud<
 
 Eigen::Matrix4f MergeUtils::computeTransformationICPNormals(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_src, const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_trg, Properties properties)
 {
+
     // Use ICP to get "better" transformation.
     pcl::IterativeClosestPointWithNormals<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal> icp;
 
@@ -222,8 +223,9 @@ Eigen::Matrix4f MergeUtils::computeTransformationICPNormals(const pcl::PointClou
     pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr reg_result (new pcl::PointCloud<pcl::PointXYZRGBNormal>());
     reg_result = cloud_src;
 
-    for (int i = 0; i < 100; ++i)
-    {
+   // for (int i = 0; i < 100; ++i)
+   // {
+
       // Estimate
         icp.setInputSource(reg_result);
         icp.align (*Final);
@@ -233,16 +235,18 @@ Eigen::Matrix4f MergeUtils::computeTransformationICPNormals(const pcl::PointClou
         	return Eigen::Matrix4f::Identity();
         }
   		//accumulate transformation between each Iteration
-      Ti = icp.getFinalTransformation () * Ti;
+     // Ti = icp.getFinalTransformation () * Ti;
 
   		//if the difference between this transformation and the previous one
   		//is smaller than the threshold, refine the process by reducing
   		//the maximal correspondence distance
-      if (fabs ((icp.getLastIncrementalTransformation () - prev).sum ()) < icp.getTransformationEpsilon ())
-        icp.setMaxCorrespondenceDistance (icp.getMaxCorrespondenceDistance () - 0.001);
+
+    //  if (fabs ((icp.getLastIncrementalTransformation () - prev).sum ()) < icp.getTransformationEpsilon ())
+    //    icp.setMaxCorrespondenceDistance (icp.getMaxCorrespondenceDistance () - 0.001);
+
       prev = icp.getLastIncrementalTransformation ();
       reg_result= Final;
-    }
+   // }
 
     // Get the transformation from target to source.
     return icp.getFinalTransformation();//.inverse();
