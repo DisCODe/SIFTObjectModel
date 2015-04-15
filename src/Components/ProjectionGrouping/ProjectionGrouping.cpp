@@ -39,6 +39,7 @@ void ProjectionGrouping::prepareInterface() {
     registerStream("out_model_bounding_box", &out_model_bounding_box);
     registerStream("out_homogMatrix", &out_homogMatrix);
     registerStream("out_clustered_translations", &out_clustered_translations);
+    registerStream("out_clustered_clouds", &out_clustered_clouds);
 	// Register handlers
     registerHandler("group", boost::bind(&ProjectionGrouping::group, this));
     //addDependency("group", &in_cloud_xyzsift);
@@ -480,6 +481,7 @@ void ProjectionGrouping::group() {
         for(int j = 0; j < clusters_indexes[i].size(); j++){
             *tmp += *(clusters_clouds[clusters_indexes[i][j]]);
         }
+        pcl::transformPointCloud(*tmp, *tmp, hms[i].getElements());
         clouds.push_back(tmp);
     }
     out_clustered_clouds.write(clouds);

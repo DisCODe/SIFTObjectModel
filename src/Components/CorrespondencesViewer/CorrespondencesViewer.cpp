@@ -145,7 +145,7 @@ void CorrespondencesViewer::displayCorrespondences(){
     clusters = clustered_corrs.size();
 
     //Remove bounding boxes
-    viewer->removeAllShapes();
+    //TODOviewer->removeAllShapes();
 
     //If no clustered corrs display corrs from in_correspondences and in_good_correspondences
     if(clusters == 0){
@@ -257,8 +257,7 @@ void CorrespondencesViewer::prepareInterface() {
     registerHandler("on_clouds", boost::bind(&CorrespondencesViewer::on_clouds, this));
 	addDependency("on_clouds", &in_cloud_xyzsift1);
 	addDependency("on_clouds", &in_cloud_xyzsift2);
-	addDependency("on_clouds", &in_cloud_xyzrgb1);
-    //addDependency("on_clouds", &in_correspondences);
+    addDependency("on_clouds", &in_cloud_xyzrgb1);
 	addDependency("on_clouds", &in_cloud_xyzrgb2);	
     registerHandler("on_projections", boost::bind(&CorrespondencesViewer::on_projections, this));
     addDependency("on_projections", &in_projections);
@@ -443,7 +442,7 @@ void CorrespondencesViewer::on_clusters() {
         for(int i = clusters_clouds; i < clusters.size() && i<10; i++){
             char id = '0' + i;
             viewer->addPointCloud<pcl::PointXYZ> (pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>), std::string("cluster") + id);
-            viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, std::string("cluster") + id);
+            viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, std::string("cluster") + id);
             viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR,
                                                         colors[i][0],
                                                         colors[i][1],
@@ -467,6 +466,16 @@ void CorrespondencesViewer::on_clusters() {
         char id = '0' + i;
         viewer->updatePointCloud(clusters[i],std::string("cluster") + id);
         LOG(LTRACE) << "update cluster "<< i <<endl;
+
+        if(display_clusters_bounding_boxes){
+            CLOG(LTRACE) << "CorrespondencesViewer Display clusters Bounding Boxes";
+            vector<int> indices;
+            Eigen::Vector4f min_pt, max_pt;
+            pcl::getMinMax3D(*clusters[i], indices, min_pt, max_pt);
+            viewer->addCube (min_pt[0], max_pt[0], min_pt[1], max_pt[1], min_pt[2], max_pt[2], colors[i][0], colors[i][1], colors[i][2], "cubec"+id);
+            viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, 10, "cubec"+id);
+
+        }
     }
 }
 
