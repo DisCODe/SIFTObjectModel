@@ -16,25 +16,33 @@
 	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
-				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="4">
+                                <Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="1" bump="1">
+                                        <!--<param name="camera_matrix">1445.69543371487 0 622.89561146331; 0 1451.60719632398 499.310147973752; 0 0 1</param>
+                                        <param name="dist_coeffs">-0.213368795840596 0.133203194326672 0.00176762788151009 -0.00218227169891789 0</param>-->
+                                        <param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
+                                        <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
+                                </Component>
+                                <Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="4">
                                         <param name="filenames">/home/discode/cuboids/models/loyd_kinect.json</param>
                                 </Component>
-                                <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="2" bump="0">
+                                <!--Sequences-->
+                                <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="3" bump="0">
                                 </Component>
-                                <Component name="SequenceRGB" type="CvBasic:Sequence" priority="3" bump="0">
+                                <Component name="SequenceRGB" type="CvBasic:Sequence" priority="4" bump="0">
                                     <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">0</param>
                                 </Component>
-                                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="4" bump="0">
+                                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="5" bump="0">
                                     <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
                                     <param name="sequence.pattern">.*\_xyz\.yml</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">0</param>
                                 </Component>
+                                <!--Processing-->
 				<Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
 				</Component>
 				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
@@ -49,6 +57,31 @@
                                 <Component name="ProjectionGrouping" type="SIFTObjectModel:ProjectionGrouping" priority="10" bump="10">
                                     <param name="mcn">10000</param>
                                 </Component>
+                                <!-- Detect coordinations -->
+                                <Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="11">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+                                </Component>
+                                <Component name="DetectCirclesInv" type="CvBasic:CvFindCirclesGrid" priority="12">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+                                        <param name="image.inverse">1</param>
+                                </Component>
+                                <Component name="SolvePNP" type="CvBasic:CvSolvePnP" priority="13">
+                                        <param name="offset.x">0.075</param>
+                                        <param name="offset.y">0.233</param>
+                                        <param name="offset.roll">3.14159265359</param>
+                                </Component>
+                                <Component name="SolvePNPinv" type="CvBasic:CvSolvePnP" priority="14">
+                                        <param name="offset.x">0.075</param>
+                                        <param name="offset.y">-0.113</param>
+                                        <param name="offset.roll">3.14159265359</param>
+                                </Component>
+                                <Component name="SolveLocation" type="CvBasic:CalcObjectLocation" priority="15" bump="5">
+                                </Component>
+
                         </Executor>
 
 			<Executor name="Visualization" period="1">
@@ -68,6 +101,7 @@
 	
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
+                <!--Sequences-->
                 <Source name="NextImageTrigger.out_trigger">
                         <sink>SequenceRGB.in_next_image_trigger</sink>
                         <sink>SequenceXYZ.in_next_image_trigger</sink>
@@ -75,11 +109,15 @@
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
                         <sink>Converter.in_rgb_stereo</sink>
+
+                        <sink>DetectCircles.in_img</sink>
+                        <sink>DetectCirclesInv.in_img</sink>
 		</Source>
                 <Source name="SequenceXYZ.out_img">
                         <sink>Converter.in_depth_xyz</sink>
                         <sink>FeatureCloudConverter.in_depth_xyz</sink>
 		</Source>
+                <!--Proccesing-->
 		<Source name="SIFT.out_descriptors">
 			<sink>FeatureCloudConverter.in_descriptors</sink>	
 		</Source>
@@ -92,7 +130,7 @@
 		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
 			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>	
 		</Source>
-
+                <!--Read model-->
 		<Source name="SOMJSONReader.out_models">
 			<sink>SIFTObjectMatcher.in_models</sink>
 		</Source>
@@ -130,6 +168,23 @@
                 <Source name="ProjectionGrouping.out_clustered_clouds">
                         <sink>Window.in_clusters</sink>
                 </Source>
+
+                <!-- Detect coordinations -->
+                <Source name="DetectCircles.out_pattern">
+                        <sink>SolvePNP.in_object3d</sink>
+                </Source>
+                <Source name="DetectCirclesInv.out_pattern">
+                        <sink>SolvePNPinv.in_object3d</sink>
+                </Source>
+                <Source name = "SolvePNPinv.out_homogMatrix">
+                        <sink>SolveLocation.in_homogMatrix</sink>
+                </Source>
+                <Source name= "SolvePNP.out_homogMatrix">
+                        <sink>SolveLocation.in_homogMatrix</sink>
+                </Source>
+<!--                <Source name= "SolveLocation.out_homogMatrix">
+
+                </Source>-->
 
 
 			

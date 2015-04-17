@@ -40,7 +40,7 @@
 				<Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="3">
                                         <param name="grid.width">3</param>
                                         <param name="grid.height">5</param>
-                                        <param name="grid.size">0.06f</param><!-- 0.06-->
+                                        <param name="grid.size">0.06f</param>
 				</Component>
 				
 				<Component name="DetectCirclesInv" type="CvBasic:CvFindCirclesGrid" priority="4">
