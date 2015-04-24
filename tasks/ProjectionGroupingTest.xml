@@ -22,22 +22,23 @@
                                         <param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
                                         <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
                                 </Component>
-                                <Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="4">
-                                        <param name="filenames">/home/discode/cuboids/models/loyd_kinect.json</param>
+                                <Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="10">
+                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/ahmad1.json</param>
                                 </Component>
                                 <!--Sequences-->
                                 <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="3" bump="0">
                                 </Component>
-                                <Component name="SequenceRGB" type="CvBasic:Sequence" priority="4" bump="0">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
+                                <Component name="SequenceRGB" type="CvBasic:Sequence" priority="4" bump="10">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/ahmad/</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">0</param>
                                 </Component>
-                                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="5" bump="0">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
-                                    <param name="sequence.pattern">.*\_xyz\.yml</param>
+                                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="5" bump="10">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/ahmad/</param>
+                                    <param name="sequence.pattern">.*\_depth\.png</param>
+<!--                                    <param name="sequence.pattern">.*\_xyz\.yml</param>-->
                                     <param name="mode.loop">1</param>
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">0</param>
@@ -101,6 +102,12 @@
 	
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
+                <Source name="CameraInfo.out_camera_info">
+                        <sink>SolvePNP.in_camerainfo</sink>
+                        <sink>SolvePNPinv.in_camerainfo</sink>
+                        <sink>Converter.in_camera_info</sink>
+                        <sink>FeatureCloudConverter.in_camera_info</sink>
+                </Source>
                 <!--Sequences-->
                 <Source name="NextImageTrigger.out_trigger">
                         <sink>SequenceRGB.in_next_image_trigger</sink>
@@ -108,14 +115,13 @@
                 </Source>
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
-                        <sink>Converter.in_rgb_stereo</sink>
-
+                        <sink>Converter.in_color</sink>
                         <sink>DetectCircles.in_img</sink>
                         <sink>DetectCirclesInv.in_img</sink>
 		</Source>
                 <Source name="SequenceXYZ.out_img">
-                        <sink>Converter.in_depth_xyz</sink>
-                        <sink>FeatureCloudConverter.in_depth_xyz</sink>
+                        <sink>Converter.in_depth</sink> <!--_xyz-->
+                        <sink>FeatureCloudConverter.in_depth</sink>
 		</Source>
                 <!--Proccesing-->
 		<Source name="SIFT.out_descriptors">
@@ -131,9 +137,9 @@
 			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>	
 		</Source>
                 <!--Read model-->
-		<Source name="SOMJSONReader.out_models">
+                <Source name="SOMJSONReader.out_models">
 			<sink>SIFTObjectMatcher.in_models</sink>
-		</Source>
+                </Source>
 
                 <!-- SIFTObjectMatcher -->
 		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb">   
@@ -168,7 +174,8 @@
                 <Source name="ProjectionGrouping.out_clustered_clouds">
                         <sink>Window.in_clusters</sink>
                 </Source>
-
+<!--            <Source name="ProjectionGrouping.out_homogMatrix">
+                </Source>-->
                 <!-- Detect coordinations -->
                 <Source name="DetectCircles.out_pattern">
                         <sink>SolvePNP.in_object3d</sink>
@@ -176,10 +183,10 @@
                 <Source name="DetectCirclesInv.out_pattern">
                         <sink>SolvePNPinv.in_object3d</sink>
                 </Source>
-                <Source name = "SolvePNPinv.out_homogMatrix">
+                <Source name="SolvePNPinv.out_homogMatrix">
                         <sink>SolveLocation.in_homogMatrix</sink>
                 </Source>
-                <Source name= "SolvePNP.out_homogMatrix">
+                <Source name="SolvePNP.out_homogMatrix">
                         <sink>SolveLocation.in_homogMatrix</sink>
                 </Source>
 <!--                <Source name= "SolveLocation.out_homogMatrix">

@@ -19,7 +19,7 @@ GreedyVerification::GreedyVerification(const std::string & name) :
 		Base::Component(name) , 
         resolution("resolution", 0.005f),
         inlier_treshold("inlier_treshold", 0.005f),
-        lambda("lambda", 3.f){
+        lambda("lambda", 1.5f){
 	registerProperty(resolution);
 	registerProperty(inlier_treshold);
     registerProperty(lambda);
@@ -31,7 +31,7 @@ GreedyVerification::~GreedyVerification() {
 
 void GreedyVerification::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
-    registerStream("in_cloud_xyzsift_model", &in_aligned_hypotheses);
+    registerStream("in_aligned_hypotheses", &in_aligned_hypotheses);
 	registerStream("in_cloud_xyzsift_scene", &in_cloud_xyzsift_scene);
 	// Register handlers
 	registerHandler("verify", boost::bind(&GreedyVerification::verify, this));
@@ -71,7 +71,7 @@ void GreedyVerification::verify() {
         aligned_hypotheses_xyz.push_back(cloud);
     }
 
-    float lambda = 3;
+
 //    pcl::GreedyVerification<PointXYZSIFT, PointXYZSIFT> greedy_hv(lambda);
     pcl::GreedyVerification<pcl::PointXYZ, pcl::PointXYZ> greedy_hv(lambda);
     greedy_hv.setResolution (resolution);
