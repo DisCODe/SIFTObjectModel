@@ -52,3 +52,7 @@ ADD_COMPONENT(ProjectionGrouping)
 
 ADD_COMPONENT(VectorToSequence)
 
+
+ADD_COMPONENT(GreedyVerification)
+
+ADD_COMPONENT(Projection)
