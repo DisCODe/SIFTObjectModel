@@ -56,3 +56,7 @@ ADD_COMPONENT(VectorToSequence)
 ADD_COMPONENT(GreedyVerification)
 
 ADD_COMPONENT(Projection)
+
+ADD_COMPONENT(ConflictGraph)
+
+ADD_COMPONENT(GlobalHypothesesVerification)

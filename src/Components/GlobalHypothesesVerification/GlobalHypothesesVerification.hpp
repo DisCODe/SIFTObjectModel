@@ -4,8 +4,8 @@
  * \author Michal Laszkowski
  */
 
-#ifndef GREEDYVERIFICATION_HPP_
-#define GREEDYVERIFICATION_HPP_
+#ifndef GLOBALHYPOTHESESVERIFICATION_HPP_
+#define GLOBALHYPOTHESESVERIFICATION_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -14,28 +14,28 @@
 #include "EventHandler2.hpp"
 
 #include <Types/PointXYZSIFT.hpp>
-#include <pcl/recognition/hv/greedy_verification.h>
+#include <pcl/recognition/hv/hv_go.h>
 
 namespace Processors {
-namespace GreedyVerification {
+namespace GlobalHypothesesVerification {
 
 /*!
- * \class GreedyVerification
- * \brief GreedyVerification processor class.
+ * \class GlobalHypothesesVerification
+ * \brief GlobalHypothesesVerification processor class.
  *
  * 
  */
-class GreedyVerification: public Base::Component {
+class GlobalHypothesesVerification: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	GreedyVerification(const std::string & name = "GreedyVerification");
+	GlobalHypothesesVerification(const std::string & name = "GlobalHypothesesVerification");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~GreedyVerification();
+	virtual ~GlobalHypothesesVerification();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -68,7 +68,7 @@ protected:
 
 
 	// Input data streams
-    Base::DataStreamIn<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > in_aligned_hypotheses;
+	Base::DataStreamIn<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > in_aligned_hypotheses;
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift_scene;
 
 	// Output data streams
@@ -76,8 +76,11 @@ protected:
 
 	// Properties
 	Base::Property<float> resolution;
-	Base::Property<float> inlier_treshold;
-    Base::Property<float> lambda;
+	Base::Property<float> inlier_threshold;
+	Base::Property<float> radius_clutter;
+	Base::Property<float> regularizer;
+	Base::Property<float> clutter_regularizer;
+	Base::Property<bool> detect_clutter;
 
 	
 	// Handlers
@@ -85,12 +88,12 @@ protected:
 
 };
 
-} //: namespace GreedyVerification
+} //: namespace GlobalHypothesesVerification
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("GreedyVerification", Processors::GreedyVerification::GreedyVerification)
+REGISTER_COMPONENT("GlobalHypothesesVerification", Processors::GlobalHypothesesVerification::GlobalHypothesesVerification)
 
-#endif /* GREEDYVERIFICATION_HPP_ */
+#endif /* GLOBALHYPOTHESESVERIFICATION_HPP_ */

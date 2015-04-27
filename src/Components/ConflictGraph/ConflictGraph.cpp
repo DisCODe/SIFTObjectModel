@@ -7,64 +7,68 @@
 #include <memory>
 #include <string>
 
-#include "GreedyVerification.hpp"
+#include "ConflictGraph.hpp"
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
 
 namespace Processors {
-namespace GreedyVerification {
+namespace ConflictGraph {
 
-GreedyVerification::GreedyVerification(const std::string & name) :
+ConflictGraph::ConflictGraph(const std::string & name) :
 		Base::Component(name) , 
-        resolution("resolution", 0.005f),
-        inlier_treshold("inlier_treshold", 0.005f),
-        lambda("lambda", 1.5f){
+		resolution("resolution", 0.005f), 
+		inlier_treshold("inlier_treshold", 0.005f), 
+		support_threshold("support_threshold", 0.08f), 
+		penalty_threshold("penalty_threshold", 0.05f), 
+		conflict_threshold("conflict_threshold", 0.02f) {
 	registerProperty(resolution);
 	registerProperty(inlier_treshold);
-    registerProperty(lambda);
+	registerProperty(support_threshold);
+	registerProperty(penalty_threshold);
+	registerProperty(conflict_threshold);
 
 }
 
-GreedyVerification::~GreedyVerification() {
+ConflictGraph::~ConflictGraph() {
 }
 
-void GreedyVerification::prepareInterface() {
+void ConflictGraph::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
-    registerStream("in_aligned_hypotheses", &in_aligned_hypotheses);
+	registerStream("in_aligned_hypotheses", &in_aligned_hypotheses);
     registerStream("in_cloud_xyzsift_scene", &in_cloud_xyzsift_scene);
     registerStream("out_verified_hypotheses", &out_verified_hypotheses);
 	// Register handlers
-	registerHandler("verify", boost::bind(&GreedyVerification::verify, this));
-    addDependency("verify", &in_aligned_hypotheses);
+	registerHandler("verify", boost::bind(&ConflictGraph::verify, this));
+	addDependency("verify", &in_aligned_hypotheses);
 	addDependency("verify", &in_cloud_xyzsift_scene);
 
 }
 
-bool GreedyVerification::onInit() {
+bool ConflictGraph::onInit() {
 
 	return true;
 }
 
-bool GreedyVerification::onFinish() {
+bool ConflictGraph::onFinish() {
 	return true;
 }
 
-bool GreedyVerification::onStop() {
+bool ConflictGraph::onStop() {
 	return true;
 }
 
-bool GreedyVerification::onStart() {
+bool ConflictGraph::onStart() {
 	return true;
 }
 
-void GreedyVerification::verify() {
-    CLOG(LTRACE) << "GreedyVerification::verify";
+void ConflictGraph::verify() {
+    CLOG(LTRACE) << "ConflictGraph::verify";
     pcl::PointCloud<PointXYZSIFT>::Ptr scene = in_cloud_xyzsift_scene.read();
     std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> aligned_hypotheses = in_aligned_hypotheses.read();
 
     if(aligned_hypotheses.size() == 0){
-        CLOG(LINFO) << "GreedyVerification No hypotheses available";
+        CLOG(LINFO) << "ConflictGraph No hypotheses available";
         return;
     }
 
@@ -77,26 +81,29 @@ void GreedyVerification::verify() {
         aligned_hypotheses_xyz.push_back(cloud);
     }
 
-    pcl::GreedyVerification<pcl::PointXYZ, pcl::PointXYZ> greedy_hv(lambda);
-    greedy_hv.setResolution (resolution);
-    greedy_hv.setInlierThreshold (inlier_treshold);
-    greedy_hv.setSceneCloud (scene_xyz);
-    greedy_hv.addModels (aligned_hypotheses_xyz, true);
-    greedy_hv.verify ();
+    pcl::PapazovHV<pcl::PointXYZ, pcl::PointXYZ> papazov;
+    papazov.setResolution (resolution);
+    papazov.setInlierThreshold (inlier_treshold);
+    papazov.setSupportThreshold (support_threshold);
+    papazov.setPenaltyThreshold (penalty_threshold);
+    papazov.setConflictThreshold (conflict_threshold);
+    papazov.setSceneCloud (scene_xyz);
+    papazov.addModels (aligned_hypotheses_xyz, true);
+    papazov.verify ();
     std::vector<bool> mask_hv;
-    greedy_hv.getMask (mask_hv);
+    papazov.getMask (mask_hv);
 
     if(mask_hv.size() != aligned_hypotheses.size()){
-       CLOG(LERROR) << "GreedyVerification wrong vector size";
+       CLOG(LERROR) << "ConflictGraph wrong vector size";
     }
     std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> verified_hypotheses;
     for(int i = 0; i < mask_hv.size(); i++){
         if(mask_hv[i]){
             verified_hypotheses.push_back(aligned_hypotheses[i]);
-            CLOG(LINFO) << "GreedyVerification: Hypothese " << i << " is CORRECT";
+            CLOG(LINFO) << "ConflictGraph: Hypothese " << i << " is CORRECT";
         }
         else{
-            CLOG(LINFO) << "GreedyVerification: Hypothese " << i << " is NOT correct";
+            CLOG(LINFO) << "ConflictGraph: Hypothese " << i << " is NOT correct";
         }
 
     }
@@ -106,5 +113,5 @@ void GreedyVerification::verify() {
 
 
 
-} //: namespace GreedyVerification
+} //: namespace ConflictGraph
 } //: namespace Processors

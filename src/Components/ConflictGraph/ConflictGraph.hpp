@@ -4,8 +4,8 @@
  * \author Michal Laszkowski
  */
 
-#ifndef GREEDYVERIFICATION_HPP_
-#define GREEDYVERIFICATION_HPP_
+#ifndef CONFLICTGRAPH_HPP_
+#define CONFLICTGRAPH_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -14,28 +14,28 @@
 #include "EventHandler2.hpp"
 
 #include <Types/PointXYZSIFT.hpp>
-#include <pcl/recognition/hv/greedy_verification.h>
+#include <pcl/recognition/hv/hv_papazov.h>
 
 namespace Processors {
-namespace GreedyVerification {
+namespace ConflictGraph {
 
 /*!
- * \class GreedyVerification
- * \brief GreedyVerification processor class.
+ * \class ConflictGraph
+ * \brief ConflictGraph processor class.
  *
  * 
  */
-class GreedyVerification: public Base::Component {
+class ConflictGraph: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	GreedyVerification(const std::string & name = "GreedyVerification");
+	ConflictGraph(const std::string & name = "ConflictGraph");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~GreedyVerification();
+	virtual ~ConflictGraph();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -68,7 +68,7 @@ protected:
 
 
 	// Input data streams
-    Base::DataStreamIn<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > in_aligned_hypotheses;
+	Base::DataStreamIn<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > in_aligned_hypotheses;
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift_scene;
 
 	// Output data streams
@@ -77,7 +77,9 @@ protected:
 	// Properties
 	Base::Property<float> resolution;
 	Base::Property<float> inlier_treshold;
-    Base::Property<float> lambda;
+	Base::Property<float> support_threshold;
+	Base::Property<float> penalty_threshold;
+	Base::Property<float> conflict_threshold;
 
 	
 	// Handlers
@@ -85,12 +87,12 @@ protected:
 
 };
 
-} //: namespace GreedyVerification
+} //: namespace ConflictGraph
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("GreedyVerification", Processors::GreedyVerification::GreedyVerification)
+REGISTER_COMPONENT("ConflictGraph", Processors::ConflictGraph::ConflictGraph)
 
-#endif /* GREEDYVERIFICATION_HPP_ */
+#endif /* CONFLICTGRAPH_HPP_ */
