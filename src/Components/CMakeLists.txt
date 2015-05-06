@@ -60,3 +60,5 @@ ADD_COMPONENT(Projection)
 ADD_COMPONENT(ConflictGraph)
 
 ADD_COMPONENT(GlobalHypothesesVerification)
+
+ADD_COMPONENT(ReprojectionError)

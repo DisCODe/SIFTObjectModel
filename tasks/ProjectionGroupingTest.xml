@@ -83,6 +83,10 @@
                                 <Component name="SolveLocation" type="CvBasic:CalcObjectLocation" priority="15" bump="5">
                                 </Component>
 
+
+                                <Component name="ReprojectionError" type="SIFTObjectModel:ReprojectionError" priority="16" bump="5">
+                                </Component>
+
                         </Executor>
 
 			<Executor name="Visualization" period="1">
@@ -162,6 +166,7 @@
                 </Source>
                 <Source name="SIFTObjectMatcher.out_rototranslations">
                         <sink>ProjectionGrouping.in_rototranslations</sink>
+                        <sink>ReprojectionError.in_rototranslations</sink>
                 </Source>
 
                 <!-- ProjectionGrouping -->
@@ -189,9 +194,11 @@
                 <Source name="SolvePNP.out_homogMatrix">
                         <sink>SolveLocation.in_homogMatrix</sink>
                 </Source>
-<!--                <Source name= "SolveLocation.out_homogMatrix">
 
-                </Source>-->
+
+                <Source name= "SolveLocation.out_homogMatrix">
+                        <sink>ReprojectionError.in_location_hm</sink>
+                </Source>
 
 
 			
