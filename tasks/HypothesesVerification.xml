@@ -114,19 +114,21 @@
                 <!-- SIFTObjectMatcher -->
 		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb">   
                         <sink>Window.in_cloud_xyzrgb1</sink>
+                        <sink>Projection.in_cloud_xyzrgb_scene</sink>
+                        <sink>GreedyVerification.in_cloud_xyzrgb_scene</sink>
+                        <sink>ConflictGraph.in_cloud_xyzrgb_scene</sink>
+                        <sink>GlobalHypothesesVerification.in_cloud_xyzrgb_scene</sink>
 		</Source>
 		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
+                        <sink>Projection.in_cloud_xyzrgb_model</sink>
                         <sink>Window.in_cloud_xyzrgb2</sink>
 		</Source>
 		<Source name="SIFTObjectMatcher.out_cloud_xyzsift">
-                        <sink>Projection.in_cloud_xyzsift_scene</sink>
-                        <sink>GreedyVerification.in_cloud_xyzsift_scene</sink>
-                        <sink>ConflictGraph.in_cloud_xyzsift_scene</sink>
-                        <sink>GlobalHypothesesVerification.in_cloud_xyzsift_scene</sink>
+
                         <sink>Window.in_cloud_xyzsift1</sink>
 		</Source>
 		<Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
-                        <sink>Projection.in_cloud_xyzsift_model</sink>
+
                         <sink>Window.in_cloud_xyzsift2</sink>
 		</Source>
                 <Source name="SIFTObjectMatcher.out_clustered_correspondences">
@@ -137,10 +139,10 @@
                 </Source>
 
                 <!-- Projection -->
-                <Source name="Projection.out_registered_instances">
-                        <sink>GreedyVerification.in_aligned_hypotheses</sink>
-                        <sink>ConflictGraph.in_aligned_hypotheses</sink>
-                        <sink>GlobalHypothesesVerification.in_aligned_hypotheses</sink>
+                <Source name="Projection.out_registered_instances_xyzrgb">
+                        <sink>GreedyVerification.in_aligned_hypotheses_xyzrgb</sink>
+                        <sink>ConflictGraph.in_aligned_hypotheses_xyzrgb</sink>
+                        <sink>GlobalHypothesesVerification.in_aligned_hypotheses_xyzrgb</sink>
                 </Source>
 
 

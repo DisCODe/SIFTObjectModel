@@ -68,12 +68,16 @@ protected:
 
 
 	// Input data streams
-	Base::DataStreamIn<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > in_aligned_hypotheses;
+    Base::DataStreamIn<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > in_aligned_hypotheses_xyzsift;
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift_scene;
-
+    Base::DataStreamIn<std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> > in_aligned_hypotheses_xyzrgb;
+    Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb_scene;
+    Base::DataStreamIn<std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> > in_aligned_hypotheses_xyz;
+    Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZ>::Ptr> in_cloud_xyz_scene;
 	// Output data streams
-    Base::DataStreamOut<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > out_verified_hypotheses;
-
+    Base::DataStreamOut<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > out_verified_hypotheses_xyzsift;
+    Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> > out_verified_hypotheses_xyzrgb;
+    Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> > out_verified_hypotheses_xyz;
 	// Properties
 	Base::Property<float> resolution;
 	Base::Property<float> inlier_treshold;
@@ -83,7 +87,9 @@ protected:
 
 	
 	// Handlers
-	void verify();
+    void verify();
+    void verify_xyzrgb();
+    void verify_xyzsift();
 
 };
 

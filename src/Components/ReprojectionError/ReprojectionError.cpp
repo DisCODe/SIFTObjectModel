@@ -73,15 +73,18 @@ void ReprojectionError::calculate_errors(std::vector<Eigen::Matrix4f, Eigen::ali
     CLOG(LTRACE) << "ReprojectionError::calculate_errors";
     location(3,3) = 1;
     CLOG(LDEBUG)<< endl << location ;
+    if(rototranslations.empty()){
+        CLOG(LINFO)<< "ReprojectionError No hypotheses available" ;
+    }
     for(int i = 0; i < rototranslations.size(); i++){
         rototranslations[i](3,3) = 1;
 
         CLOG(LDEBUG)<< "Translation " << i << endl << rototranslations[i]<<endl;
         Eigen::Matrix4f dT = rototranslations[i] * location.inverse();
-        cout<< dT <<endl;
+        CLOG(LDEBUG)<< "dT" << endl << dT <<endl;
         float et = sqrt( pow(dT(0,3), 2) + pow(dT(1,3), 2) + pow(dT(2,3), 2));
         float er = acos((dT.trace()-1-1)/2);
-        CLOG(LINFO)<< i << " et "<< et << " er " << er<< endl;
+        CLOG(LINFO)<< "ReprojectionError Hypothese " << i << " et "<< et << " er " << er<< endl;
 
     }
 }
