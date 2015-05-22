@@ -181,7 +181,6 @@ void GlobalHypothesesVerification::verify_xyzrgb() {
         return;
     }
 
-
     pcl::GlobalHypothesesVerification<pcl::PointXYZRGB, pcl::PointXYZRGB> go;
     go.setResolution (resolution);
     go.setInlierThreshold (inlier_threshold);

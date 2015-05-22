@@ -19,6 +19,9 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/kdtree/impl/kdtree_flann.hpp>
 
+#include <pcl/common/common.h>
+#include <pcl/filters/passthrough.h>
+
 namespace Processors {
 namespace Projection {
 
@@ -82,11 +85,14 @@ protected:
 	// Output data streams
     Base::DataStreamOut<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > out_registered_instances_xyzsift;
     Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> > out_registered_instances_xyzrgb;
+    Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_parts_of_scene_xyzrgb;
     Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> > out_registered_instances_xyz;
 
 	// Properties
     Base::Property<int> icp_max_iter;
     Base::Property<float> icp_corr_distance;
+    Base::Property<float> bounding_box_epsilon;
+    Base::Property<bool> use_icp;
 	
 	// Handlers
     void project();

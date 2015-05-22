@@ -84,6 +84,7 @@
 
                                 <!-- Verification -->
                                 <Component name="Projection" type="SIFTObjectModel:Projection" priority="17" bump="1">
+                                        <param name="use_icp">0</param>
                                 </Component>
                                 <Component name="GreedyVerification" type="SIFTObjectModel:GreedyVerification" priority="18" bump="1">
                                         <param name="resolution">0.005f</param>
@@ -204,6 +205,11 @@
                         <sink>GlobalHypothesesVerification.in_aligned_hypotheses_xyzrgb</sink>
                 </Source>
 
+                <Source name="Projection.out_parts_of_scene_xyzrgb">
+                        <sink>GreedyVerification.in_cloud_xyzrgb_scene</sink>
+                        <sink>ConflictGraph.in_cloud_xyzrgb_scene</sink>
+                        <sink>GlobalHypothesesVerification.in_cloud_xyzrgb_scene</sink>
+                </Source>
 
 			
 	</DataStreams>

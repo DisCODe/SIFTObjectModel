@@ -1,40 +1,40 @@
 <Task>
-	<!-- reference task information -->
-	<Reference>
-		<Author>
-			<name>Michal Laszkowski</name>
-			<link></link>
-		</Author>
-		
-		<Description>
+        <!-- reference task information -->
+        <Reference>
+                <Author>
+                        <name>Michal Laszkowski</name>
+                        <link></link>
+                </Author>
+
+                <Description>
                         <brief>SOM:VerificationTest</brief>
-			<full></full>	
-		</Description>
-	</Reference>
-	
-	<!-- task definition -->
-	<Subtasks>
-		<Subtask name="Main">
-			<Executor name="Processing"  period="1">
+                        <full></full>
+                </Description>
+        </Reference>
+
+        <!-- task definition -->
+        <Subtasks>
+                <Subtask name="Main">
+                        <Executor name="Processing"  period="1">
                                 <Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="1" bump="0">
                                         <param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
                                         <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
                                 </Component>
                                 <Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="0">
-                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/ahmad1.json</param>
+                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/herbapol_mieta1.json</param>
                                 </Component>
                                 <!--Sequences-->
                                 <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="3" bump="0">
                                 </Component>
                                 <Component name="SequenceRGB" type="CvBasic:Sequence" priority="4" bump="0">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/ahmad/</param>
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta/</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">0</param>
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">1</param>
                                 </Component>
                                 <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="5" bump="0">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/ahmad/</param>
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta/</param>
                                     <param name="sequence.pattern">.*\_depth\.png</param>
 <!--                                    <param name="sequence.pattern">.*\_xyz\.yml</param>-->
                                     <param name="mode.loop">0</param>
@@ -42,16 +42,16 @@
                                     <param name="mode.auto_next_image">1</param>
                                 </Component>
                                 <!--Processing-->
-				<Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
-				</Component>
-				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
-				</Component>
-				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
-				</Component>
-				
-				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
+                                <Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
+                                </Component>
+                                <Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
+                                </Component>
+                                <Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
+                                </Component>
+
+                                <Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
                                     <param name="cg_size">0.01f</param>
-                                    <param name="cg_thresh">9.0f</param>
+                                    <param name="cg_thresh">8.0f</param>
                                 </Component>
                                 <!-- Detect coordinations -->
                                 <Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="11">
@@ -84,6 +84,7 @@
 
                                 <!-- Verification -->
                                 <Component name="Projection" type="SIFTObjectModel:Projection" priority="17" bump="1">
+                                        <param name="use_icp">0</param>
                                 </Component>
                                 <Component name="GreedyVerification" type="SIFTObjectModel:GreedyVerification" priority="18" bump="1">
                                         <param name="resolution">0.005f</param>
@@ -116,11 +117,11 @@
                         </Executor>
 -->
             </Subtask>
-	
-	</Subtasks>
-	
-	<!-- pipes connecting datastreams -->
-	<DataStreams>
+
+        </Subtasks>
+
+        <!-- pipes connecting datastreams -->
+        <DataStreams>
                 <Source name="CameraInfo.out_camera_info">
                         <sink>SolvePNP.in_camerainfo</sink>
                         <sink>SolvePNPinv.in_camerainfo</sink>
@@ -132,44 +133,45 @@
                         <sink>SequenceRGB.in_next_image_trigger</sink>
                         <sink>SequenceXYZ.in_next_image_trigger</sink>
                 </Source>
-		<Source name="SequenceRGB.out_img">
-			<sink>SIFT.in_img</sink>
+                <Source name="SequenceRGB.out_img">
+                        <sink>SIFT.in_img</sink>
                         <sink>Converter.in_color</sink>
                         <sink>DetectCircles.in_img</sink>
                         <sink>DetectCirclesInv.in_img</sink>
-		</Source>
+                </Source>
                 <Source name="SequenceXYZ.out_img">
                         <sink>Converter.in_depth</sink> <!--_xyz-->
                         <sink>FeatureCloudConverter.in_depth</sink>
-		</Source>
+                </Source>
                 <!--Proccesing-->
-		<Source name="SIFT.out_descriptors">
-			<sink>FeatureCloudConverter.in_descriptors</sink>	
-		</Source>
-		<Source name="SIFT.out_features">
-			<sink>FeatureCloudConverter.in_features</sink>	
-		</Source>		
-		<Source name="Converter.out_cloud_xyzrgb">
-			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>		
-		</Source>
-		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
-			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>	
-		</Source>
+                <Source name="SIFT.out_descriptors">
+                        <sink>FeatureCloudConverter.in_descriptors</sink>
+                </Source>
+                <Source name="SIFT.out_features">
+                        <sink>FeatureCloudConverter.in_features</sink>
+                </Source>
+                <Source name="Converter.out_cloud_xyzrgb">
+                        <sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="FeatureCloudConverter.out_cloud_xyzsift">
+                        <sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>
+                </Source>
                 <!--Read model-->
                 <Source name="SOMJSONReader.out_models">
-			<sink>SIFTObjectMatcher.in_models</sink>
+                        <sink>SIFTObjectMatcher.in_models</sink>
                 </Source>
 
                 <!-- SIFTObjectMatcher -->
-		<Source name="SIFTObjectMatcher.out_cloud_xyzsift">
-                        <sink>Projection.in_cloud_xyzsift_scene</sink>
-                        <sink>GreedyVerification.in_cloud_xyzsift_scene</sink>
-                        <sink>ConflictGraph.in_cloud_xyzsift_scene</sink>
-                        <sink>GlobalHypothesesVerification.in_cloud_xyzsift_scene</sink>
-		</Source>
-		<Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
-                        <sink>Projection.in_cloud_xyzsift_model</sink>
+                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
+                        <sink>Projection.in_cloud_xyzrgb_scene</sink>
+                        <sink>GreedyVerification.in_cloud_xyzrgb_scene</sink>
+                        <sink>ConflictGraph.in_cloud_xyzrgb_scene</sink>
+                        <sink>GlobalHypothesesVerification.in_cloud_xyzrgb_scene</sink>
                 </Source>
+                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
+                        <sink>Projection.in_cloud_xyzrgb_model</sink>
+                </Source>
+
                 <Source name="SIFTObjectMatcher.out_rototranslations">
                         <sink>Projection.in_rototranslations</sink>
                         <sink>ReprojectionError.in_rototranslations</sink>
@@ -197,15 +199,20 @@
                 </Source>
 
                 <!-- Projection -->
-                <Source name="Projection.out_registered_instances">
-                        <sink>GreedyVerification.in_aligned_hypotheses</sink>
-                        <sink>ConflictGraph.in_aligned_hypotheses</sink>
-                        <sink>GlobalHypothesesVerification.in_aligned_hypotheses</sink>
+                <Source name="Projection.out_registered_instances_xyzrgb">
+                        <sink>GreedyVerification.in_aligned_hypotheses_xyzrgb</sink>
+                        <sink>ConflictGraph.in_aligned_hypotheses_xyzrgb</sink>
+                        <sink>GlobalHypothesesVerification.in_aligned_hypotheses_xyzrgb</sink>
+                </Source>
+
+                <Source name="Projection.out_parts_of_scene_xyzrgb">
+                        <sink>GreedyVerification.in_cloud_xyzrgb_scene</sink>
+                        <sink>ConflictGraph.in_cloud_xyzrgb_scene</sink>
+                        <sink>GlobalHypothesesVerification.in_cloud_xyzrgb_scene</sink>
                 </Source>
 
 
-			
-	</DataStreams>
+        </DataStreams>
 </Task>
 
 

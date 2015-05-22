@@ -176,7 +176,6 @@ void ConflictGraph::verify_xyzrgb() {
         return;
     }
 
-
     pcl::PapazovHV<pcl::PointXYZRGB, pcl::PointXYZRGB> papazov;
     papazov.setResolution (resolution);
     papazov.setInlierThreshold (inlier_treshold);

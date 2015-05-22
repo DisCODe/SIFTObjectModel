@@ -40,6 +40,7 @@ void GreedyVerification::prepareInterface() {
     registerStream("in_aligned_hypotheses_xyz", &in_aligned_hypotheses_xyz);
     registerStream("in_cloud_xyz_scene", &in_cloud_xyz_scene);
     registerStream("out_verified_hypotheses_xyz", &out_verified_hypotheses_xyz);
+
 	// Register handlers
     registerHandler("verify_xyzsift", boost::bind(&GreedyVerification::verify_xyzsift, this));
     addDependency("verify_xyzsift", &in_aligned_hypotheses_xyzsift);
