@@ -180,6 +180,16 @@ void GlobalHypothesesVerification::verify_xyzrgb() {
         CLOG(LINFO) << "GlobalHypothesesVerification No hypotheses available";
         return;
     }
+    for(int i = 0; i < aligned_hypotheses.size(); i++){
+        if(aligned_hypotheses[i]->size()==0){
+            cout<< "GlobalHypothesesVerification DUPA"<<endl;
+            return;
+        }
+    }
+    if(scene->size() == 0){
+            cout<< "GlobalHypothesesVerification DUPA"<<endl;
+            return;
+    }
 
     pcl::GlobalHypothesesVerification<pcl::PointXYZRGB, pcl::PointXYZRGB> go;
     go.setResolution (resolution);

@@ -1,39 +1,39 @@
-<Task>
+<?xml version="1.0" ?><Task>
         <!-- reference task information -->
         <Reference>
                 <Author>
                         <name>Michal Laszkowski</name>
-                        <link></link>
+                        <link/>
                 </Author>
 
                 <Description>
                         <brief>SOM:VerificationTest</brief>
-                        <full></full>
+                        <full/>
                 </Description>
         </Reference>
 
         <!-- task definition -->
         <Subtasks>
                 <Subtask name="Main">
-                        <Executor name="Processing"  period="1">
-                                <Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="1" bump="0">
+                        <Executor name="Processing" period="1">
+                                <Component bump="0" name="CameraInfo" priority="1" type="CvCoreTypes:CameraInfoProvider">
                                         <param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
                                         <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
                                 </Component>
-                                <Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="0">
+                                <Component bump="0" name="SOMJSONReader" priority="2" type="SIFTObjectModel:SOMJSONReader">
                                         <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/herbapol_mieta1.json</param>
                                 </Component>
                                 <!--Sequences-->
-                                <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="3" bump="0">
+                                <Component bump="0" name="NextImageTrigger" priority="3" type="CvBasic:Trigger">
                                 </Component>
-                                <Component name="SequenceRGB" type="CvBasic:Sequence" priority="4" bump="0">
+                                <Component bump="0" name="SequenceRGB" priority="4" type="CvBasic:Sequence">
                                     <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta/</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">0</param>
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">1</param>
                                 </Component>
-                                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="5" bump="0">
+                                <Component bump="0" name="SequenceXYZ" priority="5" type="CvBasic:Sequence">
                                     <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta/</param>
                                     <param name="sequence.pattern">.*\_depth\.png</param>
 <!--                                    <param name="sequence.pattern">.*\_xyz\.yml</param>-->
@@ -42,62 +42,62 @@
                                     <param name="mode.auto_next_image">1</param>
                                 </Component>
                                 <!--Processing-->
-                                <Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
+                                <Component bump="0" name="SIFT" priority="6" type="CvBasic:CvSIFT">
                                 </Component>
-                                <Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
+                                <Component bump="0" name="Converter" priority="7" type="PCL:DepthConverter">
                                 </Component>
-                                <Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
+                                <Component bump="0" name="FeatureCloudConverter" priority="8" type="SIFTObjectModel:FeatureCloudConverter">
                                 </Component>
 
-                                <Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
+                                <Component bump="0" name="SIFTObjectMatcher" priority="9" type="SIFTObjectModel:SIFTObjectMatcher">
                                     <param name="cg_size">0.01f</param>
                                     <param name="cg_thresh">8.0f</param>
                                 </Component>
                                 <!-- Detect coordinations -->
-                                <Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="11">
+                                <Component name="DetectCircles" priority="11" type="CvBasic:CvFindCirclesGrid">
                                         <param name="grid.width">3</param>
                                         <param name="grid.height">5</param>
                                         <param name="grid.size">0.06f</param>
                                 </Component>
-                                <Component name="DetectCirclesInv" type="CvBasic:CvFindCirclesGrid" priority="12">
+                                <Component name="DetectCirclesInv" priority="12" type="CvBasic:CvFindCirclesGrid">
                                         <param name="grid.width">3</param>
                                         <param name="grid.height">5</param>
                                         <param name="grid.size">0.06f</param>
                                         <param name="image.inverse">1</param>
                                 </Component>
-                                <Component name="SolvePNP" type="CvBasic:CvSolvePnP" priority="13">
+                                <Component name="SolvePNP" priority="13" type="CvBasic:CvSolvePnP">
                                         <param name="offset.x">0.075</param>
                                         <param name="offset.y">0.233</param>
                                         <param name="offset.roll">3.14159265359</param>
                                 </Component>
-                                <Component name="SolvePNPinv" type="CvBasic:CvSolvePnP" priority="14">
+                                <Component name="SolvePNPinv" priority="14" type="CvBasic:CvSolvePnP">
                                         <param name="offset.x">0.075</param>
                                         <param name="offset.y">-0.113</param>
                                         <param name="offset.roll">3.14159265359</param>
                                 </Component>
-                                <Component name="SolveLocation" type="CvBasic:CalcObjectLocation" priority="15" bump="0">
+                                <Component bump="0" name="SolveLocation" priority="15" type="CvBasic:CalcObjectLocation">
                                 </Component>
 
 
-                                <Component name="ReprojectionError" type="SIFTObjectModel:ReprojectionError" priority="16" bump="1">
+                                <Component bump="1" name="ReprojectionError" priority="16" type="SIFTObjectModel:ReprojectionError">
                                 </Component>
 
                                 <!-- Verification -->
-                                <Component name="Projection" type="SIFTObjectModel:Projection" priority="17" bump="1">
+                                <Component bump="1" name="Projection" priority="17" type="SIFTObjectModel:Projection">
                                         <param name="use_icp">0</param>
                                 </Component>
-                                <Component name="GreedyVerification" type="SIFTObjectModel:GreedyVerification" priority="18" bump="1">
+                                <Component bump="1" name="GreedyVerification" priority="18" type="SIFTObjectModel:GreedyVerification">
                                         <param name="resolution">0.005f</param>
                                         <param name="inlier_treshold">0.005f</param>
                                 </Component>
-                                <Component name="ConflictGraph" type="SIFTObjectModel:ConflictGraph" priority="19" bump="1">
+                                <Component bump="1" name="ConflictGraph" priority="19" type="SIFTObjectModel:ConflictGraph">
                                         <param name="resolution">0.005f</param>
                                         <param name="inlier_treshold">0.005f</param>
                                         <param name="support_threshold">0.08f</param>
                                         <param name="penalty_threshold">0.05f</param>
                                         <param name="conflict_threshold">0.02f</param>
                                 </Component>
-                                <Component name="GlobalHypothesesVerification" type="SIFTObjectModel:GlobalHypothesesVerification" priority="20" bump="1">
+                                <Component bump="1" name="GlobalHypothesesVerification" priority="20" type="SIFTObjectModel:GlobalHypothesesVerification">
                                         <param name="resolution">0.005f</param>
                                         <param name="inlier_treshold">0.005f</param>
                                         <param name="radius_clutter">0.04f</param>
@@ -164,9 +164,6 @@
                 <!-- SIFTObjectMatcher -->
                 <Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
                         <sink>Projection.in_cloud_xyzrgb_scene</sink>
-                        <sink>GreedyVerification.in_cloud_xyzrgb_scene</sink>
-                        <sink>ConflictGraph.in_cloud_xyzrgb_scene</sink>
-                        <sink>GlobalHypothesesVerification.in_cloud_xyzrgb_scene</sink>
                 </Source>
                 <Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
                         <sink>Projection.in_cloud_xyzrgb_model</sink>
@@ -194,7 +191,7 @@
                 </Source>
 
 
-                <Source name= "SolveLocation.out_homogMatrix">
+                <Source name="SolveLocation.out_homogMatrix">
                         <sink>ReprojectionError.in_location_hm</sink>
                 </Source>
 
@@ -214,7 +211,3 @@
 
         </DataStreams>
 </Task>
-
-
-
-

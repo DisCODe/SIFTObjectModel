@@ -238,12 +238,12 @@ Types::HomogMatrix ProjectionGrouping::calculateMeanTransformation(std::vector<E
     if (rototranslations.size() == 0) {
         Eigen::Matrix4f i = Eigen::Matrix4f::Identity();
         Types::HomogMatrix hm;
-        hm.setElements(i);
+        hm = i;
         return hm;
     }
     if (rototranslations.size() == 1) {
         Types::HomogMatrix hm;
-        hm.setElements(rototranslations[0]);
+        hm = rototranslations[0];
         return hm;
     }
 
@@ -313,10 +313,10 @@ Types::HomogMatrix ProjectionGrouping::calculateMeanTransformation(std::vector<E
 
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            hm.setElement(i, j, rottMatrix(i, j));
+            hm(i, j) = rottMatrix(i, j);
             //CLOG(LINFO) << hm.getElement(i, j) << "  ";
         }
-        hm.setElement(i, 3, tvec_avg(i, 0));
+        hm(i, 3) = tvec_avg(i, 0);
         //CLOG(LINFO) << hm.getElement(i, 3) << "\n";
     }
 
@@ -348,7 +348,7 @@ void ProjectionGrouping::group() {
 
     if(clustered_correspondences.size() == 1){
         Types::HomogMatrix hm;
-        hm.setElements(rototranslations[0]);
+        hm = rototranslations[0];
         out_homogMatrix.write(hm);
         pcl::PointCloud<pcl::PointXYZ>::Ptr model_bounding_box = getBoundingBox(cloud_xyzsift_model);
         out_model_bounding_box.write(model_bounding_box);
@@ -481,7 +481,7 @@ void ProjectionGrouping::group() {
         for(int j = 0; j < clusters_indexes[i].size(); j++){
             *tmp += *(clusters_clouds[clusters_indexes[i][j]]);
         }
-        pcl::transformPointCloud(*tmp, *tmp, hms[i].getElements());
+        pcl::transformPointCloud(*tmp, *tmp, hms[i]);
         clouds.push_back(tmp);
     }
     out_clustered_clouds.write(clouds);

@@ -66,7 +66,12 @@ void ReprojectionError::calculate_errors_hm() {
     CLOG(LTRACE) << "ReprojectionError::calculate_errors_hm";
     std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations = in_rototranslations.read();
     Types::HomogMatrix location = in_location_hm.read();
-    calculate_errors(rototranslations, location.getElements());
+    Eigen::Matrix4f l =  Eigen::Matrix4f::Identity();
+    for(int i = 0; i < 4; i++)
+        for(int j = 0; j < 4; j++){
+            l(i,j) = location(i, j);
+        }
+    calculate_errors(rototranslations, l);
 }
 
 void ReprojectionError::calculate_errors(std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations, Eigen::Matrix4f location) {

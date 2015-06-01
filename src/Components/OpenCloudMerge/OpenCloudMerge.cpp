@@ -267,8 +267,8 @@ void OpenCloudMerge::addViewToModel(){
 
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 4; ++j) {
-                hm.setElement(i, j, diff_trans(i,j) );
-                ss << hm.getElement(i, j) << "  ";
+                hm(i, j) = diff_trans(i,j);
+                ss << hm(i, j) << "  ";
 			}
 			ss << "\n";
 		}
@@ -372,8 +372,8 @@ void OpenCloudMerge::addViewToModelNormals() {
 
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 4; ++j) {
-                hm.setElement(i, j, diff_trans(i,j) );
-                ss << hm.getElement(i, j) << "  ";
+                hm(i, j) = diff_trans(i,j) ;
+                ss << hm(i, j) << "  ";
 			}
 			ss << "\n";
 		}
