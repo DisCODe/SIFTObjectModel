@@ -22,8 +22,6 @@ ADD_COMPONENT(Visualization)
 
 ADD_COMPONENT(NormalEstimation)
 
-ADD_COMPONENT(CorrespondencesViewer)
-
 ADD_COMPONENT(SIFTClusterExtraction)
 
 ADD_COMPONENT(ClosedCloudMerge)
@@ -33,8 +31,6 @@ ADD_COMPONENT(OpenCloudMerge)
 ADD_COMPONENT(SIFTNOMWriter)
 
 ADD_COMPONENT(SIFTNOMReader)
-
-ADD_COMPONENT(CorrespondenceMatcher)
 
 ADD_COMPONENT(PC2SOM)
 
