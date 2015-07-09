@@ -99,17 +99,24 @@ protected:
 
 	/// Output data stream containing object model feature cloud (SIFTs).
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
+	
+	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_lastsift;
+	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_lastsift2;
 
 	// Mean number of features per view.
 	Base::DataStreamOut<int> out_mean_viewpoint_features_number;
 
 
 	// Handlers
+    Base::EventHandler2 h_addViewToModelNormal;
     Base::EventHandler2 h_addViewToModel;
     Base::EventHandler2 h_Trigger;
 
 	// Handlers
+    void addViewToModelNormal();
     void addViewToModel();
+
+    bool loopDetection(int end, std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> &clouds, double dist, int &first, int &last);
 
     MergeUtils::Properties properties;
 
@@ -128,9 +135,13 @@ protected:
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_sift_merged;
 	Eigen::Matrix4f global_trans;
 
+public:
+    Base::Property<bool> prop_ICP_alignment;
+    Base::Property<bool> prop_ICP_alignment_color;
+    
     Base::Property<double> ICP_transformation_epsilon;
     Base::Property<float> Elch_max_correspondence_distance;
-    Base::Property<int> Elch_ICP_max_iterations;
+    Base::Property<float> Elch_ICP_max_iterations;
 
     ///RanSAC Properties
     Base::Property<float> RanSAC_inliers_threshold;
@@ -140,7 +151,7 @@ protected:
 	/// ICP properties
     Base::Property<float> Elch_loop_dist;
     Base::Property<float> ICP_max_correspondence_distance;
-    Base::Property<int> ICP_max_iterations;
+    Base::Property<float> ICP_max_iterations;
     Base::Property<float> Elch_rejection_threshold;
 
 };

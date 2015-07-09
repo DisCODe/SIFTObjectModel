@@ -78,24 +78,24 @@ protected:
 	pcl::visualization::PCLVisualizer * viewer;
 	//pcl::PointCloud<PointXYZSIFT>::Ptr cloud_view_xyzsift;
 
-// Input data streams
-
+    // Input data streams
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift1;
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift2;
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb1;
 	Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb2;
 	Base::DataStreamIn<pcl::CorrespondencesPtr> in_correspondences;
 	Base::DataStreamIn<pcl::CorrespondencesPtr> in_good_correspondences;
-    Base::DataStreamIn<std::vector<pcl::Correspondences> > in_clustered_correspondences;
-// Output data streams
+    Base::DataStreamIn<vector<pcl::Correspondences> > in_clustered_correspondences;
+    Base::DataStreamIn<vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> > in_projections;
+    Base::DataStreamIn<vector<pcl::PointCloud<pcl::PointXYZ>::Ptr > > in_clusters;
 
-	// Handlers
-    Base::EventHandler2 h_on_clouds;
-	Base::EventHandler2 h_on_spin;
+    // Output data streams
 	
 	// Handlers
     void on_clouds();
 	void on_spin();
+    void on_projections();
+    void on_clusters();
 
 	/// Handler for showing/hiding coordinate system.
 	void onCSShowClick(bool new_show_cs_);
@@ -129,7 +129,12 @@ protected:
     Base::Property<bool> display_one_cluster;
     Base::Property<int> display_cluster;
 
+    Base::Property<bool> display_clusters;
+    Base::Property<bool> display_clusters_bounding_boxes;
+
     int clusters;
+    int projections_number;
+    int clusters_clouds;
 
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb1;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb2;
@@ -151,6 +156,20 @@ protected:
 
 	/// Property: background color. As default it is set to 1 row with 0, 0, 0 (black).
 	Base::Property<std::string> prop_background_color;
+
+
+    const unsigned char colors[ 10 ][ 3 ] = {
+        { 255, 255, 255 },
+        { 255, 0, 0 },
+        { 0, 255, 0 },
+        { 0, 255, 255 },
+        { 255, 255, 0 },
+        { 255, 0, 255 },
+        { 255, 128, 0 },
+        { 128, 0, 255 },
+        { 0, 0, 255 },
+        { 128, 128, 128 }
+    };
 
 };
 

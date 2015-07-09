@@ -1,11 +1,5 @@
-/*!
- * \file
- * \brief 
- * \author tkornuta,,,
- */
-
-#ifndef SOMJSONREADER_HPP_
-#define SOMJSONREADER_HPP_
+#ifndef VECTORTOSEQENCE_HPP_
+#define VECTORTOSEQENCE_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -18,25 +12,25 @@
 #include <Types/PointXYZSIFT.hpp>
 
 namespace Processors {
-namespace SOMJSONReader {
+namespace VectorToSequence {
 
 /*!
- * \class SOMJSONReader
- * \brief SOMJSONReader processor class.
+ * \class VectorToSequence
+ * \brief VectorToSequence processor class.
  *
- * SOMJSONReader processor.
+ * VECTORTOSEQENCE processor.
  */
-class SOMJSONReader: public Base::Component, SIFTObjectModelFactory {
+class VectorToSequence: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	SOMJSONReader(const std::string & name = "SOMJSONReader");
+	VectorToSequence(const std::string & name = "VectorToSequence");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~SOMJSONReader();
+	virtual ~VectorToSequence();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -67,33 +61,33 @@ protected:
 	 */
 	bool onStop();
 
-	/// Output data stream containing models.
-	Base::DataStreamOut<std::vector<AbstractObject*> > out_models;
+        Base::DataStreamIn<Base::UnitType> in_trigger;
 
+	/// Output data stream containing models.
+	Base::DataStreamIn<std::vector<AbstractObject*> > in_models;
+
+	/// Output data stream containing object model point cloud.
+	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
+	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 
 	// Handlerswas
 	Base::EventHandler2 h_loadModels;
+	Base::EventHandler2 h_throwClouds;
 
-	/// List of the files containing models to be read.
-	Base::Property<string> filenames;
-
-	
 	/// Load models from files.
 	void loadModels();
+	void throwClouds();
 
-	/*!
-	 * Callback called when list of filenames changes.
-	 */
-	void onFilenamesChanged(const std::string & old_filenames, const std::string & new_filenames);
-
+	std::vector<AbstractObject*> models;
+	int place;
 };
 
-} //: namespace SOMJSONReader
+} //: namespace VectorToSequence
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("SOMJSONReader", Processors::SOMJSONReader::SOMJSONReader)
+REGISTER_COMPONENT("VectorToSequence", Processors::VectorToSequence::VectorToSequence)
 
-#endif /* SOMJSONREADER_HPP_ */
+#endif /* VECTORTOSEQENCE_HPP_ */

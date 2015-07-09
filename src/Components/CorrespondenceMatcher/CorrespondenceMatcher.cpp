@@ -121,7 +121,7 @@ void CorrespondenceMatcher::mach()
 	MergeUtils::computeCorrespondences(cloud_first, cloud_sec, correspondences);
 	pcl::CorrespondencesPtr inliers(new pcl::Correspondences()) ;
 	Eigen::Matrix4f current_trans = MergeUtils::computeTransformationSAC(cloud_first, cloud_sec, correspondences, *inliers, properties);
-
+    CLOG(LINFO) << "  current_trans:\n " << current_trans << "\n";
 	CLOG(LINFO) << "  correspondences3: " << inliers->size() << " out of " << correspondences->size();
 //	pcl::transformPointCloud(*cloud_sec, *cloud_sec, current_trans);
 

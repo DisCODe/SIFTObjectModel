@@ -1,0 +1,128 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Marta Lepicka</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>SIFTObjectModel:DetectCircles</brief>
+			<full>Detect circles on images loaded by sequence or via Kinect</full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+			<Executor name="Processing"  period="0.2">
+<!--                                <Component name="Sequence" type="CameraNUI:CameraNUI" priority="1" bump="0">
+					<param name="lib">freenect</param>
+					<param name="skip_stop">1</param>
+					<param name="camera_mode">rgb</param>
+					<param name="sync">1</param>
+                                        <param name="index">0</param>
+                                </Component>-->
+                                <Component name="Sequence" type="CvBasic:Sequence" priority="1" bump="0">
+                                        <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/lipton_earl_grey_lemon/</param>
+                                        <param name="sequence.pattern">.*\_rgb\.png</param>
+                                        <param name="mode.loop">1</param>
+                                        <param name="mode.sort">1</param>
+                                        <param name="mode.auto_next_image">0</param>
+                                </Component>
+
+				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="2" bump="1">
+					<!--<param name="camera_matrix">1445.69543371487 0 622.89561146331; 0 1451.60719632398 499.310147973752; 0 0 1</param>
+					<param name="dist_coeffs">-0.213368795840596 0.133203194326672 0.00176762788151009 -0.00218227169891789 0</param>-->
+					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
+					<param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
+				</Component>
+
+				<Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="3">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+				</Component>
+				
+				<Component name="DetectCirclesInv" type="CvBasic:CvFindCirclesGrid" priority="4">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+					<param name="image.inverse">1</param>
+				</Component>
+				<Component name="SolvePNP" type="CvBasic:CvSolvePnP" priority="5">
+					<param name="offset.x">0.075</param>
+					<param name="offset.y">0.233</param>
+					<param name="offset.roll">3.14159265359</param>
+				</Component>
+				<Component name="SolvePNPinv" type="CvBasic:CvSolvePnP" priority="6">
+					<param name="offset.x">0.075</param>
+					<param name="offset.y">-0.113</param>
+					<param name="offset.roll">3.14159265359</param>
+				</Component>
+				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="9">
+				</Component>
+				<Component name="Drawinv" type="SIFTObjectModel:DrawCSystem" priority="8">
+				</Component>
+				<Component name="SolveLocation" type="CvBasic:CalcObjectLocation" priority="7" bump="5">
+				</Component>
+				<Component name="Calc" type="CvBasic:CalcStatistics" priority="10">
+				</Component>
+			</Executor>
+			<Executor name="Visualization" period="0.1">
+				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
+					<param name="count">2</param>
+					<param name="title">Window,WindowInverse</param>
+				</Component>
+			</Executor>
+		</Subtask>	
+	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+		<Source name="Sequence.out_img">
+			<sink>DetectCircles.in_img</sink>
+			<sink>DetectCirclesInv.in_img</sink>
+			<sink>Window.in_img0</sink>	
+			<sink>Window.in_img1</sink>			
+		</Source>
+		<Source name="DetectCircles.out_pattern">
+			<sink>Window.in_draw0</sink>
+			<sink>SolvePNP.in_object3d</sink>		
+		</Source>
+		<Source name="DetectCirclesInv.out_pattern">
+			<sink>Window.in_draw1</sink>	
+			<sink>SolvePNPinv.in_object3d</sink>	
+		</Source>
+		<Source name="CameraInfo.out_camera_info">
+			<sink>SolvePNP.in_camerainfo</sink>
+			<sink>Draw.in_camera_matrix</sink>
+			<sink>SolvePNPinv.in_camerainfo</sink>
+			<sink>Drawinv.in_camera_matrix</sink>
+		</Source>
+		<Source name="Draw.out_csystem">
+			<sink>Window.in_draw0</sink>		
+		</Source>
+		<Source name="Drawinv.out_csystem">
+			<sink>Window.in_draw1</sink>		
+		</Source>
+		<Source name = "SolvePNPinv.out_homogMatrix">
+			
+			<sink>SolveLocation.in_homogMatrix</sink>
+		</Source>
+		<Source name= "SolvePNP.out_homogMatrix">
+			
+			<sink>SolveLocation.in_homogMatrix</sink>
+		</Source>
+		<Source name= "SolveLocation.out_homogMatrix">
+			<sink>Calc.in_homogMatrix</sink>
+			<sink>Draw.in_homogMatrix</sink>
+			<sink>Drawinv.in_homogMatrix</sink>
+		</Source>
+	</DataStreams>
+</Task>
+
+
+
+

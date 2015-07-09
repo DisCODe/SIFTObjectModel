@@ -1,0 +1,214 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Michal Laszkowski</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+                        <brief>SOM:VerificationTest</brief>
+			<full></full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+			<Executor name="Processing"  period="1">
+                                <Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="1" bump="0">
+                                        <param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
+                                        <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
+                                </Component>
+                                <Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="0">
+                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/dilmah_lemon1.json</param>
+                                </Component>
+                                <!--Sequences-->
+                                <Component name="NextImageTrigger" type="CvBasic:Trigger" priority="3" bump="0">
+                                </Component>
+                                <Component name="SequenceRGB" type="CvBasic:Sequence" priority="4" bump="0">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/dilmah_lemon/</param>
+                                    <param name="sequence.pattern">.*\_rgb\.png</param>
+                                    <param name="mode.loop">0</param>
+                                    <param name="mode.sort">1</param>
+                                    <param name="mode.auto_next_image">1</param>
+                                </Component>
+                                <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="5" bump="0">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/dilmah_lemon/</param>
+                                    <param name="sequence.pattern">.*\_depth\.png</param>
+<!--                                    <param name="sequence.pattern">.*\_xyz\.yml</param>-->
+                                    <param name="mode.loop">0</param>
+                                    <param name="mode.sort">1</param>
+                                    <param name="mode.auto_next_image">1</param>
+                                </Component>
+                                <!--Processing-->
+				<Component name="SIFT" type="CvBasic:CvSIFT" priority="6" bump="0">
+				</Component>
+				<Component name="Converter" type="PCL:DepthConverter" priority="7" bump="0">
+				</Component>
+				<Component name="FeatureCloudConverter" type="SIFTObjectModel:FeatureCloudConverter" priority="8" bump="0">
+				</Component>
+				
+				<Component name="SIFTObjectMatcher" type="SIFTObjectModel:SIFTObjectMatcher" priority="9" bump="0">
+                                    <param name="cg_size">0.01f</param>
+                                    <param name="cg_thresh">8.0f</param>
+                                </Component>
+                                <!-- Detect coordinations -->
+                                <Component name="DetectCircles" type="CvBasic:CvFindCirclesGrid" priority="11">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+                                </Component>
+                                <Component name="DetectCirclesInv" type="CvBasic:CvFindCirclesGrid" priority="12">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+                                        <param name="image.inverse">1</param>
+                                </Component>
+                                <Component name="SolvePNP" type="CvBasic:CvSolvePnP" priority="13">
+                                        <param name="offset.x">0.075</param>
+                                        <param name="offset.y">0.233</param>
+                                        <param name="offset.roll">3.14159265359</param>
+                                </Component>
+                                <Component name="SolvePNPinv" type="CvBasic:CvSolvePnP" priority="14">
+                                        <param name="offset.x">0.075</param>
+                                        <param name="offset.y">-0.113</param>
+                                        <param name="offset.roll">3.14159265359</param>
+                                </Component>
+                                <Component name="SolveLocation" type="CvBasic:CalcObjectLocation" priority="15" bump="0">
+                                </Component>
+
+
+                                <Component name="ReprojectionError" type="SIFTObjectModel:ReprojectionError" priority="16" bump="1">
+                                </Component>
+
+                                <!-- Verification -->
+                                <Component name="Projection" type="SIFTObjectModel:Projection" priority="17" bump="1">
+                                </Component>
+                                <Component name="GreedyVerification" type="SIFTObjectModel:GreedyVerification" priority="18" bump="1">
+                                        <param name="resolution">0.005f</param>
+                                        <param name="inlier_treshold">0.0075f</param>
+                                </Component>
+                                <Component name="ConflictGraph" type="SIFTObjectModel:ConflictGraph" priority="19" bump="1">
+                                        <param name="resolution">0.005f</param>
+                                        <param name="inlier_treshold">0.0075f</param>
+                                        <param name="support_threshold">0.08f</param>
+                                        <param name="penalty_threshold">0.05f</param>
+                                        <param name="conflict_threshold">0.02f</param>
+                                </Component>
+                                <Component name="GlobalHypothesesVerification" type="SIFTObjectModel:GlobalHypothesesVerification" priority="20" bump="1">
+                                        <param name="resolution">0.005f</param>
+                                        <param name="inlier_treshold">0.0075f</param>
+                                        <param name="radius_clutter">0.04f</param>
+                                        <param name="regularizer">3.f</param>
+                                        <param name="clutter_regularizer">5.f</param>
+                                </Component>
+                        </Executor>
+
+<!--			<Executor name="Visualization" period="1">
+                                <Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
+                                </Component>
+                                <Component name="CloudViewer" type="PCL:CloudViewer" priority="2" bump="0">
+                                </Component>
+                                <Component name="ClustersViewer" type="PCL:ClustersViewer" priority="2" bump="0">
+                                    <param name="title">Projections</param>
+                                </Component>
+                        </Executor>
+-->
+            </Subtask>
+	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+                <Source name="CameraInfo.out_camera_info">
+                        <sink>SolvePNP.in_camerainfo</sink>
+                        <sink>SolvePNPinv.in_camerainfo</sink>
+                        <sink>Converter.in_camera_info</sink>
+                        <sink>FeatureCloudConverter.in_camera_info</sink>
+                </Source>
+                <!--Sequences-->
+                <Source name="NextImageTrigger.out_trigger">
+                        <sink>SequenceRGB.in_next_image_trigger</sink>
+                        <sink>SequenceXYZ.in_next_image_trigger</sink>
+                </Source>
+		<Source name="SequenceRGB.out_img">
+			<sink>SIFT.in_img</sink>
+                        <sink>Converter.in_color</sink>
+                        <sink>DetectCircles.in_img</sink>
+                        <sink>DetectCirclesInv.in_img</sink>
+		</Source>
+                <Source name="SequenceXYZ.out_img">
+                        <sink>Converter.in_depth</sink> <!--_xyz-->
+                        <sink>FeatureCloudConverter.in_depth</sink>
+		</Source>
+                <!--Proccesing-->
+		<Source name="SIFT.out_descriptors">
+			<sink>FeatureCloudConverter.in_descriptors</sink>	
+		</Source>
+		<Source name="SIFT.out_features">
+			<sink>FeatureCloudConverter.in_features</sink>	
+		</Source>		
+		<Source name="Converter.out_cloud_xyzrgb">
+			<sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>		
+		</Source>
+		<Source name="FeatureCloudConverter.out_cloud_xyzsift">
+			<sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>	
+		</Source>
+                <!--Read model-->
+                <Source name="SOMJSONReader.out_models">
+			<sink>SIFTObjectMatcher.in_models</sink>
+                </Source>
+
+                <!-- SIFTObjectMatcher -->
+                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
+                        <sink>Projection.in_cloud_xyzrgb_scene</sink>
+                        <sink>GreedyVerification.in_cloud_xyzrgb_scene</sink>
+                        <sink>ConflictGraph.in_cloud_xyzrgb_scene</sink>
+                        <sink>GlobalHypothesesVerification.in_cloud_xyzrgb_scene</sink>
+                </Source>
+                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
+                        <sink>Projection.in_cloud_xyzrgb_model</sink>
+                </Source>
+
+                <Source name="SIFTObjectMatcher.out_rototranslations">
+                        <sink>Projection.in_rototranslations</sink>
+                        <sink>ReprojectionError.in_rototranslations</sink>
+                </Source>
+
+<!--            <Source name="ProjectionGrouping.out_homogMatrix">
+                </Source>-->
+                <!-- Detect coordinations -->
+                <Source name="DetectCircles.out_pattern">
+                        <sink>SolvePNP.in_object3d</sink>
+                </Source>
+                <Source name="DetectCirclesInv.out_pattern">
+                        <sink>SolvePNPinv.in_object3d</sink>
+                </Source>
+                <Source name="SolvePNPinv.out_homogMatrix">
+                        <sink>SolveLocation.in_homogMatrix</sink>
+                </Source>
+                <Source name="SolvePNP.out_homogMatrix">
+                        <sink>SolveLocation.in_homogMatrix</sink>
+                </Source>
+
+
+                <Source name= "SolveLocation.out_homogMatrix">
+                        <sink>ReprojectionError.in_location_hm</sink>
+                </Source>
+
+                <!-- Projection -->
+                <Source name="Projection.out_registered_instances_xyzrgb">
+                        <sink>GreedyVerification.in_aligned_hypotheses_xyzrgb</sink>
+                        <sink>ConflictGraph.in_aligned_hypotheses_xyzrgb</sink>
+                        <sink>GlobalHypothesesVerification.in_aligned_hypotheses_xyzrgb</sink>
+                </Source>
+
+
+			
+	</DataStreams>
+</Task>
+
+
+
+

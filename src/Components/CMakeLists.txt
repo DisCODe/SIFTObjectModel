@@ -1,5 +1,7 @@
 # Add all components here using ADD_COMPONENT(<COMPONENT_DIRECTORY>)
 
+ADD_COMPONENT(ComputeDistance)
+
 ADD_COMPONENT(SOMJSONReader)
 
 ADD_COMPONENT(SOMJSONWriter)
@@ -34,6 +36,8 @@ ADD_COMPONENT(SIFTNOMWriter)
 
 ADD_COMPONENT(SIFTNOMReader)
 
+ADD_COMPONENT(CloudViewer)
+
 ADD_COMPONENT(CorrespondenceMatcher)
 
 ADD_COMPONENT(PC2SOM)
@@ -42,3 +46,19 @@ ADD_COMPONENT(SOMs2PC)
 
 ADD_COMPONENT(xyzrgb2xyzsift)
 
+ADD_COMPONENT(GaussCloud)
+
+ADD_COMPONENT(ProjectionGrouping)
+
+ADD_COMPONENT(VectorToSequence)
+
+
+ADD_COMPONENT(GreedyVerification)
+
+ADD_COMPONENT(Projection)
+
+ADD_COMPONENT(ConflictGraph)
+
+ADD_COMPONENT(GlobalHypothesesVerification)
+
+ADD_COMPONENT(ReprojectionError)

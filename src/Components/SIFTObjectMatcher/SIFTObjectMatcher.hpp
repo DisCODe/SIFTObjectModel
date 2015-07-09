@@ -21,6 +21,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/registration/correspondence_estimation.h>
 
+
 namespace Processors {
 namespace SIFTObjectMatcher {
 
@@ -80,18 +81,14 @@ protected:
 
 // Output data streams
 	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb;
-	Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb_model;
+    Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb_model;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift_model;
 	Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;
     Base::DataStreamOut<pcl::CorrespondencesPtr> out_good_correspondences;
     Base::DataStreamOut<std::vector<pcl::Correspondences> > out_clustered_correspondences;
     Base::DataStreamOut<std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > > out_rototranslations;
-	// Handlers
-	Base::EventHandler2 h_readModels;
-	Base::EventHandler2 h_match;
 
-	
 	// Handlers
 	void readModels();
 	void match();

@@ -39,7 +39,9 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 		ty("ty", 0.0f),
         tz("tz", 0.0f),
         display_one_cluster("display_one_cluster", false),
-        display_cluster("display_cluster", 0)
+        display_cluster("display_cluster", 0),
+        display_clusters("display_clusters", false),
+        display_clusters_bounding_boxes("display_clusters_bounding_boxes", false)
 {
 	registerProperty(prop_window_name);
 	registerProperty(prop_coordinate_system);
@@ -61,6 +63,8 @@ CorrespondencesViewer::CorrespondencesViewer(const std::string & name) :
 	registerProperty(tz);
 	registerProperty(display_one_cluster);
 	registerProperty(display_cluster);
+    registerProperty(display_clusters);
+    registerProperty(display_clusters_bounding_boxes);
 
 	  // Set red as default.
 	((cv::Mat)clouds_colours).at<uchar>(0,0) = 255;
@@ -141,7 +145,7 @@ void CorrespondencesViewer::displayCorrespondences(){
     clusters = clustered_corrs.size();
 
     //Remove bounding boxes
-    viewer->removeAllShapes();
+    //TODOviewer->removeAllShapes();
 
     //If no clustered corrs display corrs from in_correspondences and in_good_correspondences
     if(clusters == 0){
@@ -202,23 +206,23 @@ void CorrespondencesViewer::displayCorrespondences(){
         //Display all clusters
         else{
             for(int i = 0; i< clustered_corrs.size(); i++){
-            	// Random colors for given cluster.
-                int c[3], index, r,g,b;
-            	index = rand()%3;
-                c[index+i] = 255;
-                c[(index+1+i)%3] = 0;
-                c[(index+2+i)%3] = 100 + rand()%155;
-                r=c[0];g=c[1];b=c[2];
-                //std::cout<<r<<","<<g<<","<<b<<endl;
+//            	// Random colors for given cluster.
+//                int c[3], index, r,g,b;
+//            	index = rand()%3;
+//                c[index+i] = 255;
+//                c[(index+1+i)%3] = 0;
+//                c[(index+2+i)%3] = 100 + rand()%155;
+//                r=c[0];g=c[1];b=c[2];
+//                //std::cout<<r<<","<<g<<","<<b<<endl;
 
                 ostringstream ss;
                 ss << i;
                 string str = ss.str();
                 viewer->addCorrespondences<PointXYZSIFT>(cloud_xyzsift2trans, cloud_xyzsift1, clustered_corrs[i], "correspondences"+str) ;
                 viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR,
-                    r,
-                    g,
-                    b,
+                    colors[i][0],
+                    colors[i][1],
+                    colors[i][2],
                     "correspondences"+str) ;
                 //Display Bounding Box
                 if(display_bounding_box){
@@ -229,7 +233,7 @@ void CorrespondencesViewer::displayCorrespondences(){
                     }
                     Eigen::Vector4f min_pt, max_pt;
                     pcl::getMinMax3D(*cloud_xyzsift1, indices, min_pt, max_pt);
-                    viewer->addCube (min_pt[0], max_pt[0], min_pt[1], max_pt[1], min_pt[2], max_pt[2], r, g, b, "cube"+str);
+                    viewer->addCube (min_pt[0], max_pt[0], min_pt[1], max_pt[1], min_pt[2], max_pt[2], colors[i][0], colors[i][1], colors[i][2], "cube"+str);
 
                 }
             }
@@ -239,25 +243,28 @@ void CorrespondencesViewer::displayCorrespondences(){
 
 void CorrespondencesViewer::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
-registerStream("in_cloud_xyzsift1", &in_cloud_xyzsift1);
-registerStream("in_cloud_xyzsift2", &in_cloud_xyzsift2);
-registerStream("in_cloud_xyzrgb1", &in_cloud_xyzrgb1);
-registerStream("in_cloud_xyzrgb2", &in_cloud_xyzrgb2);
-registerStream("in_correspondences", &in_correspondences);
-registerStream("in_good_correspondences", &in_good_correspondences);
-registerStream("in_clustered_correspondences", &in_clustered_correspondences);
+    registerStream("in_cloud_xyzsift1", &in_cloud_xyzsift1);
+    registerStream("in_cloud_xyzsift2", &in_cloud_xyzsift2);
+    registerStream("in_cloud_xyzrgb1", &in_cloud_xyzrgb1);
+    registerStream("in_cloud_xyzrgb2", &in_cloud_xyzrgb2);
+    registerStream("in_correspondences", &in_correspondences);
+    registerStream("in_good_correspondences", &in_good_correspondences);
+    registerStream("in_clustered_correspondences", &in_clustered_correspondences);
+    registerStream("in_projections", &in_projections);
+    registerStream("in_clusters", &in_clusters);
 
 	// Register handlers
-	h_on_clouds.setup(boost::bind(&CorrespondencesViewer::on_clouds, this));
-	registerHandler("on_clouds", &h_on_clouds);
+    registerHandler("on_clouds", boost::bind(&CorrespondencesViewer::on_clouds, this));
 	addDependency("on_clouds", &in_cloud_xyzsift1);
 	addDependency("on_clouds", &in_cloud_xyzsift2);
-	addDependency("on_clouds", &in_cloud_xyzrgb1);
-    //addDependency("on_clouds", &in_correspondences);
+    addDependency("on_clouds", &in_cloud_xyzrgb1);
 	addDependency("on_clouds", &in_cloud_xyzrgb2);	
+    registerHandler("on_projections", boost::bind(&CorrespondencesViewer::on_projections, this));
+    addDependency("on_projections", &in_projections);
+    registerHandler("on_clusters", boost::bind(&CorrespondencesViewer::on_clusters, this));
+    addDependency("on_clusters", &in_clusters);
 	// Register spin handler.
-	h_on_spin.setup(boost::bind(&CorrespondencesViewer::on_spin, this));
-	registerHandler("on_spin", &h_on_spin);
+    registerHandler("on_spin", boost::bind(&CorrespondencesViewer::on_spin, this));
 	addDependency("on_spin", NULL);
 }
 
@@ -286,6 +293,8 @@ bool CorrespondencesViewer::onInit() {
 	viewer->initCameraParameters ();
 	//cloud_view_xyzsift = pcl::PointCloud<PointXYZSIFT>::Ptr (new pcl::PointCloud<PointXYZSIFT>());
     clusters = 0;
+    projections_number = 0;
+    clusters_clouds = 0;
 
 	return true;
 }
@@ -375,6 +384,100 @@ void CorrespondencesViewer::on_clouds() {
     displayCorrespondences();
 }
 
+void CorrespondencesViewer::on_projections() {
+    LOG(LTRACE) << "ClustersViewer::on_projections";
+    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> projections = in_projections.read();
+    //viewer->removeAllShapes();
+    for(int i = 0; i < projections_number; i++){
+        char id = '0' + i;
+        viewer->removeShape(std::string("line") + id + std::string("01"));
+        viewer->removeShape(std::string("line") + id + std::string("12"));
+        viewer->removeShape(std::string("line") + id + std::string("23"));
+        viewer->removeShape(std::string("line") + id + std::string("30"));
+        viewer->removeShape(std::string("line") + id + std::string("04"));
+        viewer->removeShape(std::string("line") + id + std::string("15"));
+        viewer->removeShape(std::string("line") + id + std::string("26"));
+        viewer->removeShape(std::string("line") + id + std::string("37"));
+        viewer->removeShape(std::string("line") + id + std::string("45"));
+        viewer->removeShape(std::string("line") + id + std::string("56"));
+        viewer->removeShape(std::string("line") + id + std::string("67"));
+        viewer->removeShape(std::string("line") + id + std::string("74"));
+    }
+    projections_number = projections.size();
+
+    for(int i = 0; i < projections.size() && i < 10; i++){
+        LOG(LTRACE) << "draw projection "<< i <<endl;
+        char id = '0' + i;
+
+        viewer->addLine(projections[i]->at(0), projections[i]->at(1), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("01"));
+        viewer->addLine(projections[i]->at(1), projections[i]->at(2), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("12"));
+        viewer->addLine(projections[i]->at(2), projections[i]->at(3), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("23"));
+        viewer->addLine(projections[i]->at(3), projections[i]->at(0), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("30"));
+        viewer->addLine(projections[i]->at(0), projections[i]->at(4), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("04"));
+        viewer->addLine(projections[i]->at(1), projections[i]->at(5), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("15"));
+        viewer->addLine(projections[i]->at(2), projections[i]->at(6), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("26"));
+        viewer->addLine(projections[i]->at(3), projections[i]->at(7), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("37"));
+        viewer->addLine(projections[i]->at(4), projections[i]->at(5), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("45"));
+        viewer->addLine(projections[i]->at(5), projections[i]->at(6), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("56"));
+        viewer->addLine(projections[i]->at(6), projections[i]->at(7), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("67"));
+        viewer->addLine(projections[i]->at(7), projections[i]->at(4), colors[i][0], colors[i][1], colors[i][2], std::string("line") + id + std::string("74"));
+    }
+}
+
+void CorrespondencesViewer::on_clusters() {
+    LOG(LTRACE) << "CorrespondencesViewer::on_clusters";
+    //TODO display bounding boxes
+    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clusters = in_clusters.read();
+    if(!display_clusters){
+        for(int i = 0; i < clusters_clouds; i++){
+            char id = '0' + i;
+            viewer->removePointCloud(std::string("cluster") + id);
+            LOG(LTRACE) << "remove cluster "<< i <<endl;
+        }
+        clusters_clouds = 0;
+        return;
+    }
+
+    if (clusters.size() >  clusters_clouds)
+        for(int i = clusters_clouds; i < clusters.size() && i<10; i++){
+            char id = '0' + i;
+            viewer->addPointCloud<pcl::PointXYZ> (pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>), std::string("cluster") + id);
+            viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, std::string("cluster") + id);
+            viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR,
+                                                        colors[i][0],
+                                                        colors[i][1],
+                                                        colors[i][2],
+                                                        std::string("cluster") + id);
+            LOG(LTRACE) << "add cluster cloud "<< i <<endl;
+        }
+    else if (clusters.size()<clusters_clouds)
+        for(int i = clusters.size(); i < clusters_clouds; i++){
+            char id = '0' + i;
+            viewer->removePointCloud(std::string("cluster") + id);
+            LOG(LTRACE) << "remove cluster "<< i <<endl;
+        }
+
+    clusters_clouds = clusters.size();
+    if (clusters_clouds > 10)
+        clusters_clouds = 10;
+
+
+    for(int i = 0; i < clusters_clouds; i++){
+        char id = '0' + i;
+        viewer->updatePointCloud(clusters[i],std::string("cluster") + id);
+        LOG(LTRACE) << "update cluster "<< i <<endl;
+
+        if(display_clusters_bounding_boxes){
+            CLOG(LTRACE) << "CorrespondencesViewer Display clusters Bounding Boxes";
+            vector<int> indices;
+            Eigen::Vector4f min_pt, max_pt;
+            pcl::getMinMax3D(*clusters[i], indices, min_pt, max_pt);
+            viewer->addCube (min_pt[0], max_pt[0], min_pt[1], max_pt[1], min_pt[2], max_pt[2], colors[i][0], colors[i][1], colors[i][2], "cubec"+id);
+            viewer->setShapeRenderingProperties (pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, 10, "cubec"+id);
+
+        }
+    }
+}
 
 void CorrespondencesViewer::on_spin() {
 	viewer->spinOnce (100);

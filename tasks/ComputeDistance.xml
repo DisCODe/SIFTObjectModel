@@ -1,0 +1,62 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Michał Laszkowski</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>Generates SOM and stores it in PCD file</brief>
+			<full>Loads a sequence of object views and joins them into SIFT object model (SOM)</full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Main">
+			<Executor name="Processing"  period="1">
+				<Component name="Trigger" type="CvBasic:Trigger" priority="1" bump="0">
+					<param name="">1</param>
+				</Component>
+				<Component name="Reader" type="SIFTObjectModel:SOMJSONReader" priority="2" bump="1">
+					<param name="filenames">/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite4.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite1.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite3.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite2.json</param>
+				</Component>
+				<Component name="Reader2" type="SIFTObjectModel:SOMJSONReader" priority="3" bump="1">
+					<param name="filenames">/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite4.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite3.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite1.json;/home/mkamionk/DisCODe/RGB-D/cuboids/parts/gigabite2.json</param>
+				</Component>
+				<Component name="VtC" type="SIFTObjectModel:VectorToSequence" priority="4" bump="1">
+				</Component>
+				<Component name="VtC2" type="SIFTObjectModel:VectorToSequence" priority="5" bump="1">
+				</Component>
+  		              	<Component name="Distance" type="SIFTObjectModel:ComputeDistance" priority="6" bump="1">
+				</Component>
+			</Executor>
+		</Subtask>
+    	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+		<Source name="Trigger.out_trigger">
+			<sink>VtC.in_trigger</sink>
+			<sink>VtC2.in_trigger</sink>
+		</Source>
+		<Source name="Reader.out_models">
+			<sink>VtC.in_models</sink>
+		</Source>
+		<Source name="Reader2.out_models">
+			<sink>VtC2.in_models</sink>
+		</Source>
+		<Source name="VtC.out_cloud_xyzsift">
+			<sink>Distance.in_cloud_sift1</sink>
+		</Source>
+		<Source name="VtC2.out_cloud_xyzsift">
+			<sink>Distance.in_cloud_sift2</sink>	
+		</Source>
+
+		
+	</DataStreams>
+</Task>
+
+
+
