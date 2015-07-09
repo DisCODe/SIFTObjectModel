@@ -17,6 +17,7 @@
 #include <pcl/point_types.h>
 #include <pcl/common/common.h>
 #include <pcl/registration/correspondence_estimation.h>
+#include <pcl/ModelCoefficients.h>
 #include "Types/HomogMatrix.hpp"
 
 
