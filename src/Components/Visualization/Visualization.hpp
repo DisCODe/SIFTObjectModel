@@ -126,7 +126,7 @@ protected:
 
 	Base::Property<string> filenames;
 	Base::Property<bool> show_normals;
-
+	int counter;
 	void onFilenamesChanged(const std::string & old_filenames, const std::string & new_filenames);
 };
 

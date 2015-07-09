@@ -20,7 +20,7 @@
 
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="0">
                     <!--<param name="filenames">/home/discode/models/scena/scena_fragment1.json</param>-->
-                    <param name="filenames">/home/discode/models/scena/scena_fragment1.json;/home/discode/models/scena/scena_fragment2.json</param>
+                    <param name="filenames">/home/discode/14.06.13objects/modeleLUM/kakao_bez_IPC/models.json</param>
 					<!--<param name="filenames">/home/discode/cuboids/models/gigabyte.json</param>-->
 				</Component>
 

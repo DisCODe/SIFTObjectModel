@@ -17,20 +17,20 @@
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
                 <Component name="SequenceRGB" type="CvBasic:Sequence" priority="1" bump="0">
-		     <param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/stereo/domestos/xyz_rgb</param>
+		     <param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/RZ</param>
                     <param name="sequence.pattern">.*\_rgb\.png</param>
                     <param name="mode.loop">1</param>
 		     <param name="mode.auto_trigger">1</param>
                 </Component>
                 <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="2" bump="0">
-		     <param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/stereo/domestos/xyz_rgb</param>
+		     <param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/RZ</param>
                     <param name="sequence.pattern">.*\_xyz\.yml</param>
                     <param name="mode.loop">1</param>
                     <param name="mode.auto_trigger">1</param>
                 </Component>
                 <Component name="SequenceMask" type="CvBasic:Sequence" priority="3" bump="0">
-		    <param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/stereo/domestos/maski</param>
-		    <param name="sequence.pattern">.*\.png</param>
+		    <param name="sequence.directory">/home/mkamionk/DisCODe/RGB-D/RZ</param>
+		    <param name="sequence.pattern">.*\_mask.png</param>
 		    <param name="mode.loop">1</param>
 		    <param name="mode.auto_trigger">1</param>
                 </Component>
@@ -48,9 +48,9 @@
 					<param name="radius">0.02</param>
 				</Component>
                 <Component name="Generator" type="SIFTObjectModel:ClosedCloudMerge" priority="10" bump="1">
-					<param name="View.Number">20</param>
-					<param name="Interations.Max">10</param>
-					<param name="Correspondenc.Treshold">9</param>
+					<param name="View.Number">9</param>
+					<param name="Interations.Max">100</param>
+					<param name="Correspondenc.Treshold">7</param>
 				</Component>
 				<Component name="VoxelGrid" type="PCL:VoxelGrid" priority="11" bump="0">
 					<param name="LeafSize.x">0.005</param>

@@ -101,11 +101,10 @@ void SIFTObjectMatcher::prepareInterface() {
 
 
 	// Register handlers
-	h_readModels.setup(boost::bind(&SIFTObjectMatcher::readModels, this));
-	registerHandler("readModels", &h_readModels);
+    registerHandler("readModels", boost::bind(&SIFTObjectMatcher::readModels, this));
 	addDependency("readModels", &in_models);
-	h_match.setup(boost::bind(&SIFTObjectMatcher::match, this));
-	registerHandler("match", &h_match);
+
+    registerHandler("match", boost::bind(&SIFTObjectMatcher::match, this));
 	addDependency("match", &in_cloud_xyzsift);
 	addDependency("match", &in_cloud_xyzrgb);
 
@@ -153,7 +152,9 @@ void SIFTObjectMatcher::match() {
 		return;
 	}
 	pcl::PointCloud<PointXYZSIFT>::Ptr cloud_xyzsift = in_cloud_xyzsift.read();
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb = in_cloud_xyzrgb.read();	
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb (new pcl::PointCloud<pcl::PointXYZRGB>);
+    if(!in_cloud_xyzrgb.empty())
+        cloud_xyzrgb = in_cloud_xyzrgb.read();
 	
 
 		for (int i = 0 ; i<models.size(); i++){
@@ -315,7 +316,8 @@ void SIFTObjectMatcher::match() {
             }
             //Write only choosen model
             if(i==model_out_){
-                out_cloud_xyzrgb.write(cloud_xyzrgb);
+                if(!cloud_xyzrgb->empty())
+                    out_cloud_xyzrgb.write(cloud_xyzrgb);
                 out_cloud_xyzrgb_model.write(models[i]->cloud_xyzrgb);
                 out_cloud_xyzsift.write(cloud_xyzsift);
                 out_cloud_xyzsift_model.write(models[i]->cloud_xyzsift);
