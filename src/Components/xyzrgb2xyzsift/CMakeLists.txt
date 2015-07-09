@@ -5,7 +5,7 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 FILE(GLOB files *.cpp)
 
 # Find required packages
-FIND_PACKAGE( OpenCV REQUIRED )
+#FIND_PACKAGE( OpenCV REQUIRED )
 
 FIND_FILE(NONFREE_FEATURES_HPP "opencv2/nonfree/features2d.hpp" PATHS ${OpenCV_INCLUDE_DIRS})
 
@@ -22,6 +22,6 @@ INSTALL_COMPONENT(xyzrgb2xyzsift)
 
 ELSE()
 
-MESSAGE(STATUS "Skipping CuboidModelGenerator - required nonfree OpenCV module not found.")
+MESSAGE(STATUS "Skipping xyzrgb2xyzsift - required nonfree OpenCV module not found.")
 
 ENDIF()

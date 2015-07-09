@@ -4,13 +4,10 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Create a variable containing all .cpp files:
 FILE(GLOB files *.cpp)
 
-# Find required packages
-
-
 # Create an executable file from sources:
 ADD_LIBRARY(Projection SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(Projection ${DisCODe_LIBRARIES} ${PCL_LIBRARIES})
+TARGET_LINK_LIBRARIES(Projection ${DisCODe_LIBRARIES})
 
 INSTALL_COMPONENT(Projection)

@@ -64,10 +64,12 @@
                         </Executor>
 
 			<Executor name="Visualization" period="1">
-                                <Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
-
-                                </Component>
-
+                                <Component name="CorrespondenceViewer" type="Registration:CorrespondenceViewer" priority="101" bump="0">
+                                        <param name="coordinate_system">0</param>
+                                        <param name="translation.x">-0.05</param>
+                                        <param name="translation.y">0</param>
+                                        <param name="translation.z">0.05</param>
+				</Component>
 
                         </Executor>
             </Subtask>
@@ -113,7 +115,7 @@
 
                 <!-- SIFTObjectMatcher -->
 		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb">   
-                        <sink>Window.in_cloud_xyzrgb1</sink>
+                        <sink>CorrespondenceViewer.in_src_cloud_xyzrgb</sink>
                         <sink>Projection.in_cloud_xyzrgb_scene</sink>
                         <sink>GreedyVerification.in_cloud_xyzrgb_scene</sink>
                         <sink>ConflictGraph.in_cloud_xyzrgb_scene</sink>
@@ -121,18 +123,18 @@
 		</Source>
 		<Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
                         <sink>Projection.in_cloud_xyzrgb_model</sink>
-                        <sink>Window.in_cloud_xyzrgb2</sink>
+                        <sink>CorrespondenceViewer.in_trg_cloud_xyzrgb</sink>
 		</Source>
 		<Source name="SIFTObjectMatcher.out_cloud_xyzsift">
 
-                        <sink>Window.in_cloud_xyzsift1</sink>
+                        <sink>CorrespondenceViewer.in_src_cloud_xyzsift</sink>
 		</Source>
 		<Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
 
-                        <sink>Window.in_cloud_xyzsift2</sink>
+                        <sink>CorrespondenceViewer.in_trg_cloud_xyzsift</sink>
 		</Source>
                 <Source name="SIFTObjectMatcher.out_clustered_correspondences">
-                        <sink>Window.in_clustered_correspondences</sink>
+                        <sink>CorrespondenceViewer.in_clustered_correspondences</sink>
                 </Source>
                 <Source name="SIFTObjectMatcher.out_rototranslations">
                         <sink>Projection.in_rototranslations</sink>
