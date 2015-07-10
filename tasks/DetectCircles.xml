@@ -60,9 +60,9 @@
 					<param name="offset.y">-0.113</param>
 					<param name="offset.roll">3.14159265359</param>
 				</Component>
-				<Component name="Draw" type="SIFTObjectModel:DrawCSystem" priority="9">
+                                <Component name="Draw" type="CvBasic:DrawCoordinateSystem" priority="9">
 				</Component>
-				<Component name="Drawinv" type="SIFTObjectModel:DrawCSystem" priority="8">
+                                <Component name="Drawinv" type="CvBasic:DrawCoordinateSystem" priority="8">
 				</Component>
 				<Component name="SolveLocation" type="CvBasic:CalcObjectLocation" priority="7" bump="5">
 				</Component>
@@ -96,9 +96,9 @@
 			<sink>SolvePNPinv.in_object3d</sink>	
 		</Source>
 		<Source name="CameraInfo.out_camera_info">
-			<sink>SolvePNP.in_camerainfo</sink>
+                        <sink>SolvePNP.in_camera_info</sink>
 			<sink>Draw.in_camera_matrix</sink>
-			<sink>SolvePNPinv.in_camerainfo</sink>
+                        <sink>SolvePNPinv.in_camera_info</sink>
 			<sink>Drawinv.in_camera_matrix</sink>
 		</Source>
 		<Source name="Draw.out_csystem">

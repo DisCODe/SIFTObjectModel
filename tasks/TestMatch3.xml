@@ -30,14 +30,14 @@
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.sort">1</param>
-                                    <param name="mode.auto_trigger">0</param>
+                                    <param name="mode.auto_next_image">0</param>
                                 </Component>
                                 <Component name="SequenceXYZ" type="CvBasic:Sequence" priority="4" bump="0">
                                     <param name="sequence.directory">/home/mlaszkow/DCL/ModelViewAcquisition/data/scena/</param>
                                     <param name="sequence.pattern">.*\_xyz\.yml</param>
                                     <param name="mode.loop">1</param>
                                     <param name="mode.sort">1</param>
-                                    <param name="mode.auto_trigger">0</param>
+                                    <param name="mode.auto_next_image">0</param>
                                 </Component>
                                 <Component name="SIFT" type="CvBasic:CvSIFT" priority="5" bump="0">
 				</Component>
@@ -58,12 +58,13 @@
                                 </Component>
 
                                 <Component name="PassThrough" type="PCL:PassThrough" priority="10" bump="0">
-                                    <param name="x.a">-10</param>
-                                    <param name="x.b">10</param>
-                                    <param name="y.a">-10</param>
-                                    <param name="y.b">10</param>
-                                    <param name="z.a">-10</param>
-                                    <param name="z.b">10</param>
+<!--                                    <param name="pass_through">1</param>-->
+                                    <param name="x.min">-10</param>
+                                    <param name="x.max">10</param>
+                                    <param name="y.min">-10</param>
+                                    <param name="y.max">10</param>
+                                    <param name="z.min">-10</param>
+                                    <param name="z.max">10</param>
                                     <param name="negative_x">0</param>
                                     <param name="negative_y">0</param>
                                     <param name="negative_z">0</param>
@@ -87,12 +88,12 @@
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
                 <Source name="NextImageTrigger.out_trigger">
-                        <sink>SequenceRGB.in_trigger</sink>
-                        <sink>SequenceXYZ.in_trigger</sink>
+                        <sink>SequenceRGB.in_next_image_trigger</sink>
+                        <sink>SequenceXYZ.in_next_image_trigger</sink>
                 </Source>
 		<Source name="SequenceRGB.out_img">
 			<sink>SIFT.in_img</sink>
-                        <sink>Converter.in_rgb_stereo</sink>
+                        <sink>Converter.in_color</sink>
 		</Source>
                 <Source name="SequenceXYZ.out_img">
                         <sink>Converter.in_depth_xyz</sink>

@@ -123,8 +123,8 @@
         <!-- pipes connecting datastreams -->
         <DataStreams>
                 <Source name="CameraInfo.out_camera_info">
-                        <sink>SolvePNP.in_camerainfo</sink>
-                        <sink>SolvePNPinv.in_camerainfo</sink>
+                        <sink>SolvePNP.in_camera_info</sink>
+                        <sink>SolvePNPinv.in_camera_info</sink>
                         <sink>Converter.in_camera_info</sink>
                         <sink>FeatureCloudConverter.in_camera_info</sink>
                 </Source>
