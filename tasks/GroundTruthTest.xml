@@ -1,0 +1,141 @@
+<?xml version="1.0" ?><Task>
+        <!-- reference task information -->
+        <Reference>
+                <Author>
+                        <name>Michal Laszkowski</name>
+                        <link/>
+                </Author>
+
+                <Description>
+                        <brief>SOM:GroundTruthTest</brief>
+                        <full/>
+                </Description>
+        </Reference>
+
+        <!-- task definition -->
+        <Subtasks>
+                <Subtask name="Main">
+                        <Executor name="Processing" period="1">
+                                <Component bump="0" name="CameraInfo" priority="1" type="CvCoreTypes:CameraInfoProvider">
+                                        <param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
+                                        <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
+                                </Component>
+                                <!--Sequences-->
+                                <Component bump="0" name="NextImageTrigger" priority="3" type="CvBasic:Trigger">
+                                        <param name="auto_trigger">0</param>
+                                </Component>
+                                <Component bump="0" name="SequenceRGB" priority="4" type="CvBasic:Sequence">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect</param>
+                                    <param name="sequence.pattern">.*\_rgb\.png</param>
+                                    <param name="mode.loop">0</param>
+                                    <param name="mode.sort">1</param>
+                                    <param name="mode.auto_next_image">0</param>
+                                </Component>
+                                <Component bump="0" name="SequenceXYZ" priority="5" type="CvBasic:Sequence">
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect</param>
+                                    <param name="sequence.pattern">.*\_depth\.png</param>
+                                    <param name="mode.loop">0</param>
+                                    <param name="mode.sort">1</param>
+                                    <param name="mode.auto_next_image">0</param>
+                                </Component>
+                                <!--Processing-->
+                                <Component bump="0" name="Converter" priority="7" type="PCL:DepthConverter">
+                                </Component>
+                                <!-- Detect coordinations -->
+                                <Component name="DetectCircles" priority="11" type="CvBasic:CvFindCirclesGrid">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+                                </Component>
+                                <Component name="DetectCirclesInv" priority="12" type="CvBasic:CvFindCirclesGrid">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+                                        <param name="image.inverse">1</param>
+                                </Component>
+                                <Component name="SolvePNP" priority="13" type="CvBasic:CvSolvePnP">
+                                        <param name="offset.x">0.075</param>
+                                        <param name="offset.y">0.233</param>
+                                        <param name="offset.roll">3.14159265359</param>
+                                </Component>
+                                <Component name="SolvePNPinv" priority="14" type="CvBasic:CvSolvePnP">
+                                        <param name="offset.x">0.075</param>
+                                        <param name="offset.y">-0.113</param>
+                                        <param name="offset.roll">3.14159265359</param>
+                                </Component>
+                                <Component name="SolveLocation" priority="15" type="CvBasic:CalcObjectLocation">
+                                </Component>
+
+                                <Component name="CloudTransformer" priority="16" type="PCL:CloudTransformer">
+                                        <param name="inverse">1</param>
+                                </Component>
+<!--                                <Component name="Projection" priority="17" type="SIFTObjectModel:Projection">
+                                        <param name="use_icp">0</param>
+                                </Component>-->
+
+                        </Executor>
+
+                        <Executor name="Visualization" period="1">
+   <!--                             <Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
+                                </Component>-->
+                                <Component name="CloudViewer" type="PCL:CloudViewer" priority="2" bump="0">
+                                </Component>
+                             <!--   <Component name="ClustersViewer" type="PCL:ClustersViewer" priority="2" bump="0">
+                                    <param name="title">Projections</param>
+                                </Component>-->
+                        </Executor>
+
+            </Subtask>
+
+        </Subtasks>
+
+        <!-- pipes connecting datastreams -->
+        <DataStreams>
+                <Source name="CameraInfo.out_camera_info">
+                        <sink>SolvePNP.in_camera_info</sink>
+                        <sink>SolvePNPinv.in_camera_info</sink>
+                        <sink>Converter.in_camera_info</sink>
+                </Source>
+                <!--Sequences-->
+                <Source name="NextImageTrigger.out_trigger">
+                        <sink>SequenceRGB.in_next_image_trigger</sink>
+                        <sink>SequenceXYZ.in_next_image_trigger</sink>
+                </Source>
+                <Source name="SequenceRGB.out_img">
+                        <sink>Converter.in_color</sink>
+                        <sink>DetectCircles.in_img</sink>
+                        <sink>DetectCirclesInv.in_img</sink>
+                </Source>
+                <Source name="SequenceXYZ.out_img">
+                        <sink>Converter.in_depth</sink> <!--_xyz-->
+                </Source>
+                <!--Proccesing-->
+                <Source name="Converter.out_cloud_xyzrgb">
+                        <sink>CloudTransformer.in_cloud_xyzrgb</sink>
+                </Source>
+
+                <!-- Detect coordinations -->
+                <Source name="DetectCircles.out_pattern">
+                        <sink>SolvePNP.in_object3d</sink>
+                </Source>
+                <Source name="DetectCirclesInv.out_pattern">
+                        <sink>SolvePNPinv.in_object3d</sink>
+                </Source>
+                <Source name="SolvePNPinv.out_homogMatrix">
+                        <sink>SolveLocation.in_homogMatrix</sink>
+                </Source>
+                <Source name="SolvePNP.out_homogMatrix">
+                        <sink>SolveLocation.in_homogMatrix</sink>
+                </Source>
+
+                <Source name="SolveLocation.out_homogMatrix">
+                        <sink>CloudTransformer.in_hm</sink>
+                </Source>
+
+                <!--Visualization-->
+                <Source name="CloudTransformer.out_cloud_xyzrgb">
+                        <sink>CloudViewer.in_cloud_xyzrgb</sink>
+                </Source>
+
+        </DataStreams>
+</Task>
