@@ -71,8 +71,8 @@ protected:
 	Base::DataStreamOut<std::vector<AbstractObject*> > out_models;
 
 
-	/// Output data stream containing vector of XYZSIFT clouds.
-	Base::DataStreamOut < std::vector< std::string > > out_model_names;
+	/// Output data stream containing vector of model ids.
+	Base::DataStreamOut < std::vector< std::string > > out_model_ids;
 
 	/// Output data stream containing vector of XYZRGB clouds.
 	Base::DataStreamOut < std::vector< pcl::PointCloud<pcl::PointXYZRGB>::Ptr > > out_model_clouds_xyzrgb;

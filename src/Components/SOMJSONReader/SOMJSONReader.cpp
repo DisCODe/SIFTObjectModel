@@ -46,7 +46,7 @@ SOMJSONReader::~SOMJSONReader() {
 void SOMJSONReader::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
 	registerStream("out_models", &out_models);
-	registerStream("out_model_names", &out_model_names);
+	registerStream("out_model_ids", &out_model_ids);
 	registerStream("out_model_clouds_xyzrgb", &out_model_clouds_xyzrgb);
 	registerStream("out_model_clouds_xyzsift", &out_model_clouds_xyzsift);
 
@@ -104,7 +104,7 @@ void SOMJSONReader::publishModels() {
 	out_models.write(models);
 	
 	// New: dataports containing simple types.
-	out_model_names.write(model_names);
+	out_model_ids.write(model_names);
 	out_model_clouds_xyzrgb.write(model_clouds_xyzrgb);
 	out_model_clouds_xyzsift.write(model_clouds_xyzsift);
 }
@@ -114,6 +114,14 @@ void SOMJSONReader::loadModels() {
 	CLOG(LTRACE) << "loadModels()";
 
 	load_models = false;
+
+	// DEPRICATED.
+	models.clear();
+
+	// New: dataports containing simple types.
+	model_names.clear();
+	model_clouds_xyzrgb.clear();
+	model_clouds_xyzsift.clear();
 
 	// Names of models/JSON files.	
 	std::vector<std::string> namesList;
