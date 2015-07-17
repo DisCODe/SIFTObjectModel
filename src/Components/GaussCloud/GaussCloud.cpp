@@ -52,8 +52,7 @@ void GaussCloud::prepareInterface() {
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 
 	// Register handlers
-	h_makeNoisyCloud.setup(boost::bind(&GaussCloud::makeNoisyCloud, this));
-	registerHandler("makeNoisyCloud", &h_makeNoisyCloud);
+	registerHandler("makeNoisyCloud", boost::bind(&GaussCloud::makeNoisyCloud,this) );
 	addDependency("makeNoisyCloud", &in_cloud_xyzrgb);
 	addDependency("makeNoisyCloud", &in_cloud_xyzsift);
 }
