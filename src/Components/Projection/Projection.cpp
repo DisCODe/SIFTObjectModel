@@ -81,7 +81,7 @@ bool Projection::onStart() {
 
 void Projection::project() {
     CLOG(LTRACE) << "Projection::project";
-    std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations = in_rototranslations.read();
+    std::vector<Types::HomogMatrix> rototranslations = in_rototranslations.read();
     pcl::PointCloud<pcl::PointXYZ>::Ptr scene = in_cloud_xyz_scene.read();
     pcl::PointCloud<pcl::PointXYZ>::Ptr model = in_cloud_xyz_model.read();
 
@@ -162,7 +162,7 @@ void Projection::project() {
 
 void Projection::project_xyzsift() {
     CLOG(LTRACE) << "Projection::project_xyzsift";
-    std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations = in_rototranslations.read();
+    std::vector<Types::HomogMatrix> rototranslations = in_rototranslations.read();
     pcl::PointCloud<PointXYZSIFT>::Ptr scene = in_cloud_xyzsift_scene.read();
     pcl::PointCloud<PointXYZSIFT>::Ptr model = in_cloud_xyzsift_model.read();
 
@@ -243,7 +243,7 @@ void Projection::project_xyzsift() {
 
 void Projection::project_xyzrgb() {
     CLOG(LTRACE) << "Projection::project_xyzrgb";
-    std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations = in_rototranslations.read();
+    std::vector<Types::HomogMatrix> rototranslations = in_rototranslations.read();
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr scene = in_cloud_xyzrgb_scene.read();
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr model = in_cloud_xyzrgb_model.read();
 

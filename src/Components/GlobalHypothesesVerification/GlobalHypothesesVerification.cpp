@@ -187,7 +187,7 @@ void GlobalHypothesesVerification::verify_xyzrgb() {
         }
     }
     if(scene->size() == 0){
-            cout<< "GlobalHypothesesVerification DUPA"<<endl;
+            cout<< "GlobalHypothesesVerification scena pusta"<<endl;
             return;
     }
 

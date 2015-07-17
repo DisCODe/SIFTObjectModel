@@ -22,6 +22,8 @@
 #include <pcl/common/common.h>
 #include <pcl/filters/passthrough.h>
 
+#include "Types/HomogMatrix.hpp"
+
 namespace Processors {
 namespace Projection {
 
@@ -80,7 +82,7 @@ protected:
     Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb_model;
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift_scene;
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift_model;
-	Base::DataStreamIn<std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > > in_rototranslations;
+    Base::DataStreamIn<std::vector<Types::HomogMatrix> > in_rototranslations;
 
 	// Output data streams
     Base::DataStreamOut<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > out_registered_instances_xyzsift;
