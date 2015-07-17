@@ -68,8 +68,8 @@ protected:
 
 
 	// Input data streams
-	Base::DataStreamIn<std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > > in_rototranslations;
-	Base::DataStreamIn<Eigen::Matrix4f> in_location;
+    Base::DataStreamIn<std::vector<Types::HomogMatrix > > in_rototranslations;
+    //Base::DataStreamIn<Eigen::Matrix4f> in_location;
     Base::DataStreamIn<Types::HomogMatrix> in_location_hm;
 
 	// Output data streams
@@ -78,9 +78,9 @@ protected:
 
 	
 	// Handlers
-    void calculate_errors(std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations, Eigen::Matrix4f location);
+    void calculate_errors(std::vector<Types::HomogMatrix > rototranslations, Types::HomogMatrix location);
     void calculate_errors_hm();
-    void calculate_errors_eigen();
+    //void calculate_errors_eigen();
 
 };
 

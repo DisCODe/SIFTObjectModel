@@ -97,7 +97,8 @@ void SIFTObjectMatcher::prepareInterface() {
     registerStream("out_correspondences", &out_correspondences);
     registerStream("out_good_correspondences", &out_good_correspondences);
     registerStream("out_clustered_correspondences", &out_clustered_correspondences);
-    registerStream("out_rototranslations", &out_rototranslations);
+    registerStream("out_rototranslations", &out_poses);
+    registerStream("out_poses", &out_poses);
 
 
 	// Register handlers
@@ -242,7 +243,7 @@ void SIFTObjectMatcher::match() {
         //Algorithm params
         float rf_rad_ (0.015f);
 
-        std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations;
+        std::vector< Eigen::Matrix<float, 4, 4>, Eigen::aligned_allocator<Eigen::Matrix<float, 4, 4> > > poses;
         std::vector<pcl::Correspondences> clustered_corrs;
 
         //  Clustering
@@ -262,13 +263,13 @@ void SIFTObjectMatcher::match() {
             clusterer.setModelSceneCorrespondences (correspondences);
 
     //        clusterer.cluster (clustered_corrs);//tu sie wywala
-            clusterer.recognize (rototranslations, clustered_corrs);//tu sie wywala
+            clusterer.recognize (poses, clustered_corrs);//tu sie wywala
 
-            CLOG(LINFO) << "Model instances found: " << rototranslations.size ();
-            for (size_t j = 0; j < rototranslations.size (); ++j)
+            CLOG(LINFO) << "Model instances found: " << poses.size ();
+            for (size_t j = 0; j < poses.size (); ++j)
             {
-                Eigen::Matrix3f rotation = rototranslations[j].block<3,3>(0, 0);
-                Eigen::Vector3f translation = rototranslations[j].block<3,1>(0, 3);
+                Eigen::Matrix3f rotation = poses[j].block<3,3>(0, 0);
+                Eigen::Vector3f translation = poses[j].block<3,1>(0, 3);
                 if(rotation != Eigen::Matrix3f::Identity()){
                     CLOG(LINFO) << "\n    Instance " << j + 1 << ":";
                     CLOG(LINFO) << "        Correspondences belonging to this instance: " << clustered_corrs[j].size () ;
@@ -291,8 +292,8 @@ void SIFTObjectMatcher::match() {
             gc_clusterer.setModelSceneCorrespondences (correspondences);
 
             //gc_clusterer.cluster (clustered_corrs);
-            gc_clusterer.recognize (rototranslations, clustered_corrs);
-            CLOG(LINFO) << "Model instances found: " << rototranslations.size () ;
+            gc_clusterer.recognize (poses, clustered_corrs);
+            CLOG(LINFO) << "Model instances found: " << poses.size () ;
 //            cout<<"clustered_corrs "<< clustered_corrs.size();
 //            for(int j=0; j<clustered_corrs.size(); j++){
 //                for(int k =0; k<clustered_corrs[j].size();k++){
@@ -300,9 +301,9 @@ void SIFTObjectMatcher::match() {
 //                }
 //                cout<<"-----------"<<endl;
 //            }
-                for (size_t k = 0; k < rototranslations.size (); ++k){
-                      Eigen::Matrix3f rotation = rototranslations[k].block<3,3>(0, 0);
-                      Eigen::Vector3f translation = rototranslations[k].block<3,1>(0, 3);
+                for (size_t k = 0; k < poses.size (); ++k){
+                      Eigen::Matrix3f rotation = poses[k].block<3,3>(0, 0);
+                      Eigen::Vector3f translation = poses[k].block<3,1>(0, 3);
                       if(rotation != Eigen::Matrix3f::Identity()){
                           CLOG(LINFO) << "\n    Instance " << k + 1 << ":";
                           CLOG(LINFO) << "        Correspondences belonging to this instance: " << clustered_corrs[k].size () ;
@@ -324,7 +325,15 @@ void SIFTObjectMatcher::match() {
                 out_correspondences.write(correspondences);//wszystkie dopasowania
                 //        out_good_correspondences.write(inliers);
                 out_clustered_correspondences.write(clustered_corrs);
-                out_rototranslations.write(rototranslations);
+
+                std::vector<Types::HomogMatrix> hm_poses;
+                for (int var = 0; var < poses.size(); ++var) {
+                    Types::HomogMatrix tmp_hm = poses[var];
+
+                    hm_poses.push_back(tmp_hm);
+                }//: for
+
+                out_poses.write(hm_poses);
             }
         }
 }

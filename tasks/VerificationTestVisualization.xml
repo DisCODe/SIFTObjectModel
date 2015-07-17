@@ -21,25 +21,25 @@
                                         <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
                                 </Component>
                                 <Component bump="0" name="SOMJSONReader" priority="2" type="SIFTObjectModel:SOMJSONReader">
-                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/lipton_1_1.json</param>
+                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/herbapol_mieta1.json</param>
                                 </Component>
                                 <!--Sequences-->
                                 <Component bump="0" name="NextImageTrigger" priority="3" type="CvBasic:Trigger">
                                 </Component>
                                 <Component bump="0" name="SequenceRGB" priority="4" type="CvBasic:Sequence">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect</param>
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">0</param>
                                     <param name="mode.sort">1</param>
-                                    <param name="mode.auto_next_image">1</param>
+                                    <param name="mode.auto_next_image">0</param>
                                 </Component>
                                 <Component bump="0" name="SequenceXYZ" priority="5" type="CvBasic:Sequence">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect</param>
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta</param>
                                     <param name="sequence.pattern">.*\_depth\.png</param>
 <!--                                    <param name="sequence.pattern">.*\_xyz\.yml</param>-->
                                     <param name="mode.loop">0</param>
                                     <param name="mode.sort">1</param>
-                                    <param name="mode.auto_next_image">1</param>
+                                    <param name="mode.auto_next_image">0</param>
                                 </Component>
                                 <!--Processing-->
                                 <Component bump="0" name="SIFT" priority="6" type="CvBasic:CvSIFT">
@@ -106,16 +106,11 @@
                                 </Component>
                         </Executor>
 
-<!--			<Executor name="Visualization" period="1">
-                                <Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
-                                </Component>
+                        <Executor name="Visualization" period="1">
                                 <Component name="CloudViewer" type="PCL:CloudViewer" priority="2" bump="0">
                                 </Component>
-                                <Component name="ClustersViewer" type="PCL:ClustersViewer" priority="2" bump="0">
-                                    <param name="title">Projections</param>
-                                </Component>
                         </Executor>
--->
+
             </Subtask>
 
         </Subtasks>
@@ -164,6 +159,7 @@
                 <!-- SIFTObjectMatcher -->
                 <Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
                         <sink>Projection.in_cloud_xyzrgb_scene</sink>
+                        <sink>CloudViewer.in_scene_cloud_xyzrgb</sink>
                 </Source>
                 <Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
                         <sink>Projection.in_cloud_xyzrgb_model</sink>
@@ -200,6 +196,7 @@
                         <sink>GreedyVerification.in_aligned_hypotheses_xyzrgb</sink>
                         <sink>ConflictGraph.in_aligned_hypotheses_xyzrgb</sink>
                         <sink>GlobalHypothesesVerification.in_aligned_hypotheses_xyzrgb</sink>
+                        <sink>CloudViewer.in_om_clouds_xyzrgb</sink>
                 </Source>
 
                 <Source name="Projection.out_parts_of_scene_xyzrgb">

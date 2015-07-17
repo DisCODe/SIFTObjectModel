@@ -20,6 +20,7 @@
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/registration/correspondence_estimation.h>
+#include "Types/HomogMatrix.hpp"
 
 
 namespace Processors {
@@ -84,12 +85,12 @@ protected:
     Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_cloud_xyzrgb_model;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift;
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift_model;
-	Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;
+    Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;
     Base::DataStreamOut<pcl::CorrespondencesPtr> out_good_correspondences;
     Base::DataStreamOut<std::vector<pcl::Correspondences> > out_clustered_correspondences;
-    Base::DataStreamOut<std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > > out_rototranslations;
+    Base::DataStreamOut<std::vector<Types::HomogMatrix> > out_poses;
 
-	// Handlers
+    // Handlers
 	void readModels();
 	void match();
 
