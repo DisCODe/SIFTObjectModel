@@ -79,7 +79,7 @@
                                 </Component>
 
 
-                                <Component bump="1" name="ReprojectionError" priority="16" type="SIFTObjectModel:ReprojectionError">
+                                <Component bump="0" name="ReprojectionError" priority="16" type="SIFTObjectModel:ReprojectionError">
                                 </Component>
 
                                 <!-- Verification -->

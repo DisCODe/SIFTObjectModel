@@ -130,9 +130,10 @@ bool SIFTObjectMatcher::onStart() {
 
 void SIFTObjectMatcher::readModels() {
     CLOG(LTRACE) << "readModels()" << endl;
-	for( int i = 0 ; i<models.size(); i++){
+/*	for( int i = 0 ; i<models.size(); i++){
 		delete models[i];
-	}
+	}*/
+	// FIX: clear only vector, do not delete vectors.
 	models.clear();
 	std::vector<AbstractObject*> abstractObjects = in_models.read();
 	for( int i = 0 ; i<abstractObjects.size(); i++){
