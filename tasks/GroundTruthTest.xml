@@ -22,20 +22,20 @@
                                 </Component>
                                 <!--Sequences-->
                                 <Component bump="0" name="SOMJSONReader" priority="2" type="SIFTObjectModel:SOMJSONReader">
-                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/herbapol_mieta1.json</param>
+                                        <param name="filenames">/home/mlaszkow/DCL/Registration/data/models/lipton_3/lipton_3_lum_filtered.json</param>
                                 </Component>
                                 <Component bump="0" name="NextImageTrigger" priority="3" type="CvBasic:Trigger">
                                         <param name="auto_trigger">0</param>
                                 </Component>
                                 <Component bump="0" name="SequenceRGB" priority="4" type="CvBasic:Sequence">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta</param>
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-06-11/lipton_3/kinect</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">0</param>
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">0</param>
                                 </Component>
                                 <Component bump="0" name="SequenceXYZ" priority="5" type="CvBasic:Sequence">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta</param>
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-06-11/lipton_3/kinect</param>
                                     <param name="sequence.pattern">.*\_depth\.png</param>
                                     <param name="mode.loop">0</param>
                                     <param name="mode.sort">1</param>
@@ -72,6 +72,21 @@
                                 <Component name="CloudTransformer" priority="16" type="PCL:CloudTransformer">
                                         <param name="inverse">1</param>
                                 </Component>
+                                <Component name="ErrorHMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="20" bump="0">
+<!--                                        <param name="offset.x">0.01</param>
+                                        <param name="offset.y">-0.013</param>
+                                        <param name="offset.z">-0.015</param>-->
+                                        <param name="offset.x">0</param>
+                                        <param name="offset.y">0</param>
+                                        <param name="offset.z">0</param>
+                                        <param name="offset.roll">0</param>
+                                        <param name="offset.pitch">0</param>
+                                        <param name="offset.yaw">0</param>
+
+                                </Component>
+                                <Component name="ErrorCloudTransformer" priority="19" type="PCL:CloudTransformer">
+                                        <param name="inverse">0</param>
+                                </Component>
 <!--                                <Component name="Projection" priority="17" type="SIFTObjectModel:Projection">
                                         <param name="use_icp">0</param>
                                 </Component>-->
@@ -82,6 +97,7 @@
    <!--                             <Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
                                 </Component>-->
                                 <Component name="CloudViewer" type="PCL:CloudViewer" priority="2" bump="0">
+                                        <param name="coordinate_system_scale">0.05</param>
                                 </Component>
                              <!--   <Component name="ClustersViewer" type="PCL:ClustersViewer" priority="2" bump="0">
                                     <param name="title">Projections</param>
@@ -137,6 +153,12 @@
 
                 <!--Visualization-->
                 <Source name="CloudTransformer.out_cloud_xyzrgb">
+                        <sink>ErrorCloudTransformer.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="ErrorHMProvider.out_homogMatrix">
+                        <sink>ErrorCloudTransformer.in_hm</sink>
+                </Source>
+                <Source name="ErrorCloudTransformer.out_cloud_xyzrgb">
                         <sink>CloudViewer.in_cloud_xyzrgb</sink>
                 </Source>
                 <Source name="SOMJSONReader.out_model_clouds_xyzrgb">
