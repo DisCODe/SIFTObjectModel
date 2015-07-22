@@ -7,12 +7,10 @@
                 </Author>
 
                 <Description>
-                        <brief>SOM:GroundTruthTest</brief>
-                        <full/>
+                        <brief>SOM:FiducialBoardPositioningTest</brief>
+                        <full>Task for testing pattern positioning</full>
                 </Description>
         </Reference>
-
-
 
         <!-- task definition -->
         <Subtasks>
@@ -22,11 +20,8 @@
                                         <param name="camera_matrix">532.008979830747 0.0 314.7847254654873; 0.0 529.4429999673303 275.02248275437506; 0.0 0.0 1.0</param>
                                         <param name="dist_coeffs">0.20435540059259782 -0.3231259749551428 0.004128788867280242 -0.00027935219079067424 0.0</param>
                                 </Component>
+
                                 <!--Sequences-->
-                                <Component bump="0" name="SOMJSONReader" priority="2" type="SIFTObjectModel:SOMJSONReader">
-                                    <param name="filenames">/home/tkornuta/discode_ecovi/DCL/ecovi/data/lipton_green_tea_citrus/lipton_som.json</param>
-<!--                                        <param name="filenames">/home/mlaszkow/DCL/Registration/data/models/lipton_3/lipton_3_lum_filtered.json</param>-->
-                                </Component>
                                 <Component bump="0" name="NextImageTrigger" priority="3" type="CvBasic:Trigger">
                                         <param name="auto_trigger">0</param>
                                 </Component>
@@ -44,8 +39,8 @@
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">0</param>
                                 </Component>
-                                <!--Processing-->
 
+                                <!--Processing-->
                                 <Component bump="0" name="Converter" priority="10" type="PCL:DepthConverter">
                                 </Component>
 
@@ -54,59 +49,29 @@
                                         <param name="grid.width">3</param>
                                         <param name="grid.height">5</param>
                                         <param name="grid.size">0.06f</param>
-                                </Component>
-                                <Component name="DetectCirclesInv" priority="22" type="CvBasic:CvFindCirclesGrid">
-                                        <param name="grid.width">3</param>
-                                        <param name="grid.height">5</param>
-                                        <param name="grid.size">0.06f</param>
                                         <param name="image.inverse">1</param>
                                 </Component>
+
                                 <Component name="SolvePNP" priority="23" type="CvBasic:CvSolvePnP">
-                                        <param name="offset.x">0.075</param>
+<!--                                        <param name="offset.x">0.075</param>
                                         <param name="offset.y">0.233</param>
-                                        <param name="offset.roll">3.141592653589793</param>
-                                </Component>
-                                <Component name="SolvePNPinv" priority="24" type="CvBasic:CvSolvePnP">
-                                        <param name="offset.x">0.075</param>
-                                        <param name="offset.y">-0.113</param>
-                                        <param name="offset.roll">3.141592653589793</param>
-                                </Component>
-                                <Component name="SolveLocation" priority="25" type="CvBasic:CalcObjectLocation">
+                                        <param name="offset.roll">3.141592653589793</param>-->
                                 </Component>
 
-
-                                <!-- Cloud (view) transformations -->
-                                <Component name="CloudTransformer" priority="31" type="PCL:CloudTransformer">
+                                <!-- Cloud transformations -->
+                                <Component name="SolvePNPCloudTransformer" priority="31" type="PCL:CloudTransformer">
                                         <param name="inverse">1</param>
+                                        <param name="pass_through">0</param>
                                 </Component>
 
-                                <Component name="GroundTruthHMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="32" bump="0">
-                                        <param name="offset.x">0.078</param>
-                                        <param name="offset.y">-0.028</param>
-                                        <param name="offset.z">-0.017</param>
-                                        <param name="offset.roll">0</param>
-                                        <param name="offset.pitch">0</param>
-                                        <param name="offset.yaw">-1.63</param>
 
-                                </Component>
-                                <Component name="GroundTruthCloudTransformer" priority="33" type="PCL:CloudTransformer">
-                                        <param name="inverse">0</param>
-                                </Component>
-<!--                                <Component name="Projection" priority="17" type="SIFTObjectModel:Projection">
-                                        <param name="use_icp">0</param>
-                                </Component>-->
 
                         </Executor>
 
                         <Executor name="Visualization" period="1">
-   <!--                             <Component name="Window" type="SIFTObjectModel:CorrespondencesViewer" priority="1" bump="0">
-                                </Component>-->
-                                <Component name="CloudViewer" type="PCL:CloudViewer" priority="101" bump="0">
+                                <Component name="CloudViewer" type="PCL:CloudViewer" priority="100" bump="0">
                                         <param name="coordinate_system_scale">0.05</param>
                                 </Component>
-                             <!--   <Component name="ClustersViewer" type="PCL:ClustersViewer" priority="2" bump="0">
-                                    <param name="title">Projections</param>
-                                </Component>-->
                         </Executor>
 
             </Subtask>
@@ -117,7 +82,6 @@
         <DataStreams>
                 <Source name="CameraInfo.out_camera_info">
                         <sink>SolvePNP.in_camera_info</sink>
-                        <sink>SolvePNPinv.in_camera_info</sink>
                         <sink>Converter.in_camera_info</sink>
                 </Source>
                 <!--Sequences-->
@@ -128,47 +92,27 @@
                 <Source name="SequenceRGB.out_img">
                         <sink>Converter.in_color</sink>
                         <sink>DetectCircles.in_img</sink>
-                        <sink>DetectCirclesInv.in_img</sink>
                 </Source>
                 <Source name="SequenceXYZ.out_img">
                         <sink>Converter.in_depth</sink> <!--_xyz-->
                 </Source>
                 <!--Proccesing-->
                 <Source name="Converter.out_cloud_xyzrgb">
-                        <sink>CloudTransformer.in_cloud_xyzrgb</sink>
+                        <sink>SolvePNPCloudTransformer.in_cloud_xyzrgb</sink>
                 </Source>
 
                 <!-- Detect coordinations -->
                 <Source name="DetectCircles.out_pattern">
                         <sink>SolvePNP.in_object3d</sink>
                 </Source>
-                <Source name="DetectCirclesInv.out_pattern">
-                        <sink>SolvePNPinv.in_object3d</sink>
-                </Source>
-                <Source name="SolvePNPinv.out_homogMatrix">
-                        <sink>SolveLocation.in_homogMatrix</sink>
-                </Source>
                 <Source name="SolvePNP.out_homogMatrix">
-                        <sink>SolveLocation.in_homogMatrix</sink>
+			<sink>SolvePNPCloudTransformer.in_hm</sink>
                 </Source>
 
-                <Source name="SolveLocation.out_homogMatrix">
-                        <sink>CloudTransformer.in_hm</sink>
-                </Source>
-
-                <!--Visualization-->
-                <Source name="CloudTransformer.out_cloud_xyzrgb">
-                        <sink>GroundTruthCloudTransformer.in_cloud_xyzrgb</sink>
-                </Source>
-                <Source name="GroundTruthHMProvider.out_homogMatrix">
-                        <sink>GroundTruthCloudTransformer.in_hm</sink>
-                </Source>
-                <Source name="GroundTruthCloudTransformer.out_cloud_xyzrgb">
+                <Source name="SolvePNPCloudTransformer.out_cloud_xyzrgb">
                         <sink>CloudViewer.in_cloud_xyzrgb</sink>
                 </Source>
-                <Source name="SOMJSONReader.out_model_clouds_xyzrgb">
-                        <sink>CloudViewer.in_om_clouds_xyzrgb</sink>
-                </Source>
+
 
         </DataStreams>
 </Task>

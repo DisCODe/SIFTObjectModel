@@ -24,8 +24,8 @@
                                         <param name="index">0</param>
                                 </Component>-->
                                 <Component name="Sequence" type="CvBasic:Sequence" priority="1" bump="0">
-                                        <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/lipton_earl_grey_lemon/</param>
-                                        <param name="sequence.pattern">.*\_rgb\.png</param>
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-06-11/lipton_3/kinect</param>
+                                    <param name="sequence.pattern">.*\_rgb\.png</param>
                                         <param name="mode.loop">1</param>
                                         <param name="mode.sort">1</param>
                                         <param name="mode.auto_next_image">0</param>
