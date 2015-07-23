@@ -7,7 +7,7 @@
                 </Author>
 
                 <Description>
-                        <brief>SOM:GroundTruthTest</brief>
+                        <brief>SOM:GroundTruthSequenceTest</brief>
                         <full/>
                 </Description>
         </Reference>
@@ -79,15 +79,22 @@
                                         <param name="inverse">1</param>
                                 </Component>
 
-                                <Component name="GroundTruthHMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="32" bump="0">
+<!--                                <Component name="GroundTruthHMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="32" bump="0">
                                         <param name="offset.x">0.078</param>
                                         <param name="offset.y">-0.028</param>
                                         <param name="offset.z">-0.017</param>
                                         <param name="offset.roll">0</param>
                                         <param name="offset.pitch">0</param>
                                         <param name="offset.yaw">-1.63</param>
+                                </Component>-->
 
+                                <Component name="GroundTruthHMSequence" type="CvCoreTypes:HomogenousMatrixSequence" priority="32" bump="0">
+                                        <param name="filename">/home/tkornuta/discode_ecovi/DCL/Registration/data/2015-06-11/lipton_3/kinect/ground_truth.yml</param>
+                                        <param name="mode.auto_next">0</param>
                                 </Component>
+
+
+
                                 <Component name="GroundTruthCloudTransformer" priority="33" type="PCL:CloudTransformer">
                                         <param name="inverse">0</param>
                                 </Component>
@@ -123,6 +130,7 @@
                 <Source name="NextImageTrigger.out_trigger">
                         <sink>SequenceRGB.in_next_image_trigger</sink>
                         <sink>SequenceXYZ.in_next_image_trigger</sink>
+                        <sink>GroundTruthHMSequence.in_next_trigger</sink>
                 </Source>
                 <Source name="SequenceRGB.out_img">
                         <sink>Converter.in_color</sink>
@@ -159,7 +167,7 @@
                 <Source name="CloudTransformer.out_cloud_xyzrgb">
                         <sink>GroundTruthCloudTransformer.in_cloud_xyzrgb</sink>
                 </Source>
-                <Source name="GroundTruthHMProvider.out_homogMatrix">
+                <Source name="GroundTruthHMSequence.out_homogMatrix">
                         <sink>GroundTruthCloudTransformer.in_hm</sink>
                 </Source>
                 <Source name="GroundTruthCloudTransformer.out_cloud_xyzrgb">
@@ -171,3 +179,4 @@
 
         </DataStreams>
 </Task>
+
