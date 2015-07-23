@@ -89,7 +89,7 @@
                                 </Component>-->
 
                                 <Component name="GroundTruthHMSequence" type="CvCoreTypes:HomogenousMatrixSequence" priority="32" bump="0">
-                                        <param name="filename">/home/tkornuta/discode_ecovi/DCL/Registration/data/2015-06-11/lipton_3/kinect/ground_truth.yml</param>
+                                        <param name="filename">/home/mlaszkow/DCL/Registration/data/2015-06-11/lipton_2/kinect/ground_truth.yml</param>
                                         <param name="mode.auto_next">0</param>
                                 </Component>
 

@@ -93,9 +93,10 @@ void ReprojectionError::calculate_errors(std::vector<Types::HomogMatrix> rototra
         Types::HomogMatrix dT;
         dT.matrix() = rototranslations[i].matrix() * inv.matrix();
         CLOG(LDEBUG)<< "dT" << endl << dT <<endl;
-        float et = sqrt( pow(dT(0,3), 2) + pow(dT(1,3), 2) + pow(dT(2,3), 2));
-        float er = acos((dT.matrix().trace()-1-1)/2);
-        CLOG(LINFO)<< "ReprojectionError Hypothese " << i << " et "<< et << " er " << er<< endl;
+
+        double et = sqrt( pow(dT(0,3), 2) + pow(dT(1,3), 2) + pow(dT(2,3), 2));
+        double er = acos((dT.matrix().trace()-1-1)/2);
+        CLOG(LINFO)<< "ReprojectionError Hypothese " << i << " et "<< et << " er " << er<< " x " << dT(0,3) << " y " << dT(1,3) << " z " << dT(2,3) << endl;
 
     }
 }
