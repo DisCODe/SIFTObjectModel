@@ -14,6 +14,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+#include <pcl/common/common.h>
+
 using boost::property_tree::ptree;
 using boost::property_tree::read_json;
 using boost::property_tree::write_json;
@@ -44,11 +46,12 @@ SOMJSONReader::~SOMJSONReader() {
 
 
 void SOMJSONReader::prepareInterface() {
-	// Register data streams, events and event handlers HERE!
+	// Register data streams.
 	registerStream("out_models", &out_models);
 	registerStream("out_model_ids", &out_model_ids);
 	registerStream("out_model_clouds_xyzrgb", &out_model_clouds_xyzrgb);
 	registerStream("out_model_clouds_xyzsift", &out_model_clouds_xyzsift);
+	registerStream("out_model_corners_xyz", &out_model_corners_xyz);
 
 	// Register manually triggered handlers.
 	registerHandler("loadModelsButtonPressed", boost::bind(&SOMJSONReader::loadModelsButtonPressed, this));
@@ -107,6 +110,7 @@ void SOMJSONReader::publishModels() {
 	out_model_ids.write(model_names);
 	out_model_clouds_xyzrgb.write(model_clouds_xyzrgb);
 	out_model_clouds_xyzsift.write(model_clouds_xyzsift);
+	out_model_corners_xyz.write(model_corners_xyz);
 }
 
 
@@ -122,6 +126,7 @@ void SOMJSONReader::loadModels() {
 	model_names.clear();
 	model_clouds_xyzrgb.clear();
 	model_clouds_xyzsift.clear();
+	model_corners_xyz.clear();
 
 	// Names of models/JSON files.	
 	std::vector<std::string> namesList;
@@ -180,16 +185,58 @@ void SOMJSONReader::loadModels() {
 			continue;
 		}//: if
 
+		// Generate clouds consisting of eight model corners.
+		pcl::PointCloud<pcl::PointXYZ>::Ptr corners_xyz = pcl::PointCloud<pcl::PointXYZ>::Ptr (new pcl::PointCloud<pcl::PointXYZ>());
+		// Concatenate cloud - get only XYZ coordinates.
+		pcl::PointCloud<pcl::PointXYZ>::Ptr tmp_cloud_xyz (new pcl::PointCloud<pcl::PointXYZ>);
+		copyPointCloud(*cloud_xyzrgb, *tmp_cloud_xyz);
+
+		pcl::PointXYZ minPt, maxPt, tmpPt;
+		pcl::getMinMax3D(*tmp_cloud_xyz, minPt, maxPt);
+		// Get width, height and length.
+		float dx = maxPt.x - minPt.x;
+		float dy = maxPt.y - minPt.y;
+		float dz = maxPt.z - minPt.z;
+		// Add corners to cloud.
+		corners_xyz->push_back(minPt); //0
+		tmpPt.x = minPt.x + dx;
+		tmpPt.y = minPt.y;
+		tmpPt.z = minPt.z;
+		corners_xyz->push_back(tmpPt); //1
+		tmpPt.x = minPt.x + dx;
+		tmpPt.y = minPt.y + dy;
+		tmpPt.z = minPt.z;
+		corners_xyz->push_back(tmpPt); //2
+		tmpPt.x = minPt.x;
+		tmpPt.y = minPt.y + dy;
+		tmpPt.z = minPt.z;
+		corners_xyz->push_back(tmpPt); //3
+		tmpPt.x = minPt.x;
+		tmpPt.y = minPt.y;
+		tmpPt.z = minPt.z + dz;
+		corners_xyz->push_back(tmpPt); //4
+		tmpPt.x = minPt.x + dx;
+		tmpPt.y = minPt.y;
+		tmpPt.z = minPt.z + dz;
+		corners_xyz->push_back(tmpPt); //5
+		corners_xyz->push_back(maxPt); //6
+		tmpPt.x = minPt.x;
+		tmpPt.y = minPt.y + dy;
+		tmpPt.z = minPt.z + dz;
+		corners_xyz->push_back(tmpPt); //7
+
+
 
 		// Create SOModel and add it to list.
 		SIFTObjectModel* model;
 		model = dynamic_cast<SIFTObjectModel*>(produce());
 		models.push_back(model);
 
-		// Add data to lists.
+		// Add data (names/clouds) to lists.
 		model_names.push_back(model_name);
 		model_clouds_xyzrgb.push_back(cloud_xyzrgb);
 		model_clouds_xyzsift.push_back(cloud_xyzsift);
+		model_corners_xyz.push_back(corners_xyz);
 
 		CLOG(LINFO) << "Properly loaded " << model_name << "SIFT Object Model";
 
