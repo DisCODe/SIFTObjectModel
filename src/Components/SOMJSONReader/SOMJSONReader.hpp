@@ -13,7 +13,6 @@
 #include "Property.hpp"
 #include "EventHandler2.hpp"
 
-//#include <Types/SIFTObjectModel.hpp> 
 #include <Types/SIFTObjectModelFactory.hpp> 
 #include <Types/PointXYZSIFT.hpp>
 
@@ -80,6 +79,9 @@ protected:
 	/// Output data stream containing vector of XYZSIFT clouds.
 	Base::DataStreamOut < std::vector< pcl::PointCloud<PointXYZSIFT>::Ptr > > out_model_clouds_xyzsift;
 
+	/// Output data stream containing vector of model corners (each being a cloud containing 8 XYZ points).
+	Base::DataStreamOut < std::vector< pcl::PointCloud<pcl::PointXYZ>::Ptr > > out_model_corners_xyz;
+
 
 	/// Property: loads models from files at init.
 	Base::Property<bool> prop_load_on_init;
@@ -125,6 +127,9 @@ protected:
 
 	/// Vector of XYZSIFT clouds of stored models.
 	std::vector<pcl::PointCloud<PointXYZSIFT>::Ptr> model_clouds_xyzsift;
+
+	/// Vector of model corners (each being a cloud containing 8 XYZ points).
+	std::vector< pcl::PointCloud<pcl::PointXYZ>::Ptr> model_corners_xyz;
 
 };
 
