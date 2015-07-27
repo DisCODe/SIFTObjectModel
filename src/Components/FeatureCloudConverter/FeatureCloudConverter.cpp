@@ -34,26 +34,25 @@ void FeatureCloudConverter::prepareInterface() {
 	registerStream("out_cloud_xyzsift", &out_cloud_xyzsift);
 
 	// Register handlers
-	h_process.setup(boost::bind(&FeatureCloudConverter::process, this));
-	registerHandler("process", &h_process);
+	registerHandler("process", boost::bind(&FeatureCloudConverter::process, this));
 	addDependency("process", &in_depth);
 	addDependency("process", &in_features);
 	addDependency("process", &in_descriptors);
 	addDependency("process", &in_camera_info);
-	h_process_mask.setup(boost::bind(&FeatureCloudConverter::process_mask, this));
-	registerHandler("process_mask", &h_process_mask);
+
+	registerHandler("process_mask", boost::bind(&FeatureCloudConverter::process_mask, this));
 	addDependency("process_mask", &in_depth);
 	addDependency("process_mask", &in_mask);
 	addDependency("process_mask", &in_features);
 	addDependency("process_mask", &in_descriptors);
 	addDependency("process_mask", &in_camera_info);
-    h_process_depth_xyz.setup(boost::bind(&FeatureCloudConverter::process_depth_xyz, this));
-    registerHandler("process_depth_xyz", &h_process_depth_xyz);
+
+	registerHandler("process_depth_xyz", boost::bind(&FeatureCloudConverter::process_depth_xyz, this));
     addDependency("process_depth_xyz", &in_features);
     addDependency("process_depth_xyz", &in_descriptors);
     addDependency("proces_depth_xyz", &in_depth_xyz);
-    h_process_depth_xyz_mask.setup(boost::bind(&FeatureCloudConverter::process_depth_xyz_mask, this));
-    registerHandler("process_depth_xyz_mask", &h_process_depth_xyz_mask);
+
+	registerHandler("process_depth_xyz_mask", boost::bind(&FeatureCloudConverter::process_depth_xyz_mask, this));
     addDependency("process_depth_xyz_mask", &in_mask);
     addDependency("process_depth_xyz_mask", &in_features);
     addDependency("process_depth_xyz_mask", &in_descriptors);

@@ -21,7 +21,7 @@ add_definitions(${PCL_DEFINITIONS})
 # Use macro: DISCODE_FIND_DCL(<DCL_NAME>)
 DISCODE_FIND_DCL(PCLCoreTypes)
 DISCODE_FIND_DCL(CvCoreTypes)
-DISCODE_FIND_DCL(CvBasic)
+DISCODE_FIND_DCL(CvBasic) # Required for Types/Features.hpp -> TODO!
 
 #DISCODE_FIND_DCL(PCL)
 
