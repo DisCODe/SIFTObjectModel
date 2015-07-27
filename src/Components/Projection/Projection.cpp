@@ -11,6 +11,7 @@
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
+#include <pcl/filters/voxel_grid.h>
 
 namespace Processors {
 namespace Projection {
@@ -20,11 +21,13 @@ Projection::Projection(const std::string & name) :
         icp_max_iter("icp_max_iter", 5),
         icp_corr_distance("icp_corr_distance", 0.005f),
         bounding_box_epsilon("bounding_box_epsilon", 0.005f),
-        use_icp("use_icp", false){
+        use_icp("use_icp", false),
+        voxel_grid_resolution("voxel_grid_resolution", 0.005f){
             registerProperty(icp_max_iter);
             registerProperty(icp_corr_distance);
             registerProperty(bounding_box_epsilon);
             registerProperty(use_icp);
+            registerProperty(voxel_grid_resolution);
 }
 
 Projection::~Projection() {
@@ -130,15 +133,27 @@ void Projection::project() {
      * ICP
      */
     if(use_icp){
+
+        pcl::VoxelGrid<pcl::PointXYZ> vg;
+        pcl::PointCloud<pcl::PointXYZ>::Ptr scene_filtered (new pcl::PointCloud<pcl::PointXYZ>);
+        vg.setInputCloud (scene);
+        vg.setLeafSize (voxel_grid_resolution, voxel_grid_resolution, voxel_grid_resolution);
+        vg.filter (*scene_filtered);
+
         std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> registered_instances;
         CLOG(LINFO) << "ICP";
         for (size_t i = 0; i < rototranslations.size (); ++i)
         {
+            pcl::VoxelGrid<pcl::PointXYZ> vg;
+            pcl::PointCloud<pcl::PointXYZ>::Ptr instance (new pcl::PointCloud<pcl::PointXYZ>);
+            vg.setInputCloud (instances[i]);
+            vg.setLeafSize (voxel_grid_resolution, voxel_grid_resolution, voxel_grid_resolution);
+            vg.filter (*instance);
             pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
             icp.setMaximumIterations (icp_max_iter);
             icp.setMaxCorrespondenceDistance (icp_corr_distance);
-            icp.setInputTarget (scene);
-            icp.setInputSource (instances[i]);
+            icp.setInputTarget (scene_filtered);
+            icp.setInputSource (instance);
             pcl::PointCloud<pcl::PointXYZ>::Ptr registered (new pcl::PointCloud<pcl::PointXYZ>);
             icp.align (*registered);
             registered_instances.push_back (registered);
@@ -251,7 +266,7 @@ void Projection::project_xyzrgb() {
     /**
      * Generates clouds for each instances found
      */
-    std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> instances;
+    std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> instances;
     std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> parts_of_scene;
     for (size_t i = 0; i < rototranslations.size (); ++i)
     {
@@ -293,17 +308,30 @@ void Projection::project_xyzrgb() {
      * ICP
      */
     if(use_icp){
-        std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> registered_instances;
+        pcl::VoxelGrid<pcl::PointXYZRGB> vg;
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr scene_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
+        vg.setInputCloud (scene);
+        vg.setLeafSize (voxel_grid_resolution, voxel_grid_resolution, voxel_grid_resolution);
+        vg.filter (*scene_filtered);
+
+
+        std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> registered_instances;
         CLOG(LINFO) << "ICP";
         for (size_t i = 0; i < rototranslations.size (); ++i)
         {
+            pcl::VoxelGrid<pcl::PointXYZRGB> vg;
+            pcl::PointCloud<pcl::PointXYZRGB>::Ptr instance (new pcl::PointCloud<pcl::PointXYZRGB>);
+            vg.setInputCloud (instances[i]);
+            vg.setLeafSize (voxel_grid_resolution, voxel_grid_resolution, voxel_grid_resolution);
+            vg.filter (*instance);
             pcl::IterativeClosestPoint<pcl::PointXYZRGB, pcl::PointXYZRGB> icp;
             icp.setMaximumIterations (icp_max_iter);
             icp.setMaxCorrespondenceDistance (icp_corr_distance);
-            icp.setInputTarget (parts_of_scene[i]);
-            icp.setInputSource (instances[i]);
+            icp.setInputTarget (scene_filtered); //parts_of_scene[i]);
+            icp.setInputSource (instance); //instances[i]);
             pcl::PointCloud<pcl::PointXYZRGB>::Ptr registered (new pcl::PointCloud<pcl::PointXYZRGB>);
             icp.align (*registered);
+            cout<< "Registered instance " << i << " size " << registered->size() <<endl;
             registered_instances.push_back (registered);
             CLOG(LINFO) << "Instance " << i << " ";
             if (icp.hasConverged ())

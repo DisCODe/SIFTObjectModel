@@ -86,7 +86,7 @@ protected:
 
 	// Output data streams
     Base::DataStreamOut<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > out_registered_instances_xyzsift;
-    Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> > out_registered_instances_xyzrgb;
+    Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> > out_registered_instances_xyzrgb;
     Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_parts_of_scene_xyzrgb;
     Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> > out_registered_instances_xyz;
 
@@ -95,6 +95,7 @@ protected:
     Base::Property<float> icp_corr_distance;
     Base::Property<float> bounding_box_epsilon;
     Base::Property<bool> use_icp;
+    Base::Property<float> voxel_grid_resolution;
 	
 	// Handlers
     void project();
