@@ -46,8 +46,7 @@ void SIFTNOMWriter::prepareInterface() {
 	registerStream("in_mean_viewpoint_features_number", &in_mean_viewpoint_features_number);
 
 	// Register handlers
-	h_WriteNormals.setup(boost::bind(&SIFTNOMWriter::WriteNormals, this));
-	registerHandler("WriteNormals", &h_WriteNormals);
+	registerHandler("WriteNormals", boost::bind(&SIFTNOMWriter::WriteNormals, this));
 }
 
 bool SIFTNOMWriter::onInit() {

@@ -32,14 +32,12 @@ void ComputeDistance::prepareInterface() {
 	registerStream("out_distance", &out_distance);
 
 	// Register handlers
-	h_computeSIFTDist.setup(this, &ComputeDistance::computeSIFTDist);
-	registerHandler("computeSIFTDist", &h_computeSIFTDist);
+	registerHandler("computeSIFTDist", boost::bind(&ComputeDistance::computeSIFTDist, this));
 	addDependency("computeSIFTDist", &in_cloud_xyzsift1);
 	addDependency("computeSIFTDist", &in_cloud_xyzsift2);
 
 	// Register handlers
-	h_computeRGBDist.setup(this, &ComputeDistance::computeRGBDist);
-	registerHandler("computeRGBDist", &h_computeRGBDist);
+	registerHandler("computeRGBDist", boost::bind(&ComputeDistance::computeRGBDist, this));
 	addDependency("computeRGBDist", &in_cloud_xyzrgb1);
 	addDependency("computeRGBDist", &in_cloud_xyzrgb2);
 }
