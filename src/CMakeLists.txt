@@ -23,8 +23,6 @@ DISCODE_FIND_DCL(PCLCoreTypes)
 DISCODE_FIND_DCL(CvCoreTypes)
 DISCODE_FIND_DCL(CvBasic) # Required for Types/Features.hpp -> TODO!
 
-#DISCODE_FIND_DCL(PCL)
-
 # Add standard libraries for this DCL: Boost & PCL
 MESSAGE(STATUS "${PCL_LIBRARIES}")
 SET(DisCODe_LIBRARIES ${DisCODe_LIBRARIES} ${Boost_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES})
