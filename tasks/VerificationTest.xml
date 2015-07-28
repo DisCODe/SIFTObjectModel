@@ -95,7 +95,7 @@
                                 <!-- Match -->
                                 <Component bump="0" name="SIFTObjectMatcher" priority="41" type="SIFTObjectModel:SIFTObjectMatcher">
                                     <param name="cg_size">0.0075f</param>
-                                    <param name="cg_thresh">8.0f</param>
+                                    <param name="cg_thresh">6.0f</param>
                                 </Component>
                                 <Component name="HMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="42" bump="0">
                                         <param name="mode.auto_next_image">1</param>

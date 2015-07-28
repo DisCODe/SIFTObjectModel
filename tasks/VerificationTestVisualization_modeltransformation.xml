@@ -16,24 +16,24 @@
         <Subtasks>
                 <Subtask name="Main">
                         <Executor name="Processing" period="1">
-                                <Component bump="0" name="CameraInfo" priority="11" type="CvCoreTypes:CameraInfoProvider">
+                                <Component bump="0" name="CameraInfo" priority="1" type="CvCoreTypes:CameraInfoProvider">
                                         <param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
                                         <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
                                 </Component>
-                                <Component bump="0" name="SOMJSONReader" priority="12" type="SIFTObjectModel:SOMJSONReader">
-                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/lipton_1_1.json</param>
+                                <Component bump="0" name="SOMJSONReader" priority="2" type="SIFTObjectModel:SOMJSONReader">
+                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/lipton_1_1_view1.json</param>
                                 </Component>
                                 <!--Sequences-->
-                                <Component bump="0" name="NextImageTrigger" priority="13" type="CvBasic:Trigger">
+                                <Component bump="0" name="NextImageTrigger" priority="3" type="CvBasic:Trigger">
                                 </Component>
-                                <Component bump="0" name="SequenceRGB" priority="14" type="CvBasic:Sequence">
+                                <Component bump="0" name="SequenceRGB" priority="4" type="CvBasic:Sequence">
                                     <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">0</param>
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">0</param>
                                 </Component>
-                                <Component bump="0" name="SequenceXYZ" priority="15" type="CvBasic:Sequence">
+                                <Component bump="0" name="SequenceXYZ" priority="5" type="CvBasic:Sequence">
                                     <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect</param>
                                     <param name="sequence.pattern">.*\_depth\.png</param>
 <!--                                    <param name="sequence.pattern">.*\_xyz\.yml</param>-->
@@ -41,41 +41,44 @@
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">0</param>
                                 </Component>
-
                                 <!--Processing-->
-                                <Component bump="0" name="SIFT" priority="16" type="CvBasic:CvSIFT">
+                                <Component bump="0" name="SIFT" priority="6" type="CvBasic:CvSIFT">
                                 </Component>
-                                <Component bump="0" name="Converter" priority="17" type="PCL:DepthConverter">
+                                <Component bump="0" name="Converter" priority="7" type="PCL:DepthConverter">
                                 </Component>
-                                <Component bump="0" name="FeatureCloudConverter" priority="18" type="SIFTObjectModel:FeatureCloudConverter">
+                                <Component bump="0" name="FeatureCloudConverter" priority="8" type="SIFTObjectModel:FeatureCloudConverter">
                                 </Component>
 
-
+                                <Component bump="10" name="SIFTObjectMatcher" priority="9" type="SIFTObjectModel:SIFTObjectMatcher">
+                                    <param name="cg_size">0.005f</param>
+                                    <param name="cg_thresh">8.0f</param>
+                                </Component>
                                 <!-- Detect coordinations -->
-                                <Component name="DetectCircles" priority="21" type="CvBasic:CvFindCirclesGrid">
+<!--                                <Component name="DetectCircles" priority="11" type="CvBasic:CvFindCirclesGrid">
                                         <param name="grid.width">3</param>
                                         <param name="grid.height">5</param>
                                         <param name="grid.size">0.06f</param>
                                 </Component>
-                                <Component name="DetectCirclesInv" priority="22" type="CvBasic:CvFindCirclesGrid">
+                                <Component name="DetectCirclesInv" priority="12" type="CvBasic:CvFindCirclesGrid">
                                         <param name="grid.width">3</param>
                                         <param name="grid.height">5</param>
                                         <param name="grid.size">0.06f</param>
                                         <param name="image.inverse">1</param>
                                 </Component>
-                                <Component name="SolvePNP" priority="23" type="CvBasic:CvSolvePnP">
+                                <Component name="SolvePNP" priority="13" type="CvBasic:CvSolvePnP">
                                         <param name="offset.x">0.075</param>
                                         <param name="offset.y">0.233</param>
                                         <param name="offset.roll">3.14159265359</param>
                                 </Component>
-                                <Component name="SolvePNPinv" priority="24" type="CvBasic:CvSolvePnP">
+                                <Component name="SolvePNPinv" priority="14" type="CvBasic:CvSolvePnP">
                                         <param name="offset.x">0.075</param>
                                         <param name="offset.y">-0.113</param>
                                         <param name="offset.roll">3.14159265359</param>
                                 </Component>
-                                <Component bump="0" name="SolveLocation" priority="25" type="CvBasic:CalcObjectLocation">
-                                </Component>TestHMProvider
-                                <Component name="TestHMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="26" bump="0">
+                                <Component bump="0" name="SolveLocation" priority="15" type="CvBasic:CalcObjectLocation">
+                                </Component>-->
+
+                                <Component name="HMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="16" bump="0">
                                         <param name="offset.x">0</param>
                                         <param name="offset.y">0</param>
                                         <param name="offset.z">0</param>
@@ -83,57 +86,28 @@
                                         <param name="offset.pitch">0</param>
                                         <param name="offset.yaw">0</param>
                                 </Component>
-
-                                <!-- Transformations -->
-                                <Component name="CloudXYZRGBTransformer" priority="31" type="PCL:CloudTransformer">
-                                        <param name="inverse">1</param>
-                                </Component>
-                                <Component name="CloudXYZSIFTTransformer" priority="32" type="PCL:CloudTransformer">
-                                        <param name="inverse">1</param>
-                                </Component>
-                                <Component name="GroundTruthHMSequence" type="CvCoreTypes:HomogenousMatrixSequence" priority="33" bump="0">
-                                        <param name="filename">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect/ground_truth.yml</param>
-                                        <param name="mode.auto_next">0</param>
-                                </Component>
-                                <Component name="GroundTruthCloudXYZRGBTransformer" priority="34" type="PCL:CloudTransformer">
-                                        <param name="inverse">0</param>
-                                </Component>
-                                <Component name="GroundTruthCloudXYZSIFTTransformer" priority="35" type="PCL:CloudTransformer">
-                                        <param name="inverse">0</param>
-                                </Component>
-
-                                <!-- Recognition -->
-                                <Component name="SIFTObjectMatcher" priority="41" type="SIFTObjectModel:SIFTObjectMatcher" bump="1">
-                                    <param name="cg_size">0.005f</param>
-                                    <param name="cg_thresh">8.0f</param>
-                                </Component>
-                                <Component name="HMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="42" bump="0">
-                                        <param name="offset.x">0</param>
-                                        <param name="offset.y">0</param>
-                                        <param name="offset.z">0</param>
-                                        <param name="offset.roll">0</param>
-                                        <param name="offset.pitch">0</param>
-                                        <param name="offset.yaw">0</param>
-                                </Component>
-                                <Component name="ReprojectionError" priority="43" type="SIFTObjectModel:ReprojectionError" bump="1">
+                                <Component bump="1" name="ReprojectionError" priority="17" type="SIFTObjectModel:ReprojectionError">
                                 </Component>
 
                                 <!-- Verification -->
-                                <Component  name="Projection" priority="51" type="SIFTObjectModel:Projection" bump="1">
+                                <Component bump="1" name="Projection" priority="41" type="SIFTObjectModel:Projection">
                                         <param name="use_icp">0</param>
                                 </Component>
-                                <Component name="GreedyVerification" priority="52" type="SIFTObjectModel:GreedyVerification" bump="1">
+                                <Component bump="1" name="ProjectionSIFT" priority="42" type="SIFTObjectModel:Projection">
+                                        <param name="use_icp">0</param>
+                                </Component>
+                                <Component bump="1" name="GreedyVerification" priority="43" type="SIFTObjectModel:GreedyVerification">
                                         <param name="resolution">0.005f</param>
                                         <param name="inlier_treshold">0.005f</param>
                                 </Component>
-                                <Component name="ConflictGraph" priority="53" type="SIFTObjectModel:ConflictGraph" bump="1">
+                                <Component bump="1" name="ConflictGraph" priority="44" type="SIFTObjectModel:ConflictGraph">
                                         <param name="resolution">0.005f</param>
                                         <param name="inlier_treshold">0.005f</param>
                                         <param name="support_threshold">0.08f</param>
                                         <param name="penalty_threshold">0.05f</param>
                                         <param name="conflict_threshold">0.02f</param>
                                 </Component>
-                                <Component name="GlobalHypothesesVerification" priority="54" type="SIFTObjectModel:GlobalHypothesesVerification" bump="1">
+                                <Component bump="1" name="GlobalHypothesesVerification" priority="45" type="SIFTObjectModel:GlobalHypothesesVerification">
                                         <param name="resolution">0.005f</param>
                                         <param name="inlier_treshold">0.005f</param>
                                         <param name="radius_clutter">0.04f</param>
@@ -143,7 +117,7 @@
                         </Executor>
 
                         <Executor name="Visualization" period="1">
-                                <Component name="CloudViewer" type="PCL:CloudViewer" priority="101" bump="0">
+                                <Component name="CloudViewer" type="PCL:CloudViewer" priority="2" bump="0">
                                 </Component>
                         </Executor>
 
@@ -154,8 +128,8 @@
         <!-- pipes connecting datastreams -->
         <DataStreams>
                 <Source name="CameraInfo.out_camera_info">
-                        <sink>SolvePNP.in_camera_info</sink>
-                        <sink>SolvePNPinv.in_camera_info</sink>
+<!--                        <sink>SolvePNP.in_camera_info</sink>
+                        <sink>SolvePNPinv.in_camera_info</sink>-->
                         <sink>Converter.in_camera_info</sink>
                         <sink>FeatureCloudConverter.in_camera_info</sink>
                 </Source>
@@ -163,13 +137,12 @@
                 <Source name="NextImageTrigger.out_trigger">
                         <sink>SequenceRGB.in_next_image_trigger</sink>
                         <sink>SequenceXYZ.in_next_image_trigger</sink>
-                        <sink>GroundTruthHMSequence.in_next_trigger</sink>
                 </Source>
                 <Source name="SequenceRGB.out_img">
                         <sink>SIFT.in_img</sink>
                         <sink>Converter.in_color</sink>
-                        <sink>DetectCircles.in_img</sink>
-                        <sink>DetectCirclesInv.in_img</sink>
+<!--                        <sink>DetectCircles.in_img</sink>
+                        <sink>DetectCirclesInv.in_img</sink>-->
                 </Source>
                 <Source name="SequenceXYZ.out_img">
                         <sink>Converter.in_depth</sink> <!--_xyz-->
@@ -183,21 +156,47 @@
                         <sink>FeatureCloudConverter.in_features</sink>
                 </Source>
                 <Source name="Converter.out_cloud_xyzrgb">
-                        <sink>CloudXYZRGBTransformer.in_cloud_xyzrgb</sink>
+                        <sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
                 </Source>
                 <Source name="FeatureCloudConverter.out_cloud_xyzsift">
-                        <sink>CloudXYZSIFTTransformer.in_cloud_xyzsift</sink>
+                        <sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>
                 </Source>
                 <!--Read model-->
                 <Source name="SOMJSONReader.out_models">
                         <sink>SIFTObjectMatcher.in_models</sink>
                 </Source>
 
+                <!-- SIFTObjectMatcher -->
+                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
+                        <sink>Projection.in_cloud_xyzrgb_scene</sink>
+                        <sink>CloudViewer.in_scene_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
+                        <sink>Projection.in_cloud_xyzrgb_model</sink>
+                </Source>
+                <Source name="SIFTObjectMatcher.out_cloud_xyzsift">
+                        <sink>ProjectionSIFT.in_cloud_xyzsift_scene</sink>
+                </Source>
+                <Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
+                        <sink>ProjectionSIFT.in_cloud_xyzsift_model</sink>
+                </Source>
+
+                <Source name="SIFTObjectMatcher.out_rototranslations">
+                        <sink>Projection.in_rototranslations</sink>
+                        <sink>ProjectionSIFT.in_rototranslations</sink>
+                        <sink>ReprojectionError.in_rototranslations</sink>
+                </Source>
+
+                <Source name="SIFTObjectMatcher.out_clustered_correspondences">
+                        <sink>CloudViewer.in_models_scene_correspondences</sink>
+                </Source>
+
+
 
 <!--            <Source name="ProjectionGrouping.out_homogMatrix">
                 </Source>-->
                 <!-- Detect coordinations -->
-                <Source name="DetectCircles.out_pattern">
+<!--                <Source name="DetectCircles.out_pattern">
                         <sink>SolvePNP.in_object3d</sink>
                 </Source>
                 <Source name="DetectCirclesInv.out_pattern">
@@ -208,57 +207,9 @@
                 </Source>
                 <Source name="SolvePNP.out_homogMatrix">
                         <sink>SolveLocation.in_homogMatrix</sink>
-                </Source>
+                </Source>-->
 
 
-                <Source name="SolveLocation.out_homogMatrix">
-<!--                        <sink>CloudXYZRGBTransformer.in_hm</sink>
-                        <sink>CloudXYZSIFTTransformer.in_hm</sink>-->
-                </Source>
-
-                <Source name="TestHMProvider.out_homogMatrix">
-                        <sink>CloudXYZRGBTransformer.in_hm</sink>
-                        <sink>CloudXYZSIFTTransformer.in_hm</sink>
-                </Source>
-                <!-- Transformations -->
-                <Source name="CloudXYZRGBTransformer.out_cloud_xyzrgb">
-                        <sink>GroundTruthCloudXYZRGBTransformer.in_cloud_xyzrgb</sink>
-                </Source>
-                <Source name="CloudXYZSIFTTransformer.out_cloud_xyzsift">
-                        <sink>GroundTruthCloudXYZSIFTTransformer.in_cloud_xyzsift</sink>
-                </Source>
-                <Source name="GroundTruthHMSequence.out_homogMatrix">
-                        <sink>GroundTruthCloudXYZRGBTransformer.in_hm</sink>
-                        <sink>GroundTruthCloudXYZSIFTTransformer.in_hm</sink>
-                </Source>
-                <Source name="GroundTruthCloudXYZRGBTransformer.out_cloud_xyzrgb">
-                        <sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
-                </Source>
-                <Source name="GroundTruthCloudXYZSIFTTransformer.out_cloud_xyzsift">
-                        <sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>
-                </Source>
-
-
-
-                <!-- SIFTObjectMatcher -->
-                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
-                        <sink>Projection.in_cloud_xyzrgb_scene</sink>
-                        <sink>CloudViewer.in_scene_cloud_xyzrgb</sink>
-<!--                        <sink>GreedyVerification.in_cloud_xyzrgb_scene</sink>
-                        <sink>ConflictGraph.in_cloud_xyzrgb_scene</sink>
-                        <sink>GlobalHypothesesVerification.in_cloud_xyzrgb_scene</sink>-->
-                </Source>
-                <Source name="SIFTObjectMatcher.out_cloud_xyzsift">
-                        <sink>CloudViewer.in_scene_cloud_xyzsift</sink>
-                </Source>
-                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
-                        <sink>Projection.in_cloud_xyzrgb_model</sink>
-                </Source>
-
-                <Source name="SIFTObjectMatcher.out_poses">
-                        <sink>Projection.in_rototranslations</sink>
-                        <sink>ReprojectionError.in_rototranslations</sink>
-                </Source>
                 <Source name="HMProvider.out_homogMatrix">
                         <sink>ReprojectionError.in_location_hm</sink>
                 </Source>
@@ -271,16 +222,15 @@
                         <sink>CloudViewer.in_om_clouds_xyzrgb</sink>
                 </Source>
 
+                <Source name="ProjectionSIFT.out_registered_instances_xyzsift">
+                        <sink>CloudViewer.in_om_clouds_xyzsift</sink>
+                </Source>
+
                 <Source name="Projection.out_parts_of_scene_xyzrgb">
                         <sink>GreedyVerification.in_cloud_xyzrgb_scene</sink>
                         <sink>ConflictGraph.in_cloud_xyzrgb_scene</sink>
                         <sink>GlobalHypothesesVerification.in_cloud_xyzrgb_scene</sink>
                 </Source>
-
-                <!-- Verification -->
-<!--                <Source name="GreedyVerification.out_verified_hypotheses_xyzrgb">
-                        <sink>CloudViewer.in_om_clouds_xyzrgb</sink>
-                </Source>-->
 
 
         </DataStreams>

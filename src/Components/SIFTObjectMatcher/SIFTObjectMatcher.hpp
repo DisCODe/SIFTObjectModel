@@ -87,7 +87,7 @@ protected:
 	Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_cloud_xyzsift_model;
     Base::DataStreamOut<pcl::CorrespondencesPtr> out_correspondences;
     Base::DataStreamOut<pcl::CorrespondencesPtr> out_good_correspondences;
-    Base::DataStreamOut<std::vector<pcl::Correspondences> > out_clustered_correspondences;
+    Base::DataStreamOut<std::vector<pcl::CorrespondencesPtr> > out_clustered_correspondences;
     Base::DataStreamOut<std::vector<Types::HomogMatrix> > out_poses;
 
     // Handlers
