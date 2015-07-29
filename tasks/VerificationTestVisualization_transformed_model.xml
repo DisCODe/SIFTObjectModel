@@ -8,7 +8,7 @@
 
                 <Description>
                         <brief>SOM:VerificationTest</brief>
-                        <full/>
+                        <full>Rozpoznanie wcześniej przetransformowanego modelu</full>
                 </Description>
         </Reference>
 
@@ -19,9 +19,9 @@
                                 <Component bump="0" name="CameraInfo" priority="1" type="CvCoreTypes:CameraInfoProvider">
                                         <param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
                                         <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
-                                </Component>e
+                                </Component>
                                 <Component bump="0" name="SOMJSONReader" priority="2" type="SIFTObjectModel:SOMJSONReader">
-                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/lipton_1_1.json</param>
+                                        <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/lipton_1_1_view1.json</param>
                                 </Component>
                                 <!--Sequences-->
                                 <Component bump="0" name="NextImageTrigger" priority="3" type="CvBasic:Trigger">
@@ -54,7 +54,7 @@
                                     <param name="cg_thresh">8.0f</param>
                                 </Component>
                                 <!-- Detect coordinations -->
-                                <Component name="DetectCircles" priority="11" type="CvBasic:CvFindCirclesGrid">
+<!--                                <Component name="DetectCircles" priority="11" type="CvBasic:CvFindCirclesGrid">
                                         <param name="grid.width">3</param>
                                         <param name="grid.height">5</param>
                                         <param name="grid.size">0.06f</param>
@@ -76,7 +76,7 @@
                                         <param name="offset.roll">3.14159265359</param>
                                 </Component>
                                 <Component bump="0" name="SolveLocation" priority="15" type="CvBasic:CalcObjectLocation">
-                                </Component>
+                                </Component> -->
 
                                 <Component name="HMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="16" bump="0">
                                         <param name="offset.x">0</param>
@@ -87,23 +87,6 @@
                                         <param name="offset.yaw">0</param>
                                 </Component>
                                 <Component bump="1" name="ReprojectionError" priority="17" type="SIFTObjectModel:ReprojectionError">
-                                </Component>
-
-                                <Component name="GroundTruthHMSequence" type="CvCoreTypes:HomogenousMatrixSequence" priority="33" bump="0">
-                                        <param name="filename">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect/ground_truth.yml</param>
-                                        <param name="mode.auto_next">0</param>
-                                </Component>
-                                <Component name="GroundTruthCloudXYZRGBTransformer" priority="34" type="PCL:CloudTransformer">
-                                        <param name="inverse">1</param>
-                                </Component>
-                                <Component name="GroundTruthCloudXYZSIFTTransformer" priority="35" type="PCL:CloudTransformer">
-                                        <param name="inverse">1</param>
-                                </Component>
-                                <Component name="CloudXYZRGBTransformer" priority="36" type="PCL:CloudTransformer">
-                                        <param name="inverse">0</param>
-                                </Component>
-                                <Component name="CloudXYZSIFTTransformer" priority="37" type="PCL:CloudTransformer">
-                                        <param name="inverse">0</param>
                                 </Component>
 
                                 <!-- Verification -->
@@ -214,7 +197,7 @@
 <!--            <Source name="ProjectionGrouping.out_homogMatrix">
                 </Source>-->
                 <!-- Detect coordinations -->
-                <Source name="DetectCircles.out_pattern">
+<!--                <Source name="DetectCircles.out_pattern">
                         <sink>SolvePNP.in_object3d</sink>
                 </Source>
                 <Source name="DetectCirclesInv.out_pattern">
@@ -225,7 +208,7 @@
                 </Source>
                 <Source name="SolvePNP.out_homogMatrix">
                         <sink>SolveLocation.in_homogMatrix</sink>
-                </Source>
+                </Source>-->
 
 
                 <Source name="HMProvider.out_homogMatrix">

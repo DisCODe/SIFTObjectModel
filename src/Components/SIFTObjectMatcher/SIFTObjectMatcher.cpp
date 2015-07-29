@@ -327,6 +327,9 @@ void SIFTObjectMatcher::match() {
                 //        out_good_correspondences.write(inliers);
                 std::vector<pcl::CorrespondencesPtr> clustered_corrs_ptr;
                 for(int c = 0; c < clustered_corrs.size(); c++){
+                    for(int j = 0; j < clustered_corrs[c].size(); j++){
+                        cout<<clustered_corrs[c][j].index_query << " " << clustered_corrs[c][j].index_match<<endl;
+                    }
                     pcl::CorrespondencesPtr corrPtr(new pcl::Correspondences());
                     *corrPtr = clustered_corrs[c];
                     clustered_corrs_ptr.push_back(corrPtr);
