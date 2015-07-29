@@ -325,7 +325,17 @@ void SIFTObjectMatcher::match() {
                 out_cloud_xyzsift_model.write(models[i]->cloud_xyzsift);
                 out_correspondences.write(correspondences);//wszystkie dopasowania
                 //        out_good_correspondences.write(inliers);
-                out_clustered_correspondences.write(clustered_corrs);
+                std::vector<pcl::CorrespondencesPtr> clustered_corrs_ptr;
+                for(int c = 0; c < clustered_corrs.size(); c++){
+                    pcl::CorrespondencesPtr corrPtr(new pcl::Correspondences());
+                    *corrPtr = clustered_corrs[c];
+                    clustered_corrs_ptr.push_back(corrPtr);
+
+                }
+                for(int cc = 0; cc < clustered_corrs_ptr.size(); cc++){
+                    cout<< clustered_corrs_ptr[cc]->size()<<endl;
+                }
+                out_clustered_correspondences.write(clustered_corrs_ptr);
 
                 std::vector<Types::HomogMatrix> hm_poses;
                 for (int var = 0; var < poses.size(); ++var) {

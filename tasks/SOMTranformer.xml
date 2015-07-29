@@ -1,0 +1,166 @@
+<?xml version="1.0" ?><Task>
+        <!-- reference task information -->
+        <Reference>
+                <Author>
+                        <name>Michal Laszkowski</name>
+                        <link/>
+                </Author>
+
+                <Description>
+                        <brief>SOM:SOMTransformer</brief>
+                        <full>Transform SOM clouds</full>
+                </Description>
+        </Reference>
+
+        <!-- task definition -->
+        <Subtasks>
+                <Subtask name="Main">
+                        <Executor name="Processing" period="1">
+                                <Component bump="0" name="CameraInfo" priority="11" type="CvCoreTypes:CameraInfoProvider">
+                                        <param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
+                                        <param name="dist_coeffs">0.18126525 -0.39866885 0.00000000 0.00000000 0.00000000</param>
+                                </Component>
+
+                                <!--Sequences-->
+                                <!-- TODO -->
+                                <Component bump="0" name="NextImageTrigger" priority="12" type="CvBasic:Trigger">
+                                </Component>
+                                <Component bump="0" name="SequenceRGB" priority="13" type="CvBasic:Sequence">
+                                        <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect</param>
+                                        <param name="sequence.pattern">.*\_rgb\.png</param>
+                                        <param name="mode.loop">0</param>
+                                        <param name="mode.sort">1</param>
+                                        <param name="mode.auto_next_image">0</param>
+                                </Component>
+
+                                <Component bump="0" name="XYZRGBReader" priority="14" type="PCL:PCDReader">
+                                        <param name="cloud.xyzrgb">1</param>
+                                        <param name="filename">/home/mlaszkow/DCL/TexturedSolidGeneration/data/lipton_1_1_xyzrgb.pcd</param>
+                                </Component>
+                                <Component bump="0" name="XYZSIFTReader" priority="15" type="PCL:PCDReader">
+                                        <param name="cloud.xyzsift">1</param>
+                                        <param name="filename">/home/mlaszkow/DCL/TexturedSolidGeneration/data/lipton_1_1_xyzsift.pcd</param>
+                                </Component>
+
+                                <!-- Detect coordinations -->
+                                <Component name="DetectCircles" priority="21" type="CvBasic:CvFindCirclesGrid">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+                                </Component>
+                                <Component name="DetectCirclesInv" priority="22" type="CvBasic:CvFindCirclesGrid">
+                                        <param name="grid.width">3</param>
+                                        <param name="grid.height">5</param>
+                                        <param name="grid.size">0.06f</param>
+                                        <param name="image.inverse">1</param>
+                                </Component>
+                                <Component name="SolvePNP" priority="23" type="CvBasic:CvSolvePnP">
+                                        <param name="offset.x">0.075</param>
+                                        <param name="offset.y">0.233</param>
+                                        <param name="offset.roll">3.14159265359</param>
+                                </Component>
+                                <Component name="SolvePNPinv" priority="24" type="CvBasic:CvSolvePnP">
+                                        <param name="offset.x">0.075</param>
+                                        <param name="offset.y">-0.113</param>
+                                        <param name="offset.roll">3.14159265359</param>
+                                </Component>
+                                <Component bump="0" name="SolveLocation" priority="25" type="CvBasic:CalcObjectLocation">
+                                </Component>
+
+                                <!-- Transformations -->
+
+                                <Component name="GroundTruthHMSequence" type="CvCoreTypes:HomogenousMatrixSequence" priority="33" bump="0">
+                                        <param name="filename">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect/ground_truth.yml</param>
+                                        <param name="mode.auto_next">0</param>
+                                </Component>
+                                <Component name="GroundTruthCloudXYZRGBTransformer" priority="34" type="PCL:CloudTransformer">
+                                        <param name="inverse">1</param>
+                                </Component>
+                                <Component name="GroundTruthCloudXYZSIFTTransformer" priority="35" type="PCL:CloudTransformer">
+                                        <param name="inverse">1</param>
+                                </Component>
+                                <Component name="CloudXYZRGBTransformer" priority="36" type="PCL:CloudTransformer">
+                                        <param name="inverse">0</param>
+                                </Component>
+                                <Component name="CloudXYZSIFTTransformer" priority="37" type="PCL:CloudTransformer">
+                                        <param name="inverse">0</param>
+                                </Component>
+
+                                <Component name="WriterXYZRGB" type="PCL:PCDWriter" priority="41" bump="0">
+                                        <param name="suffix">0</param>
+                                        <param name="directory">/home/mlaszkow/DCL/TexturedSolidGeneration/data/</param>
+                                        <param name="base_name">lipton_1_1_xyzrgb_view1.pcd</param>
+                                </Component>
+                                <Component name="WriterXYZSIFT" type="PCL:PCDWriter" priority="42" bump="0">
+                                        <param name="suffix">0</param>
+                                        <param name="directory">/home/mlaszkow/DCL/TexturedSolidGeneration/data/</param>
+                                        <param name="base_name">lipton_1_1_xyzsift_view1.pcd</param>
+                                </Component>
+                        </Executor>
+                        <Executor name="Visualization" period="1">
+                                <Component name="CloudViewer" type="PCL:CloudViewer" priority="2" bump="0">
+                                </Component>
+                        </Executor>
+
+            </Subtask>
+
+        </Subtasks>
+
+        <!-- pipes connecting datastreams -->
+        <DataStreams>
+                <Source name="CameraInfo.out_camera_info">
+                        <sink>SolvePNP.in_camera_info</sink>
+                        <sink>SolvePNPinv.in_camera_info</sink>
+                </Source>
+                <Source name="SequenceRGB.out_img">
+                        <sink>DetectCircles.in_img</sink>
+                        <sink>DetectCirclesInv.in_img</sink>
+                </Source>
+                <Source name="XYZRGBReader.out_cloud_xyzrgb">
+                        <sink>GroundTruthCloudXYZRGBTransformer.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="XYZSIFTReader.out_cloud_xyzsift">
+                        <sink>GroundTruthCloudXYZSIFTTransformer.in_cloud_xyzsift</sink>
+                </Source>
+
+                <!--  Detect circles -->
+                <Source name="DetectCircles.out_pattern">
+                        <sink>SolvePNP.in_object3d</sink>
+                </Source>
+                <Source name="DetectCirclesInv.out_pattern">
+                        <sink>SolvePNPinv.in_object3d</sink>
+                </Source>
+                <Source name="SolvePNPinv.out_homogMatrix">
+                        <sink>SolveLocation.in_homogMatrix</sink>
+                </Source>
+                <Source name="SolvePNP.out_homogMatrix">
+                        <sink>SolveLocation.in_homogMatrix</sink>
+                </Source>
+
+                <Source name="SolveLocation.out_homogMatrix">
+                        <sink>CloudXYZRGBTransformer.in_hm</sink>
+                        <sink>CloudXYZSIFTTransformer.in_hm</sink>
+                </Source>
+                <!-- Transformations -->
+                <Source name="GroundTruthHMSequence.out_homogMatrix">
+                        <sink>GroundTruthCloudXYZRGBTransformer.in_hm</sink>
+                        <sink>GroundTruthCloudXYZSIFTTransformer.in_hm</sink>
+                </Source>
+                <Source name="GroundTruthCloudXYZRGBTransformer.out_cloud_xyzrgb">
+                        <sink>CloudXYZRGBTransformer.in_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="GroundTruthCloudXYZSIFTTransformer.out_cloud_xyzsift">
+                        <sink>CloudXYZSIFTTransformer.in_cloud_xyzsift</sink>
+                </Source>
+
+                <Source name="CloudXYZRGBTransformer.out_cloud_xyzrgb">
+                        <sink>WriterXYZRGB.in_cloud_xyzrgb</sink>
+                        <sink>CloudViewer.in_scene_cloud_xyzrgb</sink>
+                </Source>
+                <Source name="CloudXYZSIFTTransformer.out_cloud_xyzsift">
+                        <sink>WriterXYZSIFT.in_cloud_xyzsift</sink>
+                        <sink>CloudViewer.in_scene_cloud_xyzsift</sink>
+                </Source>
+
+        </DataStreams>
+</Task>
