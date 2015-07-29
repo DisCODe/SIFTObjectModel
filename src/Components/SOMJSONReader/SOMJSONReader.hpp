@@ -71,7 +71,7 @@ protected:
 
 
 	/// Output data stream containing vector of model ids.
-	Base::DataStreamOut < std::vector< std::string > > out_model_ids;
+	Base::DataStreamOut < std::vector< std::string > > out_model_labels;
 
 	/// Output data stream containing vector of XYZRGB clouds.
 	Base::DataStreamOut < std::vector< pcl::PointCloud<pcl::PointXYZRGB>::Ptr > > out_model_clouds_xyzrgb;

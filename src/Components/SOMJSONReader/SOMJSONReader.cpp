@@ -48,7 +48,7 @@ SOMJSONReader::~SOMJSONReader() {
 void SOMJSONReader::prepareInterface() {
 	// Register data streams.
 	registerStream("out_models", &out_models);
-	registerStream("out_model_ids", &out_model_ids);
+	registerStream("out_model_labels", &out_model_labels);
 	registerStream("out_model_clouds_xyzrgb", &out_model_clouds_xyzrgb);
 	registerStream("out_model_clouds_xyzsift", &out_model_clouds_xyzsift);
 	registerStream("out_model_corners_xyz", &out_model_corners_xyz);
@@ -107,7 +107,7 @@ void SOMJSONReader::publishModels() {
 	out_models.write(models);
 	
 	// New: dataports containing simple types.
-	out_model_ids.write(model_names);
+	out_model_labels.write(model_names);
 	out_model_clouds_xyzrgb.write(model_clouds_xyzrgb);
 	out_model_clouds_xyzsift.write(model_clouds_xyzsift);
 	out_model_corners_xyz.write(model_corners_xyz);
