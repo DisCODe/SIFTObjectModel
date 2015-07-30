@@ -7,7 +7,7 @@
                 </Author>
 
                 <Description>
-                        <brief>SOM:VerificationTest</brief>
+                        <brief>SOM:VerificationTestVisualization_modeltransformation</brief>
                         <full/>
                 </Description>
         </Reference>
@@ -49,10 +49,7 @@
                                 <Component bump="0" name="FeatureCloudConverter" priority="8" type="SIFTObjectModel:FeatureCloudConverter">
                                 </Component>
 
-                                <Component bump="10" name="SIFTObjectMatcher" priority="9" type="SIFTObjectModel:SIFTObjectMatcher">
-                                    <param name="cg_size">0.005f</param>
-                                    <param name="cg_thresh">8.0f</param>
-                                </Component>
+
                                 <!-- Detect coordinations -->
                                 <Component name="DetectCircles" priority="11" type="CvBasic:CvFindCirclesGrid">
                                         <param name="grid.width">3</param>
@@ -78,7 +75,44 @@
                                 <Component bump="0" name="SolveLocation" priority="15" type="CvBasic:CalcObjectLocation">
                                 </Component>
 
-                                <Component name="HMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="16" bump="0">
+
+
+                                <Component name="GroundTruthHMSequence" type="CvCoreTypes:HomogenousMatrixSequence" priority="21" bump="0">
+                                        <param name="filename">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect/ground_truth.yml</param>
+                                        <param name="mode.auto_next">0</param>
+                                </Component>
+                                <Component name="GroundTruthCloudXYZRGBTransformer" priority="22" type="PCL:CloudTransformer">
+                                        <param name="inverse">1</param>
+                                </Component>
+                                <Component name="GroundTruthCloudXYZSIFTTransformer" priority="23" type="PCL:CloudTransformer">
+                                        <param name="inverse">1</param>
+                                </Component>
+                                <Component name="GroundTruthCornersTransformer" priority="24" type="PCL:CloudTransformer">
+                                        <param name="inverse">1</param>
+                                </Component>
+                                <Component name="CloudXYZRGBTransformer" priority="25" type="PCL:CloudTransformer">
+                                        <param name="inverse">0</param>
+                                </Component>
+                                <Component name="CloudXYZSIFTTransformer" priority="26" type="PCL:CloudTransformer">
+                                        <param name="inverse">0</param>
+                                </Component>
+                                <Component name="CornersTransformer" priority="27" type="PCL:CloudTransformer">
+                                        <param name="inverse">0</param>
+                                </Component>
+
+                                <!-- Recognition -->
+                                <Component name="CorrespondenceEstimation" type="Registration:CorrespondenceEstimation" priority="31" bump="0">
+                                    <param name="rejection.use">0</param>
+                                    <param name="rejection.max_distance">0.01</param>
+                                </Component>
+
+                                <Component bump="10" name="CorrespondenceGrouping" priority="32" type="SORecognition:CorrespondenceGrouping">
+                                    <param name="cluster_grouping.size">0.005f</param>
+                                    <param name="cluster_grouping.threshold">8.0f</param>
+                                </Component>
+
+                                <!--Reprojection error -->
+                                <Component name="HMProvider" type="CvCoreTypes:HomogenousMatrixProvider" priority="36" bump="0">
                                         <param name="offset.x">0</param>
                                         <param name="offset.y">0</param>
                                         <param name="offset.z">0</param>
@@ -86,24 +120,7 @@
                                         <param name="offset.pitch">0</param>
                                         <param name="offset.yaw">0</param>
                                 </Component>
-                                <Component bump="1" name="ReprojectionError" priority="17" type="SIFTObjectModel:ReprojectionError">
-                                </Component>
-
-                                <Component name="GroundTruthHMSequence" type="CvCoreTypes:HomogenousMatrixSequence" priority="33" bump="0">
-                                        <param name="filename">/home/mlaszkow/DCL/Registration/data/2015-05-21/lipton_1_rgbdrainbow_kinect/ground_truth.yml</param>
-                                        <param name="mode.auto_next">0</param>
-                                </Component>
-                                <Component name="GroundTruthCloudXYZRGBTransformer" priority="34" type="PCL:CloudTransformer">
-                                        <param name="inverse">1</param>
-                                </Component>
-                                <Component name="GroundTruthCloudXYZSIFTTransformer" priority="35" type="PCL:CloudTransformer">
-                                        <param name="inverse">1</param>
-                                </Component>
-                                <Component name="CloudXYZRGBTransformer" priority="36" type="PCL:CloudTransformer">
-                                        <param name="inverse">0</param>
-                                </Component>
-                                <Component name="CloudXYZSIFTTransformer" priority="37" type="PCL:CloudTransformer">
-                                        <param name="inverse">0</param>
+                                <Component bump="1" name="ReprojectionError" priority="37" type="SIFTObjectModel:ReprojectionError">
                                 </Component>
 
                                 <!-- Verification -->
@@ -145,8 +162,8 @@
         <!-- pipes connecting datastreams -->
         <DataStreams>
                 <Source name="CameraInfo.out_camera_info">
-<!--                        <sink>SolvePNP.in_camera_info</sink>
-                        <sink>SolvePNPinv.in_camera_info</sink>-->
+                        <sink>SolvePNP.in_camera_info</sink>
+                        <sink>SolvePNPinv.in_camera_info</sink>
                         <sink>Converter.in_camera_info</sink>
                         <sink>FeatureCloudConverter.in_camera_info</sink>
                 </Source>
@@ -154,18 +171,19 @@
                 <Source name="NextImageTrigger.out_trigger">
                         <sink>SequenceRGB.in_next_image_trigger</sink>
                         <sink>SequenceXYZ.in_next_image_trigger</sink>
+                        <sink>GroundTruthHMSequence.in_next_trigger</sink>
                 </Source>
                 <Source name="SequenceRGB.out_img">
                         <sink>SIFT.in_img</sink>
                         <sink>Converter.in_color</sink>
-<!--                        <sink>DetectCircles.in_img</sink>
-                        <sink>DetectCirclesInv.in_img</sink>-->
+                        <sink>DetectCircles.in_img</sink>
+                        <sink>DetectCirclesInv.in_img</sink>
                 </Source>
                 <Source name="SequenceXYZ.out_img">
                         <sink>Converter.in_depth</sink> <!--_xyz-->
                         <sink>FeatureCloudConverter.in_depth</sink>
                 </Source>
-                <!--Proccesing-->
+                <!--Scene clouds generation-->
                 <Source name="SIFT.out_descriptors">
                         <sink>FeatureCloudConverter.in_descriptors</sink>
                 </Source>
@@ -173,46 +191,30 @@
                         <sink>FeatureCloudConverter.in_features</sink>
                 </Source>
                 <Source name="Converter.out_cloud_xyzrgb">
-                        <sink>SIFTObjectMatcher.in_cloud_xyzrgb</sink>
-                </Source>
-                <Source name="FeatureCloudConverter.out_cloud_xyzsift">
-                        <sink>SIFTObjectMatcher.in_cloud_xyzsift</sink>
-                </Source>
-                <!--Read model-->
-                <Source name="SOMJSONReader.out_models">
-                        <sink>SIFTObjectMatcher.in_models</sink>
-                </Source>
-
-                <!-- SIFTObjectMatcher -->
-                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb">
+                        <sink>CorrespondenceGrouping.in_cloud_xyzrgb</sink>
                         <sink>Projection.in_cloud_xyzrgb_scene</sink>
                         <sink>CloudViewer.in_scene_cloud_xyzrgb</sink>
                 </Source>
-                <Source name="SIFTObjectMatcher.out_cloud_xyzrgb_model">
-                        <sink>Projection.in_cloud_xyzrgb_model</sink>
-                </Source>
-                <Source name="SIFTObjectMatcher.out_cloud_xyzsift">
+                <Source name="FeatureCloudConverter.out_cloud_xyzsift">
+                        <sink>CorrespondenceEstimation.in_scene_cloud_xyzsift</sink>
+                        <sink>CorrespondenceGrouping.in_cloud_xyzsift</sink>
                         <sink>ProjectionSIFT.in_cloud_xyzsift_scene</sink>
                         <sink>CloudViewer.in_scene_cloud_xyzsift</sink>
                 </Source>
-                <Source name="SIFTObjectMatcher.out_cloud_xyzsift_model">
-                        <sink>ProjectionSIFT.in_cloud_xyzsift_model</sink>
+                <!--Read model-->
+                <Source name="SOMJSONReader.out_model_clouds_xyzrgb">
+                        <sink>GroundTruthCloudXYZRGBTransformer.in_clouds_xyzrgb</sink>
+                </Source>
+                <Source name="SOMJSONReader.out_model_clouds_xyzsift">
+                        <sink>GroundTruthCloudXYZSIFTTransformer.in_clouds_xyzsift</sink>
+                </Source>
+                <Source name="SOMJSONReader.out_model_corners_xyz">
+                        <sink>GroundTruthCornersTransformer.in_clouds_xyz</sink>
+                </Source>
+                <Source name="SOMJSONReader.out_model_labels">
+                        <sink>CorrespondenceGrouping.in_model_labels</sink>
                 </Source>
 
-                <Source name="SIFTObjectMatcher.out_rototranslations">
-                        <sink>Projection.in_rototranslations</sink>
-                        <sink>ProjectionSIFT.in_rototranslations</sink>
-                        <sink>ReprojectionError.in_rototranslations</sink>
-                </Source>
-
-                <Source name="SIFTObjectMatcher.out_clustered_correspondences">
-                        <sink>CloudViewer.in_models_scene_correspondences</sink>
-                </Source>
-
-
-
-<!--            <Source name="ProjectionGrouping.out_homogMatrix">
-                </Source>-->
                 <!-- Detect coordinations -->
                 <Source name="DetectCircles.out_pattern">
                         <sink>SolvePNP.in_object3d</sink>
@@ -226,6 +228,70 @@
                 <Source name="SolvePNP.out_homogMatrix">
                         <sink>SolveLocation.in_homogMatrix</sink>
                 </Source>
+                <Source name="SolveLocation.out_homogMatrix">
+                        <sink>CloudXYZRGBTransformer.in_hm</sink>
+                        <sink>CloudXYZSIFTTransformer.in_hm</sink>
+                        <sink>CornersTransformer.in_hm</sink>
+                </Source>
+
+
+                <!-- Models Transformation -->
+                <Source name="GroundTruthHMSequence.out_homogMatrix">
+                        <sink>GroundTruthCloudXYZRGBTransformer.in_hm</sink>
+                        <sink>GroundTruthCloudXYZSIFTTransformer.in_hm</sink>
+                        <sink>GroundTruthCornersTransformer.in_hm</sink>
+                </Source>
+                <Source name="GroundTruthCloudXYZRGBTransformer.out_clouds_xyzrgb">
+                        <sink>CloudXYZRGBTransformer.in_clouds_xyzrgb</sink>
+                </Source>
+                <Source name="GroundTruthCloudXYZSIFTTransformer.out_clouds_xyzsift">
+                        <sink>CloudXYZSIFTTransformer.in_clouds_xyzsift</sink>
+                </Source>
+                <Source name="GroundTruthCornersTransformer.out_clouds_xyz">
+                        <sink>CornersTransformer.in_clouds_xyz</sink>
+                </Source>
+                <Source name="CloudXYZRGBTransformer.out_clouds_xyzrgb">
+                        <sink>CorrespondenceGrouping.in_model_clouds_xyzrgb</sink>
+                </Source>
+                <Source name="CloudXYZSIFTTransformer.out_clouds_xyzsift">
+                        <sink>CorrespondenceEstimation.in_model_clouds_xyzsift</sink>
+                        <sink>CorrespondenceGrouping.in_model_clouds_xyzsift</sink>
+                </Source>
+                <Source name="CornersTransformer.out_clouds_xyz">
+                        <sink>CorrespondenceGrouping.in_model_corners_xyz</sink>
+                </Source>
+
+
+                <!-- Recognition -->
+                <Source name="CorrespondenceEstimation.out_models_scene_correspondences">
+                        <sink>CorrespondenceGrouping.in_models_scene_correspondences</sink>
+                </Source>
+
+                <Source name="CorrespondenceGrouping.out_cluster_clouds_xyzrgb">
+                        <sink>Projection.in_model_clouds_xyzrgb</sink>
+                </Source>
+
+                <Source name="CorrespondenceGrouping.out_cluster_clouds_xyzsift">
+                        <sink>ProjectionSIFT.in_model_clouds_xyzsift</sink>
+                </Source>
+
+                <Source name="CorrespondenceGrouping.out_cluster_poses">
+                        <sink>Projection.in_poses</sink>
+                        <sink>ProjectionSIFT.in_poses</sink>
+                        <sink>ReprojectionError.in_rototranslations</sink>
+                </Source>
+
+                <Source name="CorrespondenceGrouping.out_clusters_scene_correspondences">
+                        <sink>CloudViewer.in_objects_scene_correspondences</sink>
+                </Source>
+
+                <Source name="CorrespondenceGrouping.out_cluster_labels">
+                        <sink>CloudViewer.in_object_labels</sink>
+                </Source>
+
+                <Source name="CorrespondenceGrouping.out_cluster_corners_xyz">
+                        <sink>CloudViewer.in_object_corners_xyz</sink>
+                </Source>
 
 
                 <Source name="HMProvider.out_homogMatrix">
@@ -237,11 +303,11 @@
                         <sink>GreedyVerification.in_aligned_hypotheses_xyzrgb</sink>
                         <sink>ConflictGraph.in_aligned_hypotheses_xyzrgb</sink>
                         <sink>GlobalHypothesesVerification.in_aligned_hypotheses_xyzrgb</sink>
-                        <sink>CloudViewer.in_om_clouds_xyzrgb</sink>
+                        <sink>CloudViewer.in_object_clouds_xyzrgb</sink>
                 </Source>
 
                 <Source name="ProjectionSIFT.out_registered_instances_xyzsift">
-                        <sink>CloudViewer.in_om_clouds_xyzsift</sink>
+                        <sink>CloudViewer.in_object_clouds_xyzsift</sink>
                 </Source>
 
                 <Source name="Projection.out_parts_of_scene_xyzrgb">
