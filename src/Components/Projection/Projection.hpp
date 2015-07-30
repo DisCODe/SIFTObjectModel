@@ -82,12 +82,17 @@ protected:
     Base::DataStreamIn<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> in_cloud_xyzrgb_model;
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift_scene;
 	Base::DataStreamIn<pcl::PointCloud<PointXYZSIFT>::Ptr> in_cloud_xyzsift_model;
-    Base::DataStreamIn<std::vector<Types::HomogMatrix> > in_rototranslations;
+    Base::DataStreamIn<std::vector<Types::HomogMatrix> > in_poses;
+    Base::DataStreamIn<vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> > in_model_clouds_xyz;
+    Base::DataStreamIn<vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> > in_model_clouds_xyzrgb;
+    Base::DataStreamIn<vector<pcl::PointCloud<PointXYZSIFT>::Ptr> > in_model_clouds_xyzsift;
 
 	// Output data streams
     Base::DataStreamOut<std::vector<pcl::PointCloud<PointXYZSIFT>::ConstPtr> > out_registered_instances_xyzsift;
     Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> > out_registered_instances_xyzrgb;
+    Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZ>::Ptr> out_parts_of_scene_xyz;
     Base::DataStreamOut<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> out_parts_of_scene_xyzrgb;
+    Base::DataStreamOut<pcl::PointCloud<PointXYZSIFT>::Ptr> out_parts_of_scene_xyzsift;
     Base::DataStreamOut<std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> > out_registered_instances_xyz;
 
 	// Properties
@@ -101,6 +106,9 @@ protected:
     void project();
     void project_xyzrgb();
     void project_xyzsift();
+    void project_models_xyz();
+    void project_models_xyzrgb();
+    void project_models_xyzsift();
 
 };
 
