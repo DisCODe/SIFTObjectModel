@@ -24,20 +24,20 @@
                                 </Component>
                                 <!--Sequences-->
                                 <Component bump="0" name="SOMJSONReader" priority="2" type="SIFTObjectModel:SOMJSONReader">
-                                    <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/lipton_2_1.json</param>
+                                    <param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/herbapol_mieta1.json</param>
                                 </Component>
                                 <Component bump="0" name="NextImageTrigger" priority="3" type="CvBasic:Trigger">
                                         <param name="auto_trigger">0</param>
                                 </Component>
                                 <Component bump="0" name="SequenceRGB" priority="4" type="CvBasic:Sequence">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-06-11/lipton_2/kinect</param>
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta_co2</param>
                                     <param name="sequence.pattern">.*\_rgb\.png</param>
                                     <param name="mode.loop">0</param>
                                     <param name="mode.sort">1</param>
                                     <param name="mode.auto_next_image">0</param>
                                 </Component>
                                 <Component bump="0" name="SequenceXYZ" priority="5" type="CvBasic:Sequence">
-                                    <param name="sequence.directory">/home/mlaszkow/DCL/Registration/data/2015-06-11/lipton_2/kinect</param>
+                                    <param name="sequence.directory">/home/mlaszkow/DCL/ecovi/data/herbapol_mieta_co2</param>
                                     <param name="sequence.pattern">.*\_depth\.png</param>
                                     <param name="mode.loop">0</param>
                                     <param name="mode.sort">1</param>
@@ -166,10 +166,10 @@
                         <sink>CloudViewer.in_cloud_xyzrgb</sink>
                 </Source>
                 <Source name="SOMJSONReader.out_model_clouds_xyzrgb">
-                        <sink>CloudViewer.in_om_clouds_xyzrgb</sink>
+                        <sink>CloudViewer.in_object_clouds_xyzrgb</sink>
                 </Source>
                 <Source name="SOMJSONReader.out_model_corners_xyz">
-                        <sink>CloudViewer.in_om_corners_xyz</sink>
+                        <sink>CloudViewer.in_object_corners_xyz</sink>
                 </Source>
 
         </DataStreams>
