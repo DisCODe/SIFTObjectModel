@@ -71,7 +71,7 @@ protected:
 
 
 	/// Output data stream containing vector of model ids.
-	Base::DataStreamOut < std::vector< std::string > > out_model_labels;
+	Base::DataStreamOut < std::vector< std::string > > out_model_names;
 
 	/// Output data stream containing vector of XYZRGB clouds.
 	Base::DataStreamOut < std::vector< pcl::PointCloud<pcl::PointXYZRGB>::Ptr > > out_model_clouds_xyzrgb;
@@ -79,9 +79,14 @@ protected:
 	/// Output data stream containing vector of XYZSIFT clouds.
 	Base::DataStreamOut < std::vector< pcl::PointCloud<PointXYZSIFT>::Ptr > > out_model_clouds_xyzsift;
 
-	/// Output data stream containing vector of model corners (each being a cloud containing 8 XYZ points).
-	Base::DataStreamOut < std::vector< pcl::PointCloud<pcl::PointXYZ>::Ptr > > out_model_corners_xyz;
+	/// Output data stream containing vector of model vertices (used by polygons and boundingboxes).
+	Base::DataStreamOut < std::vector< pcl::PointCloud<pcl::PointXYZ>::Ptr > > out_model_vertices_xyz;
 
+	/// Output data stream containing vector of models meshes - build on top of vertices.
+	Base::DataStreamOut <std::vector< std::vector<pcl::Vertices> > > out_model_triangles;
+
+	/// Output data stream containing vector of models bounding boxes - build on top of vertices.
+	Base::DataStreamOut <std::vector<std::vector<pcl::Vertices> > > out_model_bounding_boxes;
 
 	/// Property: loads models from files at init.
 	Base::Property<bool> prop_load_on_init;
@@ -89,6 +94,14 @@ protected:
 	/// Property: list of the files containing models to be read.
 	Base::Property<std::string> prop_filenames;
 
+	/// Adds xyz point to refered point cloud.
+	void addPointToCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr & cloud_xyz_, double x_, double y_, double z_);
+
+	/// Adds triangle to refered polygon list.
+	void addTriangleToList(std::vector< ::pcl::Vertices> & triangles_, int index_0, int index_1, int index_2);
+
+	/// Adds triangle to refered polygon list.
+	void addLineToList(std::vector< ::pcl::Vertices> & lines_, int index_0, int index_1);
 
 	/// Load models from files.
 	void loadModels();
@@ -129,7 +142,13 @@ protected:
 	std::vector<pcl::PointCloud<PointXYZSIFT>::Ptr> model_clouds_xyzsift;
 
 	/// Vector of model corners (each being a cloud containing 8 XYZ points).
-	std::vector< pcl::PointCloud<pcl::PointXYZ>::Ptr> model_corners_xyz;
+	std::vector< pcl::PointCloud<pcl::PointXYZ>::Ptr> model_vertices_xyz;
+
+	/// Vector of models meshes - build on top of vertices.
+	std::vector<std::vector<pcl::Vertices> > model_triangles;
+
+	/// Vector of models bounding boces - build on top of vertices.
+	std::vector<std::vector<pcl::Vertices> > model_bounding_boxes;
 
 };
 

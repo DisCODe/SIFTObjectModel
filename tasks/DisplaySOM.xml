@@ -19,18 +19,16 @@
 			<Executor name="Processing"  period="0.1">
 
 				<Component name="SOMJSONReader" type="SIFTObjectModel:SOMJSONReader" priority="1" bump="0">
-                    <!--<param name="filenames">/home/discode/models/scena/scena_fragment1.json</param>-->
-                    <param name="filenames">/home/discode/14.06.13objects/modeleLUM/kakao_bez_IPC/models.json</param>
+					<param name="filenames">/home/mlaszkow/DCL/TexturedSolidGeneration/data/ahmad1.json</param>
+					<!--<param name="filenames">/home/discode/models/scena/scena_fragment1.json</param>-->
+<!--                    <param name="filenames">/home/discode/14.06.13objects/modeleLUM/kakao_bez_IPC/models.json</param>-->
 					<!--<param name="filenames">/home/discode/cuboids/models/gigabyte.json</param>-->
 				</Component>
 
-				<Component name="SOMs2PC" type="SIFTObjectModel:SOMs2PC" priority="2" bump="0">
-                    <param name="model_number">0</param>
-				</Component>
             </Executor>
 
 			<Executor name="Visualization" period="0.1">
-				<Component name="Window" type="PCL:CloudViewer" priority="1" bump="0">
+				<Component name="Viewer" type="PCL:CloudViewer" priority="100" bump="0">
 				</Component>
             </Executor>
 
@@ -40,17 +38,27 @@
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
 
-		<Source name="SOMJSONReader.out_models">
-			<sink>SOMs2PC.in_models</sink>
-		</Source>
+			<!--Models-->
 
-		<Source name="SOMs2PC.out_cloud_xyzrgb">
-			<sink>Window.in_cloud_xyzrgb</sink>
-		</Source>
-		
-		<Source name="SOMs2PC.out_cloud_xyzsift">
-			<sink>Window.in_cloud_xyzsift</sink>
-		</Source>
-			
+			<Source name="SOMJSONReader.out_model_clouds_xyzrgb">
+					<sink>Viewer.in_object_clouds_xyzrgb</sink>
+			</Source>
+
+			<Source name="SOMJSONReader.out_model_clouds_xyzsift">
+					<sink>Viewer.in_object_clouds_xyzsift</sink>
+			</Source>
+
+			<Source name="SOMJSONReader.out_model_vertices_xyz">
+					<sink>Viewer.in_object_vertices_xyz</sink>
+			</Source>
+
+			<Source name="SOMJSONReader.out_model_triangles">
+					<sink>Viewer.in_object_triangles</sink>
+			</Source>
+
+			<Source name="SOMJSONReader.out_model_bounding_boxes">
+					<sink>Viewer.in_object_bounding_boxes</sink>
+			</Source>
+
 	</DataStreams>
 </Task>
